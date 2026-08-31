@@ -85,7 +85,8 @@ export interface IServiceStage {
 }
 
 export interface Project {
-  id: string;
+  _id?: string;
+  id?: string;
   projectNumber: string;
   name: string;
   company?: string;
