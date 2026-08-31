@@ -32,7 +32,8 @@ import {
   FileText,
   UserCheck,
   UserMinus,
-  Briefcase
+  Briefcase,
+  Link2
 } from 'lucide-react';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import FiltersPanel from '@/components/dashboard/FiltersPanel';
@@ -931,6 +932,21 @@ export default function DashboardPage() {
 
           {/* Right Controls: Search, Filters drawer trigger, create project */}
           <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* Copy Payment Link Rounded Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const url = typeof window !== 'undefined' ? `${window.location.origin}/payment` : 'https://arjun-f-ilms.vercel.app/payment';
+                navigator.clipboard.writeText(url);
+                toast.success('Payment portal link copied to clipboard!');
+              }}
+              className="flex items-center gap-2 px-4 py-3 bg-[#e2eaf4]/70 hover:bg-[#d5e3f5] dark:bg-[#16181c] dark:hover:bg-gray-800 text-[#0066fe] dark:text-[#8efa1d] rounded-full border border-[#dae3ed]/60 dark:border-gray-800/60 text-[12.5px] font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 group"
+              title="Copy Client Payment Gateway Link"
+            >
+              <Link2 className="w-4 h-4 text-[#0066fe] dark:text-[#8efa1d] group-hover:rotate-45 transition-transform" />
+              <span className="hidden sm:inline">Copy Payment Link</span>
+            </button>
+
             {/* Search clients */}
             <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#e2eaf4]/60 dark:bg-[#16181c] rounded-2xl border border-[#dae3ed]/40 dark:border-gray-800/40 w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-750 transition-all shadow-sm">
               <Search className="text-gray-455 w-[18px] h-[18px] mr-2.5 shrink-0" />
