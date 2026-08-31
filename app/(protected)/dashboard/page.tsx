@@ -37,6 +37,7 @@ import {
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import FiltersPanel from '@/components/dashboard/FiltersPanel';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
+import CalendarView from './components/CalendarView';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from '@/store/uiStore';
@@ -674,91 +675,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Cash Flow Bar Chart */}
+          {/* Shoot Calendar View */}
           <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 relative">
-            <div className="flex justify-between items-center">
-              <div>
-                <h4 className="text-[15px] font-extrabold text-gray-800 dark:text-white">Cash Flow</h4>
-                <h2 className="text-[26px] font-black text-[#1a1c22] dark:text-white mt-1.5">
-                  ₹{totalProjectContractsValue.toLocaleString('en-IN')}
-                </h2>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                {/* Year Select dropdown */}
-                <button className="flex items-center gap-1.5 px-4 py-2 bg-[#f0f4fa] dark:bg-gray-800/40 border border-gray-200/65 dark:border-gray-800 text-[11px] font-bold text-gray-600 dark:text-gray-300 rounded-xl cursor-pointer">
-                  Yearly
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Legend indicators */}
-            <div className="flex items-center gap-4 mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800/40 pb-4">
-              <span className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${theme === 'dark' ? 'bg-[#8efa1d]' : 'bg-[#0066fe]'}`} />
-                Income
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
-                Expense
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
-                Savings
-              </span>
-            </div>
-
-            {/* Columns chart canvas */}
-            <div className="h-48 flex items-end justify-between pt-10 px-2 relative mt-4">
-              {/* Tooltip over active month bar */}
-              <div 
-                className="absolute bg-[#0a0b0d] border border-gray-855 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-xl shadow-2xl z-20 pointer-events-none transition-all duration-300"
-                style={{ bottom: '155px', left: `${5.2 + currentMonthIdx * 8.0}%` }}
-              >
-                ₹{monthlyRevenue[currentMonthIdx].toLocaleString('en-IN')}
-              </div>
-
-              {/* Monthly columns values array */}
-              {[
-                { m: 'Jan', val: monthlyRevenue[0] },
-                { m: 'Feb', val: monthlyRevenue[1] },
-                { m: 'Mar', val: monthlyRevenue[2] },
-                { m: 'Apr', val: monthlyRevenue[3] },
-                { m: 'May', val: monthlyRevenue[4] },
-                { m: 'Jun', val: monthlyRevenue[5] },
-                { m: 'Jul', val: monthlyRevenue[6] },
-                { m: 'Aug', val: monthlyRevenue[7] },
-                { m: 'Sep', val: monthlyRevenue[8] },
-                { m: 'Oct', val: monthlyRevenue[9] },
-                { m: 'Nov', val: monthlyRevenue[10] },
-                { m: 'Dec', val: monthlyRevenue[11] },
-              ].map((bar, i) => {
-                const isActive = i === currentMonthIdx;
-                // Calculate height percentage dynamically
-                const heightPercent = Math.min(90, Math.max(10, (bar.val / maxRevenueVal) * 90));
-                
-                return (
-                  <div key={i} className="flex flex-col items-center flex-1 group">
-                    <div className="w-full flex justify-center h-36 items-end">
-                      <div 
-                        className={`w-6 rounded-t-lg transition-all duration-300 ${
-                          isActive 
-                            ? theme === 'dark'
-                              ? 'bg-gradient-to-t from-[#8efa1d]/20 to-[#8efa1d] shadow-lg shadow-[#8efa1d]/20 scale-105'
-                              : 'bg-gradient-to-t from-[#0066fe]/20 to-[#0066fe] shadow-lg shadow-[#0066fe]/20 scale-105' 
-                            : 'bg-[#f0f4fa] dark:bg-[#24272c] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer'
-                        }`}
-                        style={{ height: `${heightPercent}%` }}
-                        title={`${bar.m}: ₹${bar.val.toLocaleString('en-IN')}`}
-                      />
-                    </div>
-                    <span className="text-[10px] font-extrabold text-gray-400 dark:text-gray-500 uppercase mt-3 tracking-wider">{bar.m}</span>
-                  </div>
-                );
-              })}
-            </div>
-
+            <CalendarView projects={projects} />
           </div>
 
         </div>
@@ -846,6 +765,85 @@ export default function DashboardPage() {
             >
               Transfer
             </button>
+          </div>
+
+          {/* Cash Flow Bar Chart Under Visa Card */}
+          <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 relative">
+            <div className="flex justify-between items-center">
+              <div>
+                <h4 className="text-[14px] font-extrabold text-gray-800 dark:text-white">Cash Flow</h4>
+                <h2 className="text-[22px] font-black text-[#1a1c22] dark:text-white mt-1">
+                  ₹{totalProjectContractsValue.toLocaleString('en-IN')}
+                </h2>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-[#f0f4fa] dark:bg-gray-800/40 border border-gray-200/65 dark:border-gray-800 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded-xl">
+                  Yearly
+                </span>
+              </div>
+            </div>
+
+            {/* Legend indicators */}
+            <div className="flex items-center gap-3 mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800/40 pb-3">
+              <span className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${theme === 'dark' ? 'bg-[#8efa1d]' : 'bg-[#0066fe]'}`} />
+                Income
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
+                Expense
+              </span>
+            </div>
+
+            {/* Columns chart canvas */}
+            <div className="h-40 flex items-end justify-between pt-8 px-1 relative mt-2">
+              {/* Tooltip over active month bar */}
+              <div 
+                className="absolute bg-[#0a0b0d] border border-gray-800 text-white text-[9px] font-extrabold px-2.5 py-1 rounded-lg shadow-2xl z-20 pointer-events-none transition-all duration-300"
+                style={{ bottom: '130px', left: `${3 + currentMonthIdx * 8.0}%` }}
+              >
+                ₹{monthlyRevenue[currentMonthIdx].toLocaleString('en-IN')}
+              </div>
+
+              {/* Monthly columns values array */}
+              {[
+                { m: 'Jan', val: monthlyRevenue[0] },
+                { m: 'Feb', val: monthlyRevenue[1] },
+                { m: 'Mar', val: monthlyRevenue[2] },
+                { m: 'Apr', val: monthlyRevenue[3] },
+                { m: 'May', val: monthlyRevenue[4] },
+                { m: 'Jun', val: monthlyRevenue[5] },
+                { m: 'Jul', val: monthlyRevenue[6] },
+                { m: 'Aug', val: monthlyRevenue[7] },
+                { m: 'Sep', val: monthlyRevenue[8] },
+                { m: 'Oct', val: monthlyRevenue[9] },
+                { m: 'Nov', val: monthlyRevenue[10] },
+                { m: 'Dec', val: monthlyRevenue[11] },
+              ].map((bar, i) => {
+                const isActive = i === currentMonthIdx;
+                const heightPercent = Math.min(90, Math.max(10, (bar.val / maxRevenueVal) * 90));
+                
+                return (
+                  <div key={i} className="flex flex-col items-center flex-1 group">
+                    <div className="w-full flex justify-center h-28 items-end">
+                      <div 
+                        className={`w-3.5 sm:w-4.5 rounded-t-md transition-all duration-300 ${
+                          isActive 
+                            ? theme === 'dark'
+                              ? 'bg-gradient-to-t from-[#8efa1d]/20 to-[#8efa1d] shadow-md shadow-[#8efa1d]/20 scale-105'
+                              : 'bg-gradient-to-t from-[#0066fe]/20 to-[#0066fe] shadow-md shadow-[#0066fe]/20 scale-105' 
+                            : 'bg-[#f0f4fa] dark:bg-[#24272c] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer'
+                        }`}
+                        style={{ height: `${heightPercent}%` }}
+                        title={`${bar.m}: ₹${bar.val.toLocaleString('en-IN')}`}
+                      />
+                    </div>
+                    <span className="text-[9px] font-extrabold text-gray-400 dark:text-gray-500 uppercase mt-2 tracking-wider">{bar.m}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Quick actions box */}
