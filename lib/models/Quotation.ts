@@ -23,6 +23,7 @@ export interface IQuotation extends Document {
   createdAt: Date;
   updatedAt: Date;
   projectId?: string;
+  templateId?: string;
 }
 
 const ServiceItemSchema = new Schema({
@@ -48,6 +49,7 @@ const QuotationSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   projectId: { type: Schema.Types.ObjectId, ref: 'Project' },
+  templateId: { type: String, default: 'invoice1' },
 });
 
 delete mongoose.models.Quotation;

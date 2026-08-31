@@ -20,6 +20,7 @@ interface TemplateConfig {
   footerBgColor: string;
   watermarkUrl: string;
   watermarkOpacity: number;
+  defaultTemplateId?: string;
 }
 
 const DEFAULT_TEMPLATE: TemplateConfig = {
@@ -42,7 +43,8 @@ const DEFAULT_TEMPLATE: TemplateConfig = {
   headerBgColor: "#fef2f2",
   footerBgColor: "#e50914",
   watermarkUrl: "/logo.jpeg",
-  watermarkOpacity: 0.08
+  watermarkOpacity: 0.08,
+  defaultTemplateId: "invoice1"
 };
 
 interface QuotationTemplateDrawerProps {
@@ -66,7 +68,9 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
           if (!parsed.pageBgColor) parsed.pageBgColor = DEFAULT_TEMPLATE.pageBgColor;
           if (!parsed.headerBgColor) parsed.headerBgColor = DEFAULT_TEMPLATE.headerBgColor;
           if (!parsed.footerBgColor) parsed.footerBgColor = DEFAULT_TEMPLATE.footerBgColor;
-          if (parsed.watermarkUrl === undefined) parsed.watermarkUrl = DEFAULT_TEMPLATE.watermarkUrl;
+          if (!parsed.watermarkUrl || parsed.watermarkUrl.includes('flaticon.com') || parsed.watermarkUrl.includes('685655')) {
+            parsed.watermarkUrl = DEFAULT_TEMPLATE.watermarkUrl;
+          }
           if (parsed.watermarkOpacity === undefined) parsed.watermarkOpacity = DEFAULT_TEMPLATE.watermarkOpacity;
 
           setConfig(parsed);
@@ -166,6 +170,40 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
           {/* Form Scrollable Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar text-[13px]">
             
+            {/* Default Template Choice */}
+            <div className="space-y-3">
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Default Invoice / Proposal Layout</h3>
+              <p className="text-[11px] text-gray-400 font-semibold mb-3">Choose the default visual design used across all new proposals and PDF downloads.</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div 
+                  onClick={() => setConfig({ ...config, defaultTemplateId: 'invoice1' })}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    (config.defaultTemplateId || 'invoice1') === 'invoice1'
+                      ? 'border-[#e50914] bg-[#fee2e2]/40 dark:bg-red-950/20'
+                      : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1c1f24]'
+                  }`}
+                >
+                  <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Template 1</div>
+                  <div className="text-[10px] font-extrabold text-[#e50914] mt-0.5">Neat Minimal Studio</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Reference editorial layout with circular logo & cursive thank you.</div>
+                </div>
+
+                <div 
+                  onClick={() => setConfig({ ...config, defaultTemplateId: 'classic' })}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    config.defaultTemplateId === 'classic'
+                      ? 'border-[#e50914] bg-[#fee2e2]/40 dark:bg-red-950/20'
+                      : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1c1f24]'
+                  }`}
+                >
+                  <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Template 2</div>
+                  <div className="text-[10px] font-extrabold text-[#e50914] mt-0.5">Modern Bento Cards</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Structured bento cards with 50/30/20 payment milestones.</div>
+                </div>
+              </div>
+            </div>
+
             {/* Drag and Drop Sections Order */}
             <div className="space-y-3">
               <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Drag & Drop Section Layout</h3>

@@ -32,6 +32,7 @@ export interface Quotation {
   createdAt: string;
   updatedAt: string;
   projectId?: string;
+  templateId?: string;
 }
 
 export type PaymentMethod = 'UPI QR' | 'UPI ID' | 'Bank Transfer';

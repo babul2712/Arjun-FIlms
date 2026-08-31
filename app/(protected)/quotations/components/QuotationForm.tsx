@@ -9,14 +9,20 @@ import {
   Trash2, 
   Eye,
   Printer,
-  Link as LinkIcon
+  Link as LinkIcon,
+  LayoutTemplate,
+  CheckCircle2,
+  Sparkles,
+  FileText
 } from 'lucide-react';
 import { createQuotation, updateQuotation, getEventTypes, createEventType, getProjects } from '@/app/actions';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { AVAILABLE_TEMPLATES, generateQuotationHTML } from '@/lib/quotationTemplates';
 
 export default function QuotationForm({ initialData, quotationId, projectId }: { initialData?: any, quotationId?: string, projectId?: string }) {
   const router = useRouter();
+  const [selectedTemplate, setSelectedTemplate] = useState<string>(initialData?.templateId || 'invoice1');
   const [formData, setFormData] = useState({
     customerName: initialData?.customerName || '',
     phone: initialData?.phone || '',
@@ -71,13 +77,14 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
         try {
           const parsed = JSON.parse(saved);
           
-          // Backwards compatibility fallbacks
           if (!parsed.sectionsOrder) parsed.sectionsOrder = ['header', 'client', 'services', 'payment', 'terms', 'footer'];
           if (!parsed.pageBgColor) parsed.pageBgColor = "#fdf6f6";
           if (!parsed.headerBgColor) parsed.headerBgColor = "#fef2f2";
           if (!parsed.footerBgColor) parsed.footerBgColor = parsed.accentColor || "#e50914";
-          if (parsed.watermarkUrl === undefined) parsed.watermarkUrl = "https://cdn-icons-png.flaticon.com/512/685/685655.png";
-          if (parsed.watermarkOpacity === undefined) parsed.watermarkOpacity = 0.05;
+          if (!parsed.watermarkUrl || parsed.watermarkUrl.includes('flaticon.com') || parsed.watermarkUrl.includes('685655')) {
+            parsed.watermarkUrl = "/logo.jpeg";
+          }
+          if (parsed.watermarkOpacity === undefined) parsed.watermarkOpacity = 0.08;
 
           setTemplateConfig(parsed);
         } catch (e) {
@@ -116,9 +123,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       }
 
       if (quotationId) {
-        await updateQuotation(quotationId, { ...formData, eventType: finalEventType, services, subTotal, grandTotal, projectId: selectedProjectId || undefined });
+        await updateQuotation(quotationId, { ...formData, eventType: finalEventType, services, subTotal, grandTotal, projectId: selectedProjectId || undefined, templateId: selectedTemplate });
       } else {
-        await createQuotation({ ...formData, eventType: finalEventType, services, subTotal, grandTotal, projectId: selectedProjectId || undefined });
+        await createQuotation({ ...formData, eventType: finalEventType, services, subTotal, grandTotal, projectId: selectedProjectId || undefined, templateId: selectedTemplate });
       }
       return true;
     } catch (e) {
@@ -187,169 +194,24 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
   };
 
   const generateHTML = () => {
-    const servicesHtml = services.map((s: any) => {
-      const details = (s.description || '')
-        .split(/\r\n|\n|\r/)
-        .filter((line: string) => line.trim())
-        .map((line: string) => `<div style="font-size:11px; color:#555; margin-top:2px;">${line.trim()}</div>`)
-        .join('');
-      return `
-      <tr>
-        <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
-          <h4 style="margin:0 0 4px; font-size:15px; color:${templateConfig.accentColor};">${s.name || 'Service Item'}</h4>
-          ${details}
-        </td>
-        <td style="text-align:center; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">${s.quantity}</td>
-        <td style="text-align:right; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">₹${s.price.toLocaleString()}</td>
-      </tr>
-      `;
-    }).join('');
-
-    const termsHtml = (templateConfig.terms || []).map((term: string) => `
-      <li>${term}</li>
-    `).join('');
-
-    // HTML Sections definitions
-    const headerHtml = `
-      <div class="header">
-      <div>
-      <h1>${templateConfig.studioName}</h1>
-      <p>Ph: ${templateConfig.phone}</p>
-      <p>Mail: ${templateConfig.email}</p>
-      <p>${templateConfig.address}</p>
-      </div>
-      <div style="text-align:right">
-      <p style="color:${templateConfig.accentColor};"><b>Quotation No:</b> ${quotationId ? quotationId.slice(-4) : Date.now().toString().slice(-4)}</p>
-      <p style="color:${templateConfig.accentColor};"><b>Invoice Date:</b> ${new Date().toLocaleDateString()}</p>
-      <p style="color:${templateConfig.accentColor};"><b>Booking Date:</b> ${formData.bookingDate ? new Date(formData.bookingDate).toLocaleDateString() : 'TBD'}</p>
-      </div>
-      </div>
-    `;
-
-    const clientHtml = `
-      <div class="card">
-      <h3>Quotation For</h3>
-      <p style="margin:0;line-height:1.5;"><b>${formData.customerName || 'Client Name'}</b><br>Phone: ${formData.phone || '__________'}<br>Mail: ${formData.email || '__________'}<br>Address: ${formData.location || '__________'}</p>
-      </div>
-    `;
-
-    const servicesTableHtml = `
-      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
-      <thead>
-      <tr style="background:#faf5ff; border-bottom: 2px solid ${templateConfig.accentColor};">
-        <th style="padding:10px; color:${templateConfig.accentColor}; text-align:left;">Description</th>
-        <th class="rate" style="padding:10px; color:${templateConfig.accentColor}; text-align:center;">Qty</th>
-        <th class="subtotal" style="padding:10px; color:${templateConfig.accentColor}; text-align:right;">Subtotal</th>
-      </tr>
-      </thead>
-      <tbody>
-      ${servicesHtml}
-      </tbody>
-      </table>
-      
-      <table class="summary">
-      <tr><td>Subtotal</td><td align="right">₹${subTotal.toLocaleString()}</td></tr>
-      <tr><td>Discount</td><td align="right">₹${formData.discount || 0}</td></tr>
-      <tr class="total"><td style="padding:10px;">Grand Total</td><td align="right" style="padding:10px;">₹${grandTotal.toLocaleString()}</td></tr>
-      </table>
-    `;
-
-    const paymentScheduleHtml = `
-      <div class="payment" style="margin-top:24px;">
-      <h3>Payment Schedule & Account Info</h3>
-      <p style="margin-bottom:12px; font-size:13px; line-height: 1.5; color:#555;"><b>Bank Details:</b><br/>Name: <b>${templateConfig.bankName}</b><br/>A/C No: <b>${templateConfig.bankAccount}</b><br/>IFSC: <b>${templateConfig.bankIfsc}</b></p>
-      <div class="steps">
-      <div class="step"><div class="pct" style="color:${templateConfig.accentColor};">50%</div><p><b>Booking</b></p><p>Advance Retainer</p></div>
-      <div class="step"><div class="pct" style="color:${templateConfig.accentColor};">30%</div><p><b>Event Day</b></p><p>During Shoot</p></div>
-      <div class="step"><div class="pct" style="color:${templateConfig.accentColor};">20%</div><p><b>Delivery</b></p><p>Before Final Handover</p></div>
-      </div>
-      </div>
-    `;
-
-    const termsConditionsHtml = `
-      <div class="terms">
-      <h3>Terms & Conditions</h3>
-      <ol>
-      ${termsHtml}
-      </ol>
-      </div>
-    `;
-
-    const footerHtml = `
-      <div class="footer" style="background:${templateConfig.accentColor};">
-      <div><b>Thank you for choosing ${templateConfig.studioName}!</b></div>
-      <div style="text-align:right">📞 ${templateConfig.phone}</div>
-      </div>
-    `;
-
-    const sectionsMap: Record<string, string> = {
-      header: headerHtml,
-      client: clientHtml,
-      services: servicesTableHtml,
-      payment: paymentScheduleHtml,
-      terms: termsConditionsHtml,
-      footer: footerHtml
-    };
-
-    const activeOrder = templateConfig.sectionsOrder && templateConfig.sectionsOrder.length > 0
-      ? templateConfig.sectionsOrder
-      : ['header', 'client', 'services', 'payment', 'terms', 'footer'];
-
-    const headerContent = activeOrder.includes('header') ? headerHtml : '';
-    const footerContent = activeOrder.includes('footer') ? footerHtml : '';
-    const bodyContent = activeOrder
-      .filter((sectionId: string) => sectionId !== 'header' && sectionId !== 'footer')
-      .map((sectionId: string) => sectionsMap[sectionId])
-      .join('');
-
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-      <meta charset="UTF-8">
-      <title>Quotation - ${templateConfig.studioName}</title>
-      <style>
-      @page{size:A4;margin:10mm}
-      *{box-sizing:border-box}
-      body{margin:0;background:${templateConfig.pageBgColor || '#fdf6f6'};font-family:Arial,Helvetica,sans-serif;color:#333;padding:20px}
-      .container{max-width:800px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.05);border:1px solid #eee;display:flex;flex-direction:column;justify-content:space-between;min-height:98vh;position:relative;}
-      .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;height:320px;opacity:${templateConfig.watermarkOpacity !== undefined ? templateConfig.watermarkOpacity : 0.05};background-image:url('${templateConfig.watermarkUrl || ''}');background-repeat:no-repeat;background-position:center;background-size:contain;pointer-events:none;z-index:0;}
-      .header{background:${templateConfig.headerBgColor || '#fdf2f8'};color:${templateConfig.accentColor};padding:24px;display:flex;justify-content:space-between;position:relative;z-index:1;}
-      .header h1{margin:0;font-size:26px;font-weight:bold;}
-      .header p{margin:4px 0;font-size:13px;color:#555;}
-      .section{padding:20px;flex:1;position:relative;z-index:1;}
-      .card{background:#faf5ff;border-left:5px solid ${templateConfig.accentColor};border-radius:10px;padding:14px; margin-bottom:16px;}
-      .card h3{margin:0 0 8px;color:${templateConfig.accentColor};font-size:15px;}
-      table{width:100%;border-collapse:collapse}
-      th{background:#faf5ff;color:${templateConfig.accentColor};padding:10px;text-align:left}
-      th.rate{text-align:center;width:100px;}
-      th.subtotal{text-align:right;width:120px;}
-      td{padding:12px;vertical-align:top}
-      .summary{width:280px;margin-left:auto;margin-top:12px}
-      .summary td{padding:8px}
-      .total{background:${templateConfig.accentColor};color:#fff;font-weight:bold}
-      .payment h3,.terms h3{color:${templateConfig.accentColor};margin:16px 0 10px}
-      .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-      .step{background:#faf5ff;border:1px solid #ebd9fc;border-radius:10px;padding:10px;text-align:center}
-      .step .pct{font-size:22px;font-weight:bold;color:${templateConfig.accentColor}}
-      .step p{margin:4px 0;font-size:12px}
-      .terms{background:#fdf8ff;border-left:5px solid ${templateConfig.accentColor};border-radius:10px;padding:12px;margin-top:15px}
-      .terms ol{margin:0;padding-left:18px;font-size:12px;line-height:1.45;color:#555;}
-      .footer{background:${templateConfig.footerBgColor || templateConfig.accentColor};color:#fff;padding:16px;display:flex;justify-content:space-between;font-size:12px;position:relative;z-index:1;}
-      </style>
-      </head>
-      <body>
-      <div class="container">
-        ${templateConfig.watermarkUrl ? `<div class="watermark"></div>` : ''}
-        ${headerContent}
-        <div class="section">
-          ${bodyContent}
-        </div>
-        ${footerContent}
-      </div>
-      </body>
-      </html>
-    `;
+    const activeProject = projects.find(p => p._id === selectedProjectId);
+    return generateQuotationHTML({
+      quotationId,
+      customerName: formData.customerName,
+      phone: formData.phone,
+      email: formData.email,
+      location: formData.location,
+      bookingDate: formData.bookingDate,
+      eventType: formData.eventType,
+      discount: formData.discount,
+      paymentTerms: formData.paymentTerms,
+      termsConditions: formData.termsConditions,
+      projectNumber: activeProject?.projectNumber,
+      services,
+      subTotal,
+      grandTotal,
+      templateConfig
+    }, selectedTemplate);
   };
 
   const handlePreview = () => {
@@ -411,6 +273,57 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       {/* Form Area */}
       <div className="lg:col-span-8 space-y-6">
         
+        {/* Template Style Selector */}
+        <div className="glass-card p-5 bg-white border border-[#fee2e2] rounded-2xl space-y-3 shadow-xs">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+            <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+              <LayoutTemplate className="w-4.5 h-4.5 text-[#e50914]" />
+              Select PDF Invoice / Quotation Template
+            </h3>
+            <span className="text-[11px] font-bold text-[#e50914] bg-[#fee2e2]/60 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              {selectedTemplate === 'invoice1' ? 'Template 1 (Neat Minimal)' : 'Template 2 (Modern Bento)'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {AVAILABLE_TEMPLATES.map((tmpl) => {
+              const isSelected = selectedTemplate === tmpl.id;
+              return (
+                <div
+                  key={tmpl.id}
+                  onClick={() => {
+                    setSelectedTemplate(tmpl.id);
+                    toast.success(`Switched to ${tmpl.name}`);
+                  }}
+                  className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
+                    isSelected 
+                      ? 'border-[#e50914] bg-[#fef2f2]/60 shadow-xs' 
+                      : 'border-gray-200/70 hover:border-gray-300 bg-white hover:bg-gray-50/50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <div>
+                      <span className="font-extrabold text-[13px] text-gray-900 block">{tmpl.name}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md inline-block mt-1 ${
+                        isSelected ? 'bg-[#e50914] text-white' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {tmpl.badge}
+                      </span>
+                    </div>
+                    {isSelected && (
+                      <CheckCircle2 className="w-5 h-5 text-[#e50914] shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-[11px] text-gray-500 line-clamp-2 mt-1 leading-snug">
+                    {tmpl.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Client details card */}
         <div className="glass-card p-6 bg-white border border-gray-200/50 rounded-2xl space-y-4 shadow-sm">
           <h3 className="text-base font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
@@ -524,44 +437,61 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
 
           <div className="space-y-4">
             {services.map((service: any) => (
-              <div key={service.id} className="grid grid-cols-12 gap-4 items-end bg-gray-50/50 p-4 rounded-xl border border-gray-100 relative">
-                <div className="col-span-12 md:col-span-5 flex flex-col">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Service Title</label>
-                  <input 
-                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px]" 
-                    placeholder="e.g. Cinematic Video Editing" 
-                    value={service.name}
-                    onChange={e => handleServiceChange(service.id, 'name', e.target.value)}
-                    type="text"
-                  />
+              <div key={service.id} className="bg-gray-50/80 p-4 rounded-xl border border-gray-200/60 relative space-y-3 transition-all hover:border-gray-300">
+                <div className="grid grid-cols-12 gap-4 items-end">
+                  <div className="col-span-12 md:col-span-5 flex flex-col">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Service Title</label>
+                    <input 
+                      className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px] font-semibold text-gray-900" 
+                      placeholder="e.g. Cinematic Wedding Film" 
+                      value={service.name}
+                      onChange={e => handleServiceChange(service.id, 'name', e.target.value)}
+                      type="text"
+                    />
+                  </div>
+                  <div className="col-span-4 md:col-span-2 flex flex-col">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Qty</label>
+                    <input 
+                      className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px] font-medium" 
+                      value={service.quantity}
+                      onChange={e => handleServiceChange(service.id, 'quantity', parseInt(e.target.value) || 0)}
+                      type="number"
+                      min="1"
+                    />
+                  </div>
+                  <div className="col-span-6 md:col-span-3 flex flex-col">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Price (₹)</label>
+                    <input 
+                      className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px] font-bold text-gray-900" 
+                      value={service.price}
+                      onChange={e => handleServiceChange(service.id, 'price', parseInt(e.target.value) || 0)}
+                      type="number"
+                    />
+                  </div>
+                  <div className="col-span-2 flex items-center justify-end">
+                    <button 
+                      onClick={() => handleRemoveService(service.id)}
+                      className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                      title="Remove Item"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="col-span-4 md:col-span-2 flex flex-col">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Qty</label>
-                  <input 
-                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px]" 
-                    value={service.quantity}
-                    onChange={e => handleServiceChange(service.id, 'quantity', parseInt(e.target.value) || 0)}
-                    type="number"
-                    min="1"
+
+                {/* Feature Description / Deliverables */}
+                <div className="flex flex-col pt-2 border-t border-gray-200/50">
+                  <label className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <FileText className="w-3 h-3 text-[#e50914]" />
+                    Feature Description / Deliverables (Appears under title on invoice)
+                  </label>
+                  <textarea 
+                    rows={2}
+                    className="w-full bg-white border border-gray-250/70 rounded-lg p-2 text-[12px] focus:outline-none focus:border-[#e50914] placeholder:text-gray-400 resize-none font-normal leading-relaxed text-gray-700"
+                    placeholder="e.g. • 4K multi-cam coverage&#10;• Drone aerial footage&#10;• Color-graded teaser & raw archives"
+                    value={service.description || ''}
+                    onChange={e => handleServiceChange(service.id, 'description', e.target.value)}
                   />
-                </div>
-                <div className="col-span-6 md:col-span-3 flex flex-col">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Price (₹)</label>
-                  <input 
-                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px]" 
-                    value={service.price}
-                    onChange={e => handleServiceChange(service.id, 'price', parseInt(e.target.value) || 0)}
-                    type="number"
-                  />
-                </div>
-                <div className="col-span-2 flex items-center justify-end">
-                  <button 
-                    onClick={() => handleRemoveService(service.id)}
-                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                    title="Remove Item"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
             ))}
