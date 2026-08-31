@@ -46,70 +46,14 @@ export default function Sidebar() {
     <aside className="w-20 h-screen bg-[#f3f7fc] dark:bg-[#090b0d] border-r border-gray-200/50 dark:border-gray-800/40 flex flex-col items-center justify-between py-8 z-50 shrink-0">
       {/* Top Section: Logo */}
       <div className="flex flex-col items-center">
-        <Link href="/dashboard" className="cursor-pointer" title="Arjun CRM">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-8 h-8 text-[#0066fe] dark:text-[#8efa1d]"
-          >
-            <style>
-              {`
-                @keyframes click {
-                  0%, 85%, 100% { transform: scale(1); }
-                  90% { transform: scale(0.92); }
-                  95% { transform: scale(1.03); }
-                }
-                @keyframes flash {
-                  0%, 85%, 100% { opacity: 0; transform: scale(0.4); }
-                  90% { opacity: 1; transform: scale(2.2); fill: ${theme === 'dark' ? '#8efa1d' : '#0066fe'}; }
-                  95% { opacity: 0; transform: scale(0.4); }
-                }
-                .camera-click {
-                  animation: click 3.5s ease-in-out infinite;
-                  transform-origin: center;
-                }
-                .camera-lens {
-                  animation: click 3.5s ease-in-out infinite;
-                  transform-origin: 12px 13px;
-                }
-                .camera-flash {
-                  animation: flash 3.5s ease-in-out infinite;
-                  transform-origin: 18px 7px;
-                }
-                .camera-container:hover .camera-click {
-                  animation: click 0.5s ease-in-out 1;
-                }
-                .camera-container:hover .camera-flash {
-                  animation: flash 0.5s ease-in-out 1;
-                }
-              `}
-            </style>
-            <g className="camera-container">
-              <path 
-                className="camera-click"
-                d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" 
-              />
-              <circle 
-                className="camera-lens" 
-                cx="12" 
-                cy="13" 
-                r="3" 
-              />
-              <circle 
-                className="camera-flash" 
-                cx="18" 
-                cy="7" 
-                r="1.2" 
-                fill={theme === 'dark' ? '#8efa1d' : '#0066fe'}
-                stroke={theme === 'dark' ? '#8efa1d' : '#0066fe'}
-              />
-            </g>
-          </svg>
+        <Link href="/dashboard" className="cursor-pointer group flex flex-col items-center" title="Arjun Films CRM">
+          <div className="w-12 h-12 rounded-2xl  dark:bg-[#16181c] p-1.5 shadow-sm  hover:shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center overflow-hidden">
+            <img 
+              src="/logo.jpeg" 
+              alt="Arjun Films" 
+              className="w-full h-full object-contain rounded-xl scale-200"
+            />
+          </div>
         </Link>
       </div>
 

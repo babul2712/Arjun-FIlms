@@ -23,7 +23,7 @@ interface TemplateConfig {
 }
 
 const DEFAULT_TEMPLATE: TemplateConfig = {
-  studioName: "ARJUN PHOTOGRAPHY",
+  studioName: "ARJUN FILMS",
   phone: "+91 7788992712",
   email: "arjunphotographyyy@gmail.com",
   address: "Bhubaneswar, Odisha - 751030",
@@ -41,8 +41,8 @@ const DEFAULT_TEMPLATE: TemplateConfig = {
   pageBgColor: "#f0f4fa",
   headerBgColor: "#eef4fc",
   footerBgColor: "#0066fe",
-  watermarkUrl: "https://cdn-icons-png.flaticon.com/512/685/685655.png",
-  watermarkOpacity: 0.05
+  watermarkUrl: "/logo.jpeg",
+  watermarkOpacity: 0.08
 };
 
 interface QuotationTemplateDrawerProps {

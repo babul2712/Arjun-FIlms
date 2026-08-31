@@ -23,16 +23,16 @@ body{
     background:#ffffff;
     border-radius:18px;
     overflow:hidden;
-    border:1px solid #E2DAFF;
+    border:1px solid #E2E8F0;
 }
 .header{
-    background:#ECE9FF;
+    background:#EEF4FC;
     padding:35px;
 }
 .logo{
     font-size:34px;
     font-weight:800;
-    color:#65006C;
+    color:#0066FE;
     letter-spacing:.5px;
 }
 .subtitle{
@@ -44,7 +44,7 @@ body{
     padding:45px;
 }
 .title{
-    color:#65006C;
+    color:#0A0B0D;
     font-size:28px;
     font-weight:700;
     margin-bottom:10px;
@@ -56,8 +56,8 @@ body{
 }
 .otp-box{
     margin:35px 0;
-    background:#F5F2FF;
-    border:2px dashed #65006C;
+    background:#F0F6FF;
+    border:2px dashed #0066FE;
     border-radius:16px;
     padding:30px;
     text-align:center;
@@ -71,13 +71,13 @@ body{
 .otp{
     font-size:46px;
     font-weight:800;
-    color:#65006C;
+    color:#0066FE;
     letter-spacing:10px;
     margin-top:12px;
 }
 .info-box{
-    background:#FAFAFF;
-    border-left:5px solid #65006C;
+    background:#FAFBFF;
+    border-left:5px solid #0066FE;
     padding:18px 20px;
     border-radius:8px;
     margin-top:20px;
@@ -95,7 +95,7 @@ body{
     line-height:24px;
 }
 .footer{
-    background:#65006C;
+    background:#0A0B0D;
     padding:22px;
     text-align:center;
     color:white;
@@ -127,7 +127,7 @@ body{
 <div class="container">
 <div class="header">
 <div class="logo">
-ARJUN PHOTOGRAPHY
+ARJUN FILMS
 </div>
 <div class="subtitle">
 Secure Administration Portal
@@ -141,7 +141,7 @@ Admin Verification
 Hello <strong>${adminName}</strong>,
 </p>
 <p class="text">
-We received a request to sign in to the <strong>Arjun Photography Admin Portal</strong>.
+We received a request to sign in to the <strong>Arjun Films Admin Portal</strong>.
 Use the verification code below to continue.
 </p>
 <div class="otp-box">
@@ -165,13 +165,13 @@ No changes will be made to your account.
 </p>
 </div>
 <div class="footer">
-<strong>ARJUN PHOTOGRAPHY</strong><br><br>
+<strong>ARJUN FILMS</strong><br><br>
 📷 Instagram :
 @arjun_photographyyy
 <br><br>
 📞 +91 7788992712
 <br><br>
-© ${year} Arjun Photography. All rights reserved.
+© ${year} Arjun Films. All rights reserved.
 </div>
 </div>
 </div>

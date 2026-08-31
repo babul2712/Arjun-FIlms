@@ -3,8 +3,13 @@ import AuthProvider from '@/components/AuthProvider';
 import { Toaster } from 'sonner';
 
 export const metadata = {
-  title: "Arjun Photography CRM",
+  title: "Arjun Films CRM",
   description: "High-Fidelity Client Case Management and Photography CRM System",
+  icons: {
+    icon: "/logo.jpeg",
+    shortcut: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
 };
 
 export default function RootLayout({ children }) {

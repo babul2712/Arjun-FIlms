@@ -227,11 +227,15 @@ export default function PaymentPage() {
         
         {/* Header Section */}
         <div className="text-center mb-8 flex flex-col items-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#0066fe] flex items-center justify-center shadow-lg shadow-blue-500/20 mb-3">
-            <Camera className="text-white w-7 h-7" />
+          <div className="w-18 h-18 rounded-3xl bg-white p-2 flex items-center justify-center shadow-lg shadow-black/5 border border-gray-200/50 mb-3 overflow-hidden">
+            <img 
+              src="/logo.jpeg" 
+              alt="Arjun Films" 
+              className="w-full h-full object-contain rounded-2xl"
+            />
           </div>
-          <h1 className="text-[26px] font-extrabold text-[#1a1c22] tracking-tight">Arjun Photography</h1>
-          <p className="text-gray-400 font-semibold text-[13px] mt-0.5">Secure Studio Client Payment Gateway</p>
+          <h1 className="text-[26px] font-extrabold text-[#1a1c22] tracking-tight">Arjun Films</h1>
+          <p className="text-gray-400 font-semibold text-[13px] mt-0.5">Secure Client Payment Gateway</p>
         </div>
 
         {/* The Main Glass Card */}

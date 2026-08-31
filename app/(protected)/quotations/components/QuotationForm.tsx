@@ -39,7 +39,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
   const [projects, setProjects] = useState<any[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>(projectId || initialData?.projectId || '');
   const [templateConfig, setTemplateConfig] = useState<any>({
-    studioName: "ARJUN PHOTOGRAPHY",
+    studioName: "ARJUN FILMS",
     phone: "+91 7788992712",
     email: "arjunphotographyyy@gmail.com",
     address: "Bhubaneswar, Odisha - 751030",
@@ -57,8 +57,8 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
     pageBgColor: "#f0f4fa",
     headerBgColor: "#eef4fc",
     footerBgColor: "#0066fe",
-    watermarkUrl: "https://cdn-icons-png.flaticon.com/512/685/685655.png",
-    watermarkOpacity: 0.05
+    watermarkUrl: "/logo.jpeg",
+    watermarkOpacity: 0.08
   });
 
   React.useEffect(() => {

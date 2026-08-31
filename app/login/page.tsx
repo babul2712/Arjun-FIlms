@@ -81,14 +81,18 @@ export default function LoginPage() {
       <main className="relative z-10 w-full max-w-md px-5">
         <div className="bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.06)] rounded-[24px] p-10 flex flex-col items-center overflow-hidden">
           <div className="mb-8 flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#0a0b0d] flex items-center justify-center shadow-lg shadow-black/10 mb-4">
-              {step === 1 ? <Camera className="text-white w-8 h-8" /> : <ShieldCheck className="text-white w-8 h-8" />}
+            <div className="w-20 h-20 rounded-3xl bg-white p-2 flex items-center justify-center shadow-lg shadow-black/5 border border-gray-200/50 mb-4 overflow-hidden">
+              <img 
+                src="/logo.jpeg" 
+                alt="Arjun Films" 
+                className="w-full h-full object-contain rounded-2xl"
+              />
             </div>
-            <h1 className="text-[30px] leading-[1.2] font-semibold text-[#1a1c22] tracking-tighter">
-              {step === 1 ? 'Arjun Photography' : 'Verification'}
+            <h1 className="text-[28px] leading-[1.2] font-extrabold text-[#1a1c22] tracking-tighter">
+              {step === 1 ? 'Arjun Films' : 'Verification'}
             </h1>
-            <p className="text-[14px] text-gray-500 mt-1 font-medium text-center">
-              {step === 1 ? 'Elevated Photography Management' : 'We sent a one-time password to your email.'}
+            <p className="text-[13px] text-gray-500 mt-1 font-semibold text-center">
+              {step === 1 ? 'Studio & Client Case Management' : 'We sent a one-time password to your email.'}
             </p>
           </div>
 
