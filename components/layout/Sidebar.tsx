@@ -13,6 +13,7 @@ import {
   Bell,
   LogOut,
   Camera,
+  Calendar,
   Sun,
   Moon
 } from 'lucide-react';
@@ -21,6 +22,7 @@ import { useUIStore } from '@/store/uiStore';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Calendar', href: '/calendar', icon: Calendar },
   { name: 'Quotations', href: '/quotations', icon: FileText },
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Projects', href: '/projects', icon: Briefcase },
