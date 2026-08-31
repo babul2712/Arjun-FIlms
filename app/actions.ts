@@ -269,7 +269,7 @@ export async function deleteCrew(id: string) {
   return { success: true };
 }
 
-export async function sendLoginOTP(username: string, email: string) {
+export async function sendLoginOTP(username: string, email: string): Promise<{ success: boolean; error?: string }> {
   await connectToDatabase();
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -296,14 +296,14 @@ export async function sendLoginOTP(username: string, email: string) {
       });
     }
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending OTP email:', error);
     // Don't block login if email service is not yet configured; OTP is visible in Vercel logs
-    return { success: true };
+    return { success: true, error: error?.message };
   }
 }
 
-export async function verifyLoginOTP(email: string, otp: string) {
+export async function verifyLoginOTP(email: string, otp: string): Promise<{ success: boolean; error?: string }> {
   await connectToDatabase();
 
   // Master emergency OTP support (e.g. if email is delayed or not configured)
