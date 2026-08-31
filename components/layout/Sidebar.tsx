@@ -72,7 +72,7 @@ export default function Sidebar() {
               title={item.name}
             >
               <div
-                className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
                   isActive
                     ? 'bg-[#e50914] text-white shadow-lg shadow-red-500/30 scale-105 ring-2 ring-red-400/20'
                     : 'text-gray-400 hover:text-[#e50914] hover:bg-[#fef2f2] dark:hover:text-red-300 dark:hover:bg-red-950/40'
@@ -126,13 +126,13 @@ export default function Sidebar() {
         <div className="relative mt-1">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="w-10 h-10 rounded-2xl overflow-hidden border-2 border-[#fee2e2] dark:border-gray-800 hover:border-[#e50914] dark:hover:border-[#e50914] transition-all cursor-pointer shadow-sm active:scale-95 p-0.5"
+            className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#fee2e2] dark:border-gray-800 hover:border-[#e50914] dark:hover:border-[#e50914] transition-all cursor-pointer shadow-sm active:scale-95 p-0.5"
             title="User Profile"
           >
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"
               alt="Profile"
-              className="w-full h-full object-cover rounded-xl"
+              className="w-full h-full object-cover rounded-full"
             />
           </button>
 
