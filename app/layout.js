@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
       lang="en"
       className="h-full antialiased font-sans"
     >
-      <body className="min-h-full flex flex-col bg-[#f0f4fa] text-[#1e2229]">
+      <body className="min-h-full flex flex-col bg-[#fdf6f6] text-[#1e2229]">
         <AuthProvider>
           {children}
         </AuthProvider>

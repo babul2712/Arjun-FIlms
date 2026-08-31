@@ -92,10 +92,10 @@ export default function BlueprintPage() {
   return (
     <div className="space-y-8 max-w-[1600px] mx-auto pb-16 animate-fade-in text-gray-800">
       {/* Header bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#e2eaf4]/60 p-5 rounded-[32px] border border-[#dae3ed]/40 backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#fee2e2]/40 p-5 rounded-[32px] border border-[#fecaca]/40 backdrop-blur-md">
         <div>
           <h2 className="text-[20px] font-extrabold text-gray-800 flex items-center gap-2.5">
-            <Briefcase className="w-5.5 h-5.5 text-[#0066fe]" />
+            <Briefcase className="w-5.5 h-5.5 text-[#e50914]" />
             Crew Blueprint Database
           </h2>
           <p className="text-[12px] text-gray-400 font-bold mt-1 uppercase tracking-wider">Manage details and daily rates of photographers, editors, and shoot operators.</p>
@@ -136,13 +136,13 @@ export default function BlueprintPage() {
                 className="glass-card rounded-[45px] p-8 bg-white border border-gray-100/50 shadow-sm flex flex-col justify-between h-full relative overflow-hidden transition-all hover:shadow-md"
               >
                 {/* Scoop Notch Corner (Top-Right) matching ProjectCard */}
-                <div className="absolute top-0 right-0 w-[112px] h-[112px] bg-[#f2f7fc] rounded-bl-[45px] z-10">
+                <div className="absolute top-0 right-0 w-[112px] h-[112px] bg-[#fdf6f6] rounded-bl-[45px] z-10">
                   <div className="inverted-radius-top"></div>
                   <div className="inverted-radius-right"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <button 
                       onClick={() => openEditModal(crew)}
-                      className="w-[85px] h-[85px] bg-[#ededed] hover:bg-gray-200 text-[#0066fe] rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-95"
+                      className="w-[85px] h-[85px] bg-[#ededed] hover:bg-gray-200 text-[#e50914] rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-95"
                       title="Edit Record"
                     >
                       <Edit2 className="w-[22px] h-[22px] stroke-[2.5]" />
@@ -163,7 +163,7 @@ export default function BlueprintPage() {
                       </div>
                       <div>
                         <h4 className="text-[16px] font-extrabold text-[#1a1c22] leading-tight">{crew.name}</h4>
-                        <span className="inline-block bg-[#eaf2ff] text-[#0263e0] border border-[#d2e4ff] text-[9.5px] font-extrabold uppercase px-2.5 py-1 rounded-[10px] mt-2.5 leading-none">
+                        <span className="inline-block bg-[#fef2f2] text-[#e50914] border border-[#fee2e2] text-[9.5px] font-extrabold uppercase px-2.5 py-1 rounded-[10px] mt-2.5 leading-none">
                           {crew.role}
                         </span>
                       </div>
@@ -239,7 +239,7 @@ export default function BlueprintPage() {
                 <input 
                   type="text" required value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] font-semibold" 
+                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#e50914] text-[15px] font-semibold" 
                   placeholder="e.g. Rahul Sen" 
                 />
               </div>
@@ -249,7 +249,7 @@ export default function BlueprintPage() {
                 <input 
                   type="text" required value={formData.role}
                   onChange={e => setFormData({...formData, role: e.target.value})}
-                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] font-semibold" 
+                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#e50914] text-[15px] font-semibold" 
                   placeholder="e.g. Lead Photographer" 
                 />
               </div>
@@ -260,7 +260,7 @@ export default function BlueprintPage() {
                   <input 
                     type="number" required value={formData.charges}
                     onChange={e => setFormData({...formData, charges: e.target.value})}
-                    className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] font-semibold" 
+                    className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#e50914] text-[15px] font-semibold" 
                     placeholder="e.g. 10000" 
                   />
                 </div>
@@ -269,7 +269,7 @@ export default function BlueprintPage() {
                   <input 
                     type="text" required value={formData.location}
                     onChange={e => setFormData({...formData, location: e.target.value})}
-                    className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] font-semibold" 
+                    className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#e50914] text-[15px] font-semibold" 
                     placeholder="e.g. Mumbai" 
                   />
                 </div>
@@ -280,7 +280,7 @@ export default function BlueprintPage() {
                 <input 
                   type="tel" required value={formData.phone}
                   onChange={e => setFormData({...formData, phone: e.target.value})}
-                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] font-semibold" 
+                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#e50914] text-[15px] font-semibold" 
                   placeholder="+91 99887 76655" 
                 />
               </div>
@@ -290,7 +290,7 @@ export default function BlueprintPage() {
                 <input 
                   type="text" required value={formData.address}
                   onChange={e => setFormData({...formData, address: e.target.value})}
-                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] font-semibold" 
+                  className="bg-transparent border-b border-gray-200 py-2 focus:outline-none focus:border-[#e50914] text-[15px] font-semibold" 
                   placeholder="Street and Lane details..." 
                 />
               </div>

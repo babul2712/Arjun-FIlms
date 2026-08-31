@@ -79,7 +79,7 @@ export default function CreateProjectPage() {
         <button 
           onClick={handleSave}
           disabled={loading}
-          className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0066fe] text-white rounded-xl text-[13px] font-bold hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-75"
+          className="flex items-center gap-1.5 px-5 py-2.5 bg-[#e50914] text-white rounded-xl text-[13px] font-bold hover:bg-red-700 shadow-lg shadow-red-500/20 transition-all cursor-pointer disabled:opacity-75"
         >
           <Save className="w-4 h-4" />
           {loading ? 'Saving...' : 'Save Case'}
@@ -93,7 +93,7 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Client Name *</label>
             <input 
               name="name" value={formData.name} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]" 
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]" 
               placeholder="e.g. John Doe" 
             />
           </div>
@@ -101,7 +101,7 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Company / Agency</label>
             <input 
               name="company" value={formData.company} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]" 
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]" 
               placeholder="e.g. Stitch Films" 
             />
           </div>
@@ -109,7 +109,7 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Phone Number *</label>
             <input 
               name="phone" value={formData.phone} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]" 
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]" 
               placeholder="+91 98765 43210" 
             />
           </div>
@@ -117,7 +117,7 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Email Address *</label>
             <input 
               name="email" type="email" value={formData.email} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]" 
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]" 
               placeholder="client@example.com" 
             />
           </div>
@@ -125,7 +125,7 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Event Location *</label>
             <input 
               name="location" value={formData.location} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]" 
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]" 
               placeholder="e.g. Mumbai, IN" 
             />
           </div>
@@ -144,7 +144,7 @@ export default function CreateProjectPage() {
                     }
                   }}
                   name="eventType"
-                  className="w-full bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[16px] cursor-pointer"
+                  className="w-full bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[16px] cursor-pointer"
                 >
                   <option value="">Select event type...</option>
                   {eventTypes.map((t: any) => (
@@ -161,7 +161,7 @@ export default function CreateProjectPage() {
                   <option value="CUSTOM">+ Add New Event Type</option>
                 </select>
               ) : (
-                <div className="w-full flex items-center gap-2 border-b border-gray-300 py-1 focus-within:border-[#0066fe]">
+                <div className="w-full flex items-center gap-2 border-b border-gray-300 py-1 focus-within:border-[#e50914]">
                   <input 
                     type="text"
                     name="eventType"
@@ -176,7 +176,7 @@ export default function CreateProjectPage() {
                       setIsCustomEvent(false);
                       setFormData(prev => ({ ...prev, eventType: '' }));
                     }}
-                    className="text-xs text-gray-500 hover:text-[#0066fe]"
+                    className="text-xs text-gray-500 hover:text-[#e50914]"
                   >
                     Cancel
                   </button>
@@ -188,14 +188,14 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Event Date</label>
             <input 
               type="date" name="eventDate" value={formData.eventDate} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]" 
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]" 
             />
           </div>
           <div className="flex flex-col">
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Project Status</label>
             <select 
               name="status" value={formData.status} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[16px] cursor-pointer"
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[16px] cursor-pointer"
             >
               <option value="Lead">Lead</option>
               <option value="Negotiation">Negotiation</option>
@@ -208,7 +208,7 @@ export default function CreateProjectPage() {
             <input 
               type="number"
               name="totalValue" value={formData.totalValue} onChange={handleChange}
-              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] transition-colors text-[16px]"
+              className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] transition-colors text-[16px]"
               placeholder="e.g. 50000"
             />
           </div>
@@ -216,7 +216,7 @@ export default function CreateProjectPage() {
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Notes / Special Requirements</label>
             <textarea 
               name="notes" value={formData.notes} onChange={handleChange} rows={3}
-              className="bg-transparent border border-gray-300 rounded-xl p-3 focus:outline-none focus:border-[#0066fe] text-[15px]" 
+              className="bg-transparent border border-gray-300 rounded-xl p-3 focus:outline-none focus:border-[#e50914] text-[15px]" 
               placeholder="Enter notes, deliverables requirements..." 
             />
           </div>

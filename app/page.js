@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-24 bg-[#f0f4fa] text-[#1e2229] font-sans">
+    <div className="flex min-h-screen flex-col items-center justify-center p-24 bg-[#fdf6f6] text-[#1e2229] font-sans">
       <div className="flex flex-col items-center gap-4">
         <div className="w-20 h-20 rounded-3xl bg-white p-2 flex items-center justify-center shadow-xl border border-gray-200/60 animate-bounce">
           <img src="/logo.jpeg" alt="Arjun Films" className="w-full h-full object-contain rounded-2xl" />

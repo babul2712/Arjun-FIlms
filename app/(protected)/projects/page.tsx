@@ -131,7 +131,7 @@ export default function ProjectsListPage() {
     switch (status) {
       case 'Request client authorization':
       case 'Blue':
-        return 'bg-[#eaf2ff] text-[#0263e0] border border-[#d2e4ff]';
+        return 'bg-[#fef2f2] text-[#e50914] border border-[#fee2e2]';
       case 'Assemble Packet':
       case 'Yellow':
       case 'Orange':
@@ -156,7 +156,7 @@ export default function ProjectsListPage() {
       {/* Integrated Header Row matching mockup */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         {/* Left Side: Tabs */}
-        <div className="flex bg-[#e2eaf4]/60 p-1.5 rounded-[22px] border border-[#dae3ed]/40 backdrop-blur-md">
+        <div className="flex bg-[#fee2e2]/40 p-1.5 rounded-[22px] border border-[#fecaca]/40 backdrop-blur-md">
           <button 
             onClick={() => handleTabChange('active')}
             className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-[14px] font-bold cursor-pointer transition-all ${
@@ -166,7 +166,7 @@ export default function ProjectsListPage() {
             }`}
           >
             <span>Active cases</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#e50914]" />
           </button>
           <button 
             onClick={() => handleTabChange('leads')}
@@ -177,7 +177,7 @@ export default function ProjectsListPage() {
             }`}
           >
             <span>New prospects</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#e50914]" />
           </button>
         </div>
 
@@ -191,15 +191,15 @@ export default function ProjectsListPage() {
               navigator.clipboard.writeText(url);
               toast.success('Payment portal link copied to clipboard!');
             }}
-            className="flex items-center gap-2 px-4 py-3 bg-[#e2eaf4]/70 hover:bg-[#d5e3f5] text-[#0066fe] rounded-full border border-[#dae3ed]/60 text-[12.5px] font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 group"
+            className="flex items-center gap-2 px-4 py-3 bg-[#fee2e2]/50 hover:bg-[#fbd3d3] text-[#e50914] rounded-full border border-[#fecaca]/60 text-[12.5px] font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 group"
             title="Copy Client Payment Gateway Link"
           >
-            <Link2 className="w-4 h-4 text-[#0066fe] group-hover:rotate-45 transition-transform" />
+            <Link2 className="w-4 h-4 text-[#e50914] group-hover:rotate-45 transition-transform" />
             <span className="hidden sm:inline">Copy Payment Link</span>
           </button>
 
           {/* Search Field */}
-          <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#e2eaf4]/60 rounded-2xl border border-[#dae3ed]/40 w-64 focus-within:bg-white focus-within:border-gray-300 transition-all">
+          <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#fee2e2]/40 rounded-2xl border border-[#fecaca]/40 w-64 focus-within:bg-white focus-within:border-gray-300 transition-all">
             <Search className="text-gray-400 w-[18px] h-[18px] mr-2.5 shrink-0" />
             <input 
               value={searchQuery}
@@ -213,7 +213,7 @@ export default function ProjectsListPage() {
           {/* Filter Toggle */}
           <button 
             onClick={toggleFilterPanel}
-            className="p-3 bg-[#e2eaf4]/60 hover:bg-[#e2eaf4] text-gray-600 rounded-2xl border border-[#dae3ed]/40 transition-all cursor-pointer"
+            className="p-3 bg-[#fee2e2]/40 hover:bg-[#fee2e2] text-gray-600 rounded-2xl border border-[#fecaca]/40 transition-all cursor-pointer"
             title="Filters"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -221,10 +221,10 @@ export default function ProjectsListPage() {
             </svg>
           </button>
 
-          {/* Blue action trigger button */}
+          {/* Red action trigger button */}
           <button 
             onClick={() => router.push('/projects/create')}
-            className="w-12 h-12 rounded-full bg-[#0066fe] hover:bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
+            className="w-12 h-12 rounded-full bg-[#e50914] hover:bg-red-700 text-white flex items-center justify-center shadow-lg shadow-red-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
             title="Create New Case"
           >
             <Plus className="w-[22px] h-[22px] stroke-[2.5]" />
@@ -233,7 +233,7 @@ export default function ProjectsListPage() {
       </div>
 
       {/* Cases Counter Badge */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-[#d7e4f6]/80 text-[#0066fe] rounded-full border border-[#bfd3ee]/40 w-fit text-[13px] font-bold shadow-sm">
+      <div className="flex items-center gap-2 px-4 py-2 bg-[#fee2e2]/80 text-[#e50914] rounded-full border border-[#fecaca]/60 w-fit text-[13px] font-bold shadow-sm">
         <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
@@ -299,7 +299,7 @@ export default function ProjectsListPage() {
                     <h3 className="text-[17px] font-extrabold text-gray-800 leading-tight">
                       {selectedProject.name}
                     </h3>
-                    <span className="text-[11px] font-extrabold text-[#0066fe] uppercase tracking-wider block mt-1">
+                    <span className="text-[11px] font-extrabold text-[#e50914] uppercase tracking-wider block mt-1">
                       {selectedProject.eventType}
                     </span>
                   </div>

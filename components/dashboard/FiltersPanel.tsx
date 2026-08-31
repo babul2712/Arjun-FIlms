@@ -42,13 +42,13 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
         <h3 className="text-[18px] font-bold text-gray-800 flex items-center gap-2">
-          <CalendarIcon className="w-5 h-5 text-[#0066fe]" />
+          <CalendarIcon className="w-5 h-5 text-[#e50914]" />
           Filters
         </h3>
         <div className="flex items-center gap-3">
           <button 
             onClick={handleClearAll}
-            className="text-[12px] font-bold text-gray-400 hover:text-[#0066fe] cursor-pointer flex items-center gap-1"
+            className="text-[12px] font-bold text-gray-400 hover:text-[#e50914] cursor-pointer flex items-center gap-1"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Clear all
@@ -74,8 +74,8 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
                 onClick={() => handleStatusSelect(status)}
                 className={`px-3 py-2 text-[12px] font-bold rounded-xl border text-center cursor-pointer transition-all ${
                   isSel 
-                    ? 'bg-[#0066fe] text-white border-[#0066fe] shadow-sm' 
-                    : 'bg-white text-gray-600 border-gray-200/60 hover:border-[#0066fe]'
+                    ? 'bg-[#e50914] text-white border-[#e50914] shadow-sm' 
+                    : 'bg-white text-gray-600 border-gray-200/60 hover:border-[#e50914]'
                 }`}
               >
                 {status}
@@ -97,8 +97,8 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
                 onClick={() => handleStageSelect(stage)}
                 className={`w-full px-4 py-2.5 text-left text-[12px] font-bold rounded-xl border cursor-pointer transition-all ${
                   isSel 
-                    ? 'bg-[#0066fe] text-white border-[#0066fe]' 
-                    : 'bg-white text-gray-600 border-gray-200/60 hover:border-[#0066fe]'
+                    ? 'bg-[#e50914] text-white border-[#e50914]' 
+                    : 'bg-white text-gray-600 border-gray-200/60 hover:border-[#e50914]'
                 }`}
               >
                 {stage}
@@ -119,7 +119,7 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
               className={`py-1.5 px-1 text-[10px] font-bold rounded-lg border text-center cursor-pointer transition-all ${
                 selectedDateRange === range 
                   ? 'bg-gray-100 border-gray-300 text-gray-800' 
-                  : 'bg-white border-gray-200/60 text-gray-500 hover:border-[#0066fe]'
+                  : 'bg-white border-gray-200/60 text-gray-500 hover:border-[#e50914]'
               }`}
             >
               {range}
@@ -146,7 +146,7 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
                 <span 
                   key={day} 
                   className={`py-1 font-bold rounded-md ${
-                    isSelected ? 'bg-[#0066fe] text-white font-extrabold shadow-sm' : 'text-gray-600'
+                    isSelected ? 'bg-[#e50914] text-white font-extrabold shadow-sm' : 'text-gray-600'
                   }`}
                 >
                   {day}
@@ -167,7 +167,7 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
             setSelectedNationality(e.target.value);
             onFilterChange({ status: selectedStatus, stage: selectedStage, dateRange: selectedDateRange, nationality: e.target.value });
           }}
-          className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+          className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
           placeholder="Start typing nationality..."
         />
       </div>

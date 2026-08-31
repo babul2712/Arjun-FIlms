@@ -52,7 +52,7 @@ export default function QuotationsDashboardPage() {
       <div className="flex justify-between items-center bg-white/40 p-4 rounded-3xl border border-white/40 backdrop-blur-md">
         <div>
           <h2 className="text-[18px] font-bold text-gray-800 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#0066fe]" />
+            <FileText className="w-5 h-5 text-[#e50914]" />
             Quotations
           </h2>
           <p className="text-[12px] text-gray-400 font-semibold mt-0.5">Manage and view all your generated client proposals and packages.</p>
@@ -62,12 +62,12 @@ export default function QuotationsDashboardPage() {
             onClick={() => setShowTemplateDrawer(true)}
             className="flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-[#16181c] text-gray-700 dark:text-gray-200 border border-gray-250/60 dark:border-gray-800 rounded-xl text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all cursor-pointer shadow-sm active:scale-98"
           >
-            <Sparkles className="w-4 h-4 text-[#0066fe]" />
+            <Sparkles className="w-4 h-4 text-[#e50914]" />
             Customize Template
           </button>
           <button 
             onClick={() => router.push('/quotations/create')}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0066fe] text-white rounded-xl text-[13px] font-bold hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#e50914] text-white rounded-xl text-[13px] font-bold hover:bg-red-700 shadow-lg shadow-red-500/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add New Quotation
@@ -112,7 +112,7 @@ export default function QuotationsDashboardPage() {
                     <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
                     {quotation.location}
                   </p>
-                  <p className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-[#eaf2ff] text-[#0263e0] mt-2">
+                  <p className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-[#fef2f2] text-[#e50914] mt-2">
                     {quotation.eventType}
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export default function QuotationsDashboardPage() {
               <div className="flex justify-end gap-2 border-t border-gray-50 pt-4 mt-4">
                 <button 
                   onClick={() => router.push(`/quotations/edit/${quotation._id || quotation.id}`)}
-                  className="p-2 text-gray-400 hover:text-[#0066fe] hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                   title="Edit Proposal"
                 >
                   <Edit2 className="w-4 h-4" />

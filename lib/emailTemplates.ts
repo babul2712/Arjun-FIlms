@@ -9,12 +9,12 @@ export const generateOTPEmailHtml = (adminName: string, otp: string, year: numbe
 body{
     margin:0;
     padding:0;
-    background:#f4f2ff;
+    background:#fdf6f6;
     font-family:Arial, Helvetica, sans-serif;
 }
 .wrapper{
     width:100%;
-    background:#f4f2ff;
+    background:#fdf6f6;
     padding:40px 15px;
 }
 .container{
@@ -26,13 +26,13 @@ body{
     border:1px solid #E2E8F0;
 }
 .header{
-    background:#EEF4FC;
+    background:#fef2f2;
     padding:35px;
 }
 .logo{
     font-size:34px;
     font-weight:800;
-    color:#0066FE;
+    color:#e50914;
     letter-spacing:.5px;
 }
 .subtitle{
@@ -56,8 +56,8 @@ body{
 }
 .otp-box{
     margin:35px 0;
-    background:#F0F6FF;
-    border:2px dashed #0066FE;
+    background:#fff5f5;
+    border:2px dashed #e50914;
     border-radius:16px;
     padding:30px;
     text-align:center;
@@ -71,13 +71,13 @@ body{
 .otp{
     font-size:46px;
     font-weight:800;
-    color:#0066FE;
+    color:#e50914;
     letter-spacing:10px;
     margin-top:12px;
 }
 .info-box{
-    background:#FAFBFF;
-    border-left:5px solid #0066FE;
+    background:#fff8f8;
+    border-left:5px solid #e50914;
     padding:18px 20px;
     border-radius:8px;
     margin-top:20px;

@@ -3,20 +3,20 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #eef4fc;
+  --background: #fdf6f6;
   --foreground: #1a1c22;
   
   --card-bg: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.04);
+  --card-border: rgba(229, 9, 20, 0.05);
   
-  /* Colors inspired by the high-end mockup */
+  /* Colors inspired by high-end cinema branding */
   --primary: #0a0b0d; /* Black/Dark Gray for selected states */
-  --primary-container: #0066fe; /* Vibrant blue for accent buttons */
+  --primary-container: #e50914; /* Vibrant signature red for accent buttons */
   --on-primary: #ffffff;
   --secondary: #5f6368;
   --surface: #ffffff;
-  --surface-variant: #f1f3f4;
-  --outline-variant: #dadce0;
+  --surface-variant: #fdf2f2;
+  --outline-variant: #fecaca;
 }
 
 @theme {
@@ -33,7 +33,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #ebf1fa 0%, #f2f7fc 50%, #f9fbfd 100%);
+  background: radial-gradient(circle at 10% 10%, rgba(229, 9, 20, 0.04) 0%, transparent 45%), radial-gradient(circle at 90% 85%, rgba(229, 9, 20, 0.03) 0%, transparent 40%), linear-gradient(135deg, #fdf6f6 0%, #f9f0f0 50%, #fdf8f8 100%);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: 'Poppins', sans-serif;

@@ -73,7 +73,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#e4e4ff] to-[#fef0f7] font-sans text-[#1e2229]">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#0066fe]/10 rounded-full blur-3xl" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#e50914]/10 rounded-full blur-3xl" />
         <div className="absolute top-1/2 -right-24 w-80 h-80 bg-[#e0e0fb]/30 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 left-1/4 w-64 h-64 bg-[#daeaa1]/20 rounded-full blur-3xl" />
       </div>
@@ -110,7 +110,7 @@ export default function LoginPage() {
                   <label className="text-[14px] font-medium text-gray-700" htmlFor="username">Username</label>
                 </div>
                 <input 
-                  className="w-full bg-transparent border-b border-gray-300 py-3 px-1 text-[16px] focus:outline-none focus:border-[#0066fe] transition-all" 
+                  className="w-full bg-transparent border-b border-gray-300 py-3 px-1 text-[16px] focus:outline-none focus:border-[#e50914] transition-all" 
                   id="username" 
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -129,7 +129,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative">
                   <input 
-                    className="w-full bg-transparent border-b border-gray-300 py-3 px-1 text-[16px] focus:outline-none focus:border-[#0066fe] pr-10 transition-all" 
+                    className="w-full bg-transparent border-b border-gray-300 py-3 px-1 text-[16px] focus:outline-none focus:border-[#e50914] pr-10 transition-all" 
                     id="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -138,7 +138,7 @@ export default function LoginPage() {
                     required
                   />
                   <button 
-                    className="absolute right-2 top-3 text-gray-400 hover:text-[#0066fe]" 
+                    className="absolute right-2 top-3 text-gray-400 hover:text-[#e50914]" 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                   >
@@ -172,7 +172,7 @@ export default function LoginPage() {
                   <label className="text-[14px] font-medium text-gray-700" htmlFor="otp">One Time Password</label>
                 </div>
                 <input 
-                  className="w-full bg-transparent border-b border-gray-300 py-3 px-1 text-[24px] tracking-widest text-center focus:outline-none focus:border-[#0066fe] transition-all" 
+                  className="w-full bg-transparent border-b border-gray-300 py-3 px-1 text-[24px] tracking-widest text-center focus:outline-none focus:border-[#e50914] transition-all" 
                   id="otp" 
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
@@ -195,7 +195,7 @@ export default function LoginPage() {
                 <button 
                   type="button"
                   onClick={() => { setStep(1); setOtp(''); setError(''); }}
-                  className="w-full mt-4 text-[13px] font-medium text-gray-500 hover:text-[#0066fe] transition-colors text-center cursor-pointer"
+                  className="w-full mt-4 text-[13px] font-medium text-gray-500 hover:text-[#e50914] transition-colors text-center cursor-pointer"
                 >
                   Back to login
                 </button>

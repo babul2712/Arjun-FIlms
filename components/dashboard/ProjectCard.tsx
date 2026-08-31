@@ -130,8 +130,8 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover }: Pro
       case 'Request client authorization':
       case 'Blue':
         return {
-          badge: 'bg-blue-50 text-[#0263e0] border border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30',
-          dot: 'bg-[#0263e0] text-white border-blue-50 dark:border-blue-950'
+          badge: 'bg-[#fef2f2] text-[#e50914] border border-[#fee2e2] dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
+          dot: 'bg-[#e50914] text-white border-red-50 dark:border-red-950'
         };
       case 'Assemble Packet':
       case 'Yellow':
@@ -173,7 +173,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover }: Pro
       className="glass-card glass-card-hover rounded-[32px] p-5 cursor-pointer relative flex flex-col justify-between h-full bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm overflow-hidden"
     >
       {/* Scoop Notch Corner (Top-Right) matching inverted_bouder-radius-2.html but scaled down */}
-      <div className="absolute top-0 right-0 w-[80px] h-[80px] bg-[#f2f7fc] dark:bg-[#0b0c0e] rounded-bl-[28px] z-10 transition-colors">
+      <div className="absolute top-0 right-0 w-[80px] h-[80px] bg-[#fdf6f6] dark:bg-[#0b0c0e] rounded-bl-[28px] z-10 transition-colors">
         <div className="inverted-radius-top"></div>
         <div className="inverted-radius-right"></div>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -274,7 +274,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover }: Pro
         {/* Table header */}
         <div className="flex items-center justify-between text-[9px] text-gray-400 dark:text-gray-500 font-extrabold uppercase tracking-wider mb-2.5 px-1">
           <div className="flex items-center gap-1">
-            <span className="w-4 h-4 rounded bg-[#e2eaf4]/60 dark:bg-gray-800/40 text-[#0066fe] dark:text-[#8efa1d] flex items-center justify-center text-[9px] font-extrabold">
+            <span className="w-4 h-4 rounded bg-[#fee2e2]/60 dark:bg-gray-800/40 text-[#e50914] dark:text-[#8efa1d] flex items-center justify-center text-[9px] font-extrabold">
               {displayServices.length}
             </span>
             <span>Services</span>

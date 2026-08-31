@@ -39,7 +39,7 @@ export default function RecentActivity() {
               className="flex items-center justify-between p-4 bg-gray-50/40 rounded-2xl border border-gray-150/40 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-full bg-[#eaf2ff] text-[#0263e0] border border-[#d2e4ff] flex items-center justify-center font-extrabold text-[15px] shrink-0 shadow-sm">
+                <div className="w-11 h-11 rounded-full bg-[#fef2f2] text-[#e50914] border border-[#fee2e2] flex items-center justify-center font-extrabold text-[15px] shrink-0 shadow-sm">
                   {activity.customerName.charAt(0)}
                 </div>
                 <div>

@@ -127,7 +127,7 @@ export default function Sidebar() {
         <div className="relative mt-1">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="w-9 h-9 rounded-full overflow-hidden border border-white dark:border-gray-800 hover:border-[#0066fe] dark:hover:border-[#8efa1d] transition-all cursor-pointer shadow-sm active:scale-95"
+            className="w-9 h-9 rounded-full overflow-hidden border border-white dark:border-gray-800 hover:border-[#e50914] dark:hover:border-[#e50914] transition-all cursor-pointer shadow-sm active:scale-95"
             title="User Profile"
           >
             {/* High-quality Unsplash avatar to match premium design */}

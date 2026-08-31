@@ -63,7 +63,7 @@ export function ConfirmationDialog({
             className={`px-5 py-2 rounded-xl text-white transition-colors cursor-pointer font-bold ${
               isDestructive 
                 ? 'bg-rose-600 hover:bg-rose-700 shadow-md' 
-                : 'bg-[#0066fe] hover:bg-blue-600 shadow-md shadow-blue-500/20'
+                : 'bg-[#e50914] hover:bg-red-700 shadow-md shadow-red-500/20'
             }`}
           >
             {confirmText}

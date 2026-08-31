@@ -43,7 +43,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     fetchDetails();
   }, [resolvedParams.id]);
 
-  if (loading) return <div className="p-10 flex justify-center text-[#0066fe] font-bold">Loading case dashboard...</div>;
+  if (loading) return <div className="p-10 flex justify-center text-[#e50914] font-bold">Loading case dashboard...</div>;
   if (!project) return <div className="p-10 text-center text-gray-500 font-semibold">Case record not found</div>;
 
   const payments = project.paymentsList || [];
@@ -148,7 +148,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
           <div>
             <h3 className="text-[20px] font-bold text-gray-800 flex items-center gap-2">
               {project.projectNumber}
-              <span className="text-[12px] bg-[#eaf2ff] text-[#0263e0] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+              <span className="text-[12px] bg-[#fef2f2] text-[#e50914] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
                 {project.status}
               </span>
             </h3>
@@ -197,7 +197,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-5 py-2.5 rounded-xl text-[13px] font-bold cursor-pointer transition-all whitespace-nowrap ${
                   activeTab === tab.id 
-                    ? 'bg-[#0066fe] text-white shadow-md shadow-blue-500/20' 
+                    ? 'bg-[#e50914] text-white shadow-md shadow-red-500/20' 
                     : 'text-gray-500 hover:text-gray-700 hover:bg-white/40'
                 }`}
               >
@@ -214,12 +214,12 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
               <div className="space-y-6">
                 <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                   <h4 className="text-[16px] font-bold text-gray-800 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-[#0066fe]" />
+                    <Users className="w-5 h-5 text-[#e50914]" />
                     Assigned Project Crew
                   </h4>
                   <button 
                     onClick={() => setShowCrewModal(true)}
-                    className="flex items-center gap-1 px-4 py-2 bg-[#0066fe] hover:bg-blue-600 text-white rounded-xl text-[12px] font-bold shadow-sm transition-all cursor-pointer"
+                    className="flex items-center gap-1 px-4 py-2 bg-[#e50914] hover:bg-red-700 text-white rounded-xl text-[12px] font-bold shadow-sm transition-all cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     Allocate Crew
@@ -238,7 +238,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                       return (
                         <div key={idx} className="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 flex items-start justify-between relative shadow-sm hover:shadow-md transition-shadow">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-[#eaf2ff] text-[#0263e0] font-bold flex items-center justify-center text-[18px]">
+                            <div className="w-12 h-12 rounded-full bg-[#fef2f2] text-[#e50914] font-bold flex items-center justify-center text-[18px]">
                               {(details?.name || 'C').charAt(0)}
                             </div>
                             <div>
@@ -246,7 +246,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                 {details?.name || 'Unassigned Crew'}
                               </h5>
                               <div className="flex flex-wrap gap-1.5 mt-1.5">
-                                <span className="bg-[#eaf2ff] text-[#0263e0] text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
+                                <span className="bg-[#fef2f2] text-[#e50914] text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
                                   {crew.role}
                                 </span>
                                 <span className="bg-gray-100 text-gray-500 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
@@ -256,7 +256,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </div>
                           </div>
                           
-                          <button className="text-gray-400 hover:text-[#0066fe] p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                          <button className="text-gray-400 hover:text-[#e50914] p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
                             <Edit3 className="w-4 h-4" />
                           </button>
                         </div>
@@ -273,7 +273,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                 <div className="flex justify-between items-start flex-wrap gap-4 border-b border-gray-100 pb-4">
                   <div>
                     <h4 className="text-[16px] font-bold text-gray-800 flex items-center gap-2">
-                      <Receipt className="w-5 h-5 text-[#0066fe]" />
+                      <Receipt className="w-5 h-5 text-[#e50914]" />
                       Financial Ledger Statement
                     </h4>
                     <p className="text-[13px] text-gray-400 font-semibold mt-1">Project Total: <strong className="text-gray-900">₹{project.totalValue.toLocaleString()}</strong></p>
@@ -282,7 +282,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Pending Client Payments</span>
-                      <span className="text-[18px] font-extrabold text-[#0066fe]">₹{pendingAmount.toLocaleString()}</span>
+                      <span className="text-[18px] font-extrabold text-[#e50914]">₹{pendingAmount.toLocaleString()}</span>
                     </div>
                     <button 
                       onClick={() => setShowExpenseModal(true)}
@@ -345,7 +345,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             {activeTab === 'documents' && (
               <div className="space-y-6">
                 <h4 className="text-[16px] font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-4">
-                  <FileText className="w-5 h-5 text-[#0066fe]" />
+                  <FileText className="w-5 h-5 text-[#e50914]" />
                   Uploaded Agreements & Invoice Receipts
                 </h4>
                 
@@ -367,7 +367,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                           href={p.screenshotUrl} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="text-[12px] font-bold text-[#0066fe] hover:underline"
+                          className="text-[12px] font-bold text-[#e50914] hover:underline"
                         >
                           View File
                         </a>
@@ -387,12 +387,12 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             {activeTab === 'history' && (
               <div className="space-y-6">
                 <h4 className="text-[16px] font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-4">
-                  <Clock className="w-5 h-5 text-[#0066fe]" />
+                  <Clock className="w-5 h-5 text-[#e50914]" />
                   Case Activity History Log
                 </h4>
-                <div className="relative pl-6 border-l-2 border-[#0066fe]/20 space-y-6 py-2 ml-4">
+                <div className="relative pl-6 border-l-2 border-[#e50914]/20 space-y-6 py-2 ml-4">
                   <div className="relative">
-                    <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-[#0066fe] border-4 border-white" />
+                    <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-[#e50914] border-4 border-white" />
                     <p className="text-[13px] font-bold text-gray-800">Project record created</p>
                     <p className="text-[11px] text-gray-400 font-semibold mt-0.5">{dayjs(project.createdAt).format('DD MMM YYYY, hh:mm A')}</p>
                   </div>
@@ -415,11 +415,11 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
           <div className="glass-card rounded-[24px] p-6 bg-white border border-gray-200/50 space-y-6 shadow-sm">
             {/* User Profile Header */}
             <div className="text-center pb-6 border-b border-gray-100">
-              <div className="w-18 h-18 rounded-full bg-[#eaf2ff] text-[#0263e0] font-bold flex items-center justify-center text-[28px] mx-auto shadow-sm">
+              <div className="w-18 h-18 rounded-full bg-[#fef2f2] text-[#e50914] font-bold flex items-center justify-center text-[28px] mx-auto shadow-sm">
                 {project.name.split(' ').map((n: string) => n[0]).join('')}
               </div>
               <h4 className="text-[16px] font-extrabold text-gray-800 mt-3">{project.name}</h4>
-              <p className="text-[11px] text-[#0066fe] font-bold uppercase tracking-wider mt-1">{project.eventType}</p>
+              <p className="text-[11px] text-[#e50914] font-bold uppercase tracking-wider mt-1">{project.eventType}</p>
               
               {/* Call/Mail buttons */}
               <div className="flex justify-center gap-3 mt-4">
@@ -499,7 +499,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                   type="date" 
                   value={expenseForm.date} 
                   onChange={e => setExpenseForm({...expenseForm, date: e.target.value})}
-                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
                 />
               </div>
               <div>
@@ -508,7 +508,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                   type="text" 
                   value={expenseForm.description} 
                   onChange={e => setExpenseForm({...expenseForm, description: e.target.value})}
-                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
                   placeholder="e.g. Camera lenses rental"
                 />
               </div>
@@ -518,7 +518,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                   type="number" 
                   value={expenseForm.amount} 
                   onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})}
-                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
                   placeholder="e.g. 5000"
                 />
               </div>
@@ -561,7 +561,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                       charges: selected?.charges?.toString() || ''
                     });
                   }}
-                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
                 >
                   <option value="">Select crew member...</option>
                   {availableCrew.map(c => (
@@ -576,7 +576,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                   type="text" 
                   value={crewForm.role} 
                   onChange={e => setCrewForm({...crewForm, role: e.target.value})}
-                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
                   placeholder="e.g. Lead Shooter"
                 />
               </div>
@@ -587,7 +587,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                   type="number" 
                   value={crewForm.charges} 
                   onChange={e => setCrewForm({...crewForm, charges: e.target.value})}
-                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe]"
+                  className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
                   placeholder="e.g. 15000"
                 />
               </div>
@@ -601,7 +601,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
               </button>
               <button 
                 onClick={handleAddCrew}
-                className="px-5 py-2 rounded-xl bg-[#0066fe] hover:bg-blue-600 text-white text-[13px] font-bold shadow-md shadow-blue-500/20 cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-[#e50914] hover:bg-red-700 text-white text-[13px] font-bold shadow-md shadow-red-500/20 cursor-pointer"
               >
                 Assign Crew
               </button>

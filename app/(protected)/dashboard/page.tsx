@@ -176,7 +176,7 @@ export default function DashboardPage() {
     switch (status) {
       case 'Request client authorization':
       case 'Blue':
-        return 'bg-[#eaf2ff] text-[#0263e0] border border-[#d2e4ff] dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-905/30';
+        return 'bg-[#fef2f2] text-[#e50914] border border-[#fee2e2] dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30';
       case 'Assemble Packet':
       case 'Yellow':
       case 'Orange':
@@ -484,7 +484,7 @@ export default function DashboardPage() {
             
             <div className="flex items-center gap-3 w-full md:w-auto">
               {/* Search Bar */}
-              <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#e2eaf4]/60 border border-[#dae3ed]/40 dark:bg-[#16181c] dark:border-gray-800/40 rounded-2xl w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-700 transition-colors shadow-sm">
+              <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#fee2e2]/40 border border-[#fecaca]/40 dark:bg-[#16181c] dark:border-gray-800/40 rounded-2xl w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-700 transition-colors shadow-sm">
                 <Search className="text-gray-505 w-4.5 h-4.5 mr-3 shrink-0" />
                 <input 
                   type="text" 
@@ -498,7 +498,7 @@ export default function DashboardPage() {
                 <button
                   onClick={handleSeedData}
                   disabled={seeding}
-                  className="p-3 bg-[#e2eaf4]/60 hover:bg-[#e2eaf4] border border-[#dae3ed]/40 text-[#0066fe] dark:bg-[#16181c] dark:hover:bg-gray-800 dark:border-gray-800 dark:text-[#8efa1d] rounded-2xl cursor-pointer active:scale-95 transition-all shadow-sm"
+                  className="p-3 bg-[#fee2e2]/40 hover:bg-[#fee2e2] border border-[#fecaca]/40 text-[#e50914] dark:bg-[#16181c] dark:hover:bg-gray-800 dark:border-gray-800 dark:text-[#8efa1d] rounded-2xl cursor-pointer active:scale-95 transition-all shadow-sm"
                   title="Seed Database"
                 >
                   <Database className="w-5 h-5 animate-pulse" />
@@ -520,7 +520,7 @@ export default function DashboardPage() {
                   </div>
                   <button 
                     onClick={() => router.push('/projects/create')}
-                    className="text-[11px] font-extrabold text-gray-550 dark:text-gray-400 hover:text-gray-855 dark:hover:text-white px-3 py-1.5 bg-[#f0f4fa] dark:bg-gray-800/40 border border-gray-200/50 dark:border-gray-800/30 rounded-xl cursor-pointer transition-colors"
+                    className="text-[11px] font-extrabold text-gray-550 dark:text-gray-400 hover:text-gray-855 dark:hover:text-white px-3 py-1.5 bg-[#fdf2f2] dark:bg-gray-800/40 border border-gray-200/50 dark:border-gray-800/30 rounded-xl cursor-pointer transition-colors"
                   >
                     Add New +
                   </button>
@@ -536,18 +536,18 @@ export default function DashboardPage() {
 
               {/* Bottom Quick Tiles (Crew Stats Integration) */}
               <div className="grid grid-cols-3 gap-2 mt-4">
-                <div className="bg-[#f0f4fa] dark:bg-[#24272c] rounded-2xl p-2 flex flex-col justify-center text-center transition-colors border border-gray-200/20 dark:border-gray-855/50">
+                <div className="bg-[#fdf2f2] dark:bg-[#24272c] rounded-2xl p-2 flex flex-col justify-center text-center transition-colors border border-gray-200/20 dark:border-gray-855/50">
                   <Users className="w-4 h-4 text-gray-550 dark:text-gray-400 mx-auto mb-1 shrink-0" />
                   <span className="text-[13px] font-black text-gray-808 dark:text-white leading-none block">{stats.totalCrew}</span>
                   <span className="text-[8px] font-bold text-gray-400 dark:text-gray-500 block mt-1 uppercase tracking-wider truncate">Total Crew</span>
                 </div>
-                <div className="bg-[#f0f4fa] dark:bg-[#24272c] rounded-2xl p-2 flex flex-col justify-center text-center transition-colors border border-gray-200/20 dark:border-gray-855/50">
+                <div className="bg-[#fdf2f2] dark:bg-[#24272c] rounded-2xl p-2 flex flex-col justify-center text-center transition-colors border border-gray-200/20 dark:border-gray-855/50">
                   <UserCheck className="w-4 h-4 text-teal-600 dark:text-teal-400 mx-auto mb-1 shrink-0" />
                   <span className="text-[13px] font-black text-gray-808 dark:text-white leading-none block">{stats.totalCrewAssigned}</span>
                   <span className="text-[8px] font-bold text-gray-400 dark:text-gray-500 block mt-1 uppercase tracking-wider truncate">Assigned</span>
                 </div>
-                <div className="bg-[#f0f4fa] dark:bg-[#24272c] rounded-2xl p-2 flex flex-col justify-center text-center transition-colors border border-gray-200/20 dark:border-gray-855/50">
-                  <UserMinus className="w-4 h-4 text-[#0066fe] dark:text-[#8efa1d] mx-auto mb-1 shrink-0" />
+                <div className="bg-[#fdf2f2] dark:bg-[#24272c] rounded-2xl p-2 flex flex-col justify-center text-center transition-colors border border-gray-200/20 dark:border-gray-855/50">
+                  <UserMinus className="w-4 h-4 text-[#e50914] dark:text-[#8efa1d] mx-auto mb-1 shrink-0" />
                   <span className="text-[13px] font-black text-gray-808 dark:text-white leading-none block">{stats.totalCrewNotAssigned}</span>
                   <span className="text-[8px] font-bold text-gray-400 dark:text-gray-505 block mt-1 uppercase tracking-wider truncate">Unassigned</span>
                 </div>
@@ -589,7 +589,7 @@ export default function DashboardPage() {
               <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[28px] p-5 flex flex-col justify-between h-[115px]">
                 <div className="flex justify-between items-start w-full">
                   {/* Miniature toggle switch */}
-                  <div className="flex bg-[#f0f4fa] dark:bg-[#24272c] p-0.5 rounded-lg border border-gray-200/40 dark:border-gray-800/30 text-[9px] font-bold">
+                  <div className="flex bg-[#fdf2f2] dark:bg-[#24272c] p-0.5 rounded-lg border border-gray-200/40 dark:border-gray-800/30 text-[9px] font-bold">
                     <button 
                       onClick={() => setShowBookings(false)}
                       className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
@@ -633,7 +633,7 @@ export default function DashboardPage() {
               <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[28px] p-5 flex flex-col justify-between h-[115px]">
                 <div className="flex justify-between items-start w-full">
                   {/* Miniature toggle switch */}
-                  <div className="flex bg-[#f0f4fa] dark:bg-[#24272c] p-0.5 rounded-lg border border-gray-200/40 dark:border-gray-800/30 text-[9px] font-bold">
+                  <div className="flex bg-[#fdf2f2] dark:bg-[#24272c] p-0.5 rounded-lg border border-gray-200/40 dark:border-gray-800/30 text-[9px] font-bold">
                     <button 
                       onClick={() => setShowFinished(false)}
                       className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
@@ -709,7 +709,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               
-              <button className="w-9 h-9 rounded-full bg-[#f0f4fa] dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 flex items-center justify-center text-gray-505 dark:text-gray-300 cursor-pointer transition-colors ml-auto border border-gray-200/20 dark:border-gray-700/20 active:scale-95">
+              <button className="w-9 h-9 rounded-full bg-[#fdf2f2] dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 flex items-center justify-center text-gray-505 dark:text-gray-300 cursor-pointer transition-colors ml-auto border border-gray-200/20 dark:border-gray-700/20 active:scale-95">
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
             </div>
@@ -761,7 +761,7 @@ export default function DashboardPage() {
               className={`py-3.5 rounded-2xl text-[13px] font-black cursor-pointer active:scale-95 transition-colors ${
                 theme === 'dark'
                   ? 'bg-[#8efa1d] hover:bg-[#a5f841] text-[#0b0c0e] shadow-lg shadow-[#8efa1d]/10'
-                  : 'bg-[#0066fe] hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                  : 'bg-[#e50914] hover:bg-red-700 text-white shadow-lg shadow-red-500/20'
               }`}
             >
               Transfer
@@ -779,7 +779,7 @@ export default function DashboardPage() {
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-[#f0f4fa] dark:bg-gray-800/40 border border-gray-200/65 dark:border-gray-800 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded-xl">
+                <span className="px-3 py-1 bg-[#fdf2f2] dark:bg-gray-800/40 border border-gray-200/65 dark:border-gray-800 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded-xl">
                   Yearly
                 </span>
               </div>
@@ -788,7 +788,7 @@ export default function DashboardPage() {
             {/* Legend indicators */}
             <div className="flex items-center gap-3 mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800/40 pb-3">
               <span className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${theme === 'dark' ? 'bg-[#8efa1d]' : 'bg-[#0066fe]'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${theme === 'dark' ? 'bg-[#8efa1d]' : 'bg-[#e50914]'}`} />
                 Income
               </span>
               <span className="flex items-center gap-1.5">
@@ -833,8 +833,8 @@ export default function DashboardPage() {
                           isActive 
                             ? theme === 'dark'
                               ? 'bg-gradient-to-t from-[#8efa1d]/20 to-[#8efa1d] shadow-md shadow-[#8efa1d]/20 scale-105'
-                              : 'bg-gradient-to-t from-[#0066fe]/20 to-[#0066fe] shadow-md shadow-[#0066fe]/20 scale-105' 
-                            : 'bg-[#f0f4fa] dark:bg-[#24272c] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer'
+                              : 'bg-gradient-to-t from-[#e50914]/20 to-[#e50914] shadow-md shadow-[#e50914]/20 scale-105' 
+                            : 'bg-[#fdf2f2] dark:bg-[#24272c] hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer'
                         }`}
                         style={{ height: `${heightPercent}%` }}
                         title={`${bar.m}: ₹${bar.val.toLocaleString('en-IN')}`}
@@ -851,15 +851,15 @@ export default function DashboardPage() {
           <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 space-y-4">
             <h4 className="text-[14px] font-extrabold text-gray-855 dark:text-white">Quick Action</h4>
             <div className="grid grid-cols-3 gap-2">
-              <div className="bg-[#f0f4fa] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-805/30">
+              <div className="bg-[#fdf2f2] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-805/30">
                 <ArrowDownLeft className="w-5 h-5 text-gray-555 dark:text-gray-400 mx-auto mb-2" />
                 <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 block">Received</span>
               </div>
-              <div className="bg-[#f0f4fa] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-805/30">
+              <div className="bg-[#fdf2f2] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-805/30">
                 <ArrowUpRight className="w-5 h-5 text-gray-555 dark:text-gray-400 mx-auto mb-2" />
                 <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 block">Request</span>
               </div>
-              <div className="bg-[#f0f4fa] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-850/30">
+              <div className="bg-[#fdf2f2] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-850/30">
                 <MoreHorizontal className="w-5 h-5 text-gray-555 dark:text-gray-400 mx-auto mb-2" />
                 <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 block">More</span>
               </div>
@@ -868,10 +868,10 @@ export default function DashboardPage() {
 
           {/* Starter Plan Promotion Box */}
           <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 relative overflow-hidden flex flex-col justify-between min-h-[175px] group">
-            {/* Glowing blue/neon ball element absolute positioned in backdrop */}
+            {/* Glowing red element absolute positioned in backdrop */}
             <div 
               className={`absolute -bottom-8 -right-8 w-24 h-24 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-500 ${
-                theme === 'dark' ? 'bg-[#8efa1d]/10' : 'bg-[#0066fe]/5'
+                theme === 'dark' ? 'bg-[#8efa1d]/10' : 'bg-[#e50914]/5'
               }`} 
             />
             
@@ -886,7 +886,7 @@ export default function DashboardPage() {
               className={`w-full text-[13px] font-black py-3.5 rounded-2xl mt-4 cursor-pointer active:scale-95 transition-all shadow-md ${
                 theme === 'dark'
                   ? 'bg-[#8efa1d] hover:bg-[#a5f841] text-[#0b0c0e]'
-                  : 'bg-[#0066fe] hover:bg-blue-600 text-white'
+                  : 'bg-[#e50914] hover:bg-red-700 text-white'
               }`}
             >
               Upgrade Plan
@@ -904,7 +904,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           
           {/* Left Tabs: Active Cases vs New prospects */}
-          <div className="flex bg-[#e2eaf4]/60 dark:bg-[#16181c] p-1.5 rounded-[22px] border border-[#dae3ed]/40 dark:border-gray-800/40 backdrop-blur-md">
+          <div className="flex bg-[#fee2e2]/40 dark:bg-[#16181c] p-1.5 rounded-[22px] border border-[#fecaca]/40 dark:border-gray-800/40 backdrop-blur-md">
             <button 
               onClick={() => handleTabChange('active')}
               className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-[14px] font-bold cursor-pointer transition-all ${
@@ -914,7 +914,7 @@ export default function DashboardPage() {
               }`}
             >
               <span>Active cases</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#e50914]" />
             </button>
             
             <button 
@@ -926,7 +926,7 @@ export default function DashboardPage() {
               }`}
             >
               <span>New prospects</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#e50914]" />
             </button>
           </div>
 
@@ -940,15 +940,15 @@ export default function DashboardPage() {
                 navigator.clipboard.writeText(url);
                 toast.success('Payment portal link copied to clipboard!');
               }}
-              className="flex items-center gap-2 px-4 py-3 bg-[#e2eaf4]/70 hover:bg-[#d5e3f5] dark:bg-[#16181c] dark:hover:bg-gray-800 text-[#0066fe] dark:text-[#8efa1d] rounded-full border border-[#dae3ed]/60 dark:border-gray-800/60 text-[12.5px] font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 group"
+              className="flex items-center gap-2 px-4 py-3 bg-[#fee2e2]/50 hover:bg-[#fbd3d3] dark:bg-[#16181c] dark:hover:bg-gray-800 text-[#e50914] dark:text-[#8efa1d] rounded-full border border-[#fecaca]/60 dark:border-gray-800/60 text-[12.5px] font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 group"
               title="Copy Client Payment Gateway Link"
             >
-              <Link2 className="w-4 h-4 text-[#0066fe] dark:text-[#8efa1d] group-hover:rotate-45 transition-transform" />
+              <Link2 className="w-4 h-4 text-[#e50914] dark:text-[#8efa1d] group-hover:rotate-45 transition-transform" />
               <span className="hidden sm:inline">Copy Payment Link</span>
             </button>
 
             {/* Search clients */}
-            <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#e2eaf4]/60 dark:bg-[#16181c] rounded-2xl border border-[#dae3ed]/40 dark:border-gray-800/40 w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-750 transition-all shadow-sm">
+            <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#fee2e2]/40 dark:bg-[#16181c] rounded-2xl border border-[#fecaca]/40 dark:border-gray-800/40 w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-750 transition-all shadow-sm">
               <Search className="text-gray-455 w-[18px] h-[18px] mr-2.5 shrink-0" />
               <input 
                 value={searchQuery}
@@ -962,7 +962,7 @@ export default function DashboardPage() {
             {/* Filter drawer toggle */}
             <button 
               onClick={toggleFilterPanel}
-              className="p-3 bg-[#e2eaf4]/60 hover:bg-[#e2eaf4] dark:bg-[#16181c] dark:hover:bg-gray-805 text-gray-655 dark:text-gray-405 rounded-2xl border border-[#dae3ed]/40 dark:border-gray-800/40 transition-all cursor-pointer shadow-sm"
+              className="p-3 bg-[#fee2e2]/40 hover:bg-[#fee2e2] dark:bg-[#16181c] dark:hover:bg-gray-805 text-gray-655 dark:text-gray-405 rounded-2xl border border-[#fecaca]/40 dark:border-gray-800/40 transition-all cursor-pointer shadow-sm"
               title="Filters"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -973,7 +973,7 @@ export default function DashboardPage() {
             {/* Create new case button */}
             <button 
               onClick={() => router.push('/projects/create')}
-              className="w-12 h-12 rounded-full bg-[#0066fe] hover:bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
+              className="w-12 h-12 rounded-full bg-[#e50914] hover:bg-red-700 text-white flex items-center justify-center shadow-lg shadow-red-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
               title="Create New Case"
             >
               <Plus className="w-[22px] h-[22px] stroke-[2.5]" />
@@ -983,7 +983,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Cases counter status capsule */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-[#d7e4f6]/80 dark:bg-gray-800/40 text-[#0066fe] dark:text-[#8efa1d] rounded-full border border-[#bfd3ee]/40 dark:border-gray-800/20 w-fit text-[13px] font-bold shadow-sm">
+        <div className="flex items-center gap-2 px-4 py-2 bg-[#fee2e2]/80 dark:bg-gray-800/40 text-[#e50914] dark:text-[#8efa1d] rounded-full border border-[#fecaca]/60 dark:border-gray-800/20 w-fit text-[13px] font-bold shadow-sm">
           <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
@@ -1049,7 +1049,7 @@ export default function DashboardPage() {
                       <h3 className="text-[17px] font-extrabold text-gray-808 dark:text-white leading-tight">
                         {selectedProject.name}
                       </h3>
-                      <span className="text-[11px] font-extrabold text-[#0066fe] dark:text-[#8efa1d] uppercase tracking-wider block mt-1">
+                      <span className="text-[11px] font-extrabold text-[#e50914] dark:text-[#8efa1d] uppercase tracking-wider block mt-1">
                         {selectedProject.eventType}
                       </span>
                     </div>

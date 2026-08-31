@@ -90,7 +90,7 @@ export default function PaymentsPage() {
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5">
               Total Received
-              <TrendingUp className="text-[#0066fe] w-4 h-4" />
+              <TrendingUp className="text-[#e50914] w-4 h-4" />
             </span>
             <div className="mt-2 text-[26px] font-extrabold text-gray-900 tracking-tight">₹{totalReceived.toLocaleString()}</div>
           </div>
@@ -135,7 +135,7 @@ export default function PaymentsPage() {
       {/* Main Table Card */}
       <div className="glass-card rounded-[24px] overflow-hidden bg-white border border-gray-200/50">
         {loading ? (
-          <div className="p-8 flex justify-center text-[#0066fe] font-bold">Loading transactions...</div>
+          <div className="p-8 flex justify-center text-[#e50914] font-bold">Loading transactions...</div>
         ) : (
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse text-[13px]">
@@ -171,7 +171,7 @@ export default function PaymentsPage() {
                         {payment.screenshotUrl && (
                           <button 
                             onClick={() => setSelectedScreenshot(payment.screenshotUrl)}
-                            className="p-2 text-gray-400 hover:text-[#0066fe] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                             title="View Screenshot Proof"
                           >
                             <Eye className="w-4 h-4" />
@@ -181,7 +181,7 @@ export default function PaymentsPage() {
                         {!isPaid(payment) && (
                           <button 
                             onClick={() => setPaymentToVerify(payment.id)}
-                            className="px-3 py-1 bg-[#0066fe] hover:bg-blue-600 text-white text-[11px] font-bold rounded-lg shadow-sm cursor-pointer"
+                            className="px-3 py-1 bg-[#e50914] hover:bg-red-700 text-white text-[11px] font-bold rounded-lg shadow-sm cursor-pointer"
                           >
                             Verify
                           </button>
@@ -240,7 +240,7 @@ export default function PaymentsPage() {
             <select 
               value={selectedProjectId} 
               onChange={e => setSelectedProjectId(e.target.value)}
-              className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#0066fe] cursor-pointer"
+              className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914] cursor-pointer"
             >
               <option value="">Do not link to project</option>
               {projects.map(p => (

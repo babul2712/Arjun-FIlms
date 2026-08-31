@@ -27,7 +27,7 @@ const DEFAULT_TEMPLATE: TemplateConfig = {
   phone: "+91 7788992712",
   email: "arjunphotographyyy@gmail.com",
   address: "Bhubaneswar, Odisha - 751030",
-  accentColor: "#0066fe",
+  accentColor: "#e50914",
   bankName: "BABUL SAMAL",
   bankAccount: "39149567096",
   bankIfsc: "SBIN0000068",
@@ -38,9 +38,9 @@ const DEFAULT_TEMPLATE: TemplateConfig = {
     "Booking retainer is non-refundable."
   ],
   sectionsOrder: ['header', 'client', 'services', 'payment', 'terms', 'footer'],
-  pageBgColor: "#f0f4fa",
-  headerBgColor: "#eef4fc",
-  footerBgColor: "#0066fe",
+  pageBgColor: "#fdf6f6",
+  headerBgColor: "#fef2f2",
+  footerBgColor: "#e50914",
   watermarkUrl: "/logo.jpeg",
   watermarkOpacity: 0.08
 };
@@ -129,7 +129,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
   if (!isOpen) return null;
 
   const colorPresets = [
-    { name: 'Royal Blue (Theme)', hex: '#0066fe' },
+    { name: 'Royal Blue (Theme)', hex: '#e50914' },
     { name: 'Dark Slate', hex: '#2d3748' },
     { name: 'Studio Purple', hex: '#5c0656' },
     { name: 'Emerald Green', hex: '#137333' },
@@ -153,7 +153,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
         <div className="w-screen max-w-md bg-white dark:bg-[#16181c] shadow-2xl flex flex-col h-full border-l border-gray-150 dark:border-gray-800 transition-all duration-300">
           
           {/* Header */}
-          <div className="px-6 py-5 border-b border-gray-150 dark:border-gray-850 flex justify-between items-center bg-[#eef4fc]/60 dark:bg-gray-900/30">
+          <div className="px-6 py-5 border-b border-gray-150 dark:border-gray-850 flex justify-between items-center bg-[#fee2e2]/40 dark:bg-gray-900/30">
             <div>
               <h2 className="text-[17px] font-extrabold text-gray-900 dark:text-white">PDF Quotation Settings</h2>
               <p className="text-[11px] text-gray-400 dark:text-gray-500 font-semibold mt-0.5">Drag-and-drop order & branding parameters.</p>
@@ -168,7 +168,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
             
             {/* Drag and Drop Sections Order */}
             <div className="space-y-3">
-              <h3 className="text-[12px] font-bold text-[#0066fe] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Drag & Drop Section Layout</h3>
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Drag & Drop Section Layout</h3>
               <p className="text-[11px] text-gray-400 font-semibold mb-3">Grab handles to rearrange the vertical sequence of sections on the generated PDF.</p>
               
               <div className="space-y-2">
@@ -180,7 +180,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                     onDragOver={(e) => onDragOver(e, idx)}
                     onDragEnd={onDragEnd}
                     className={`flex items-center gap-3 p-3 bg-gray-50 dark:bg-[#1c1f24] hover:bg-gray-100/80 dark:hover:bg-gray-800/80 rounded-xl border border-gray-200/40 dark:border-gray-800/60 cursor-grab active:cursor-grabbing transition-all select-none ${
-                      draggedIndex === idx ? 'opacity-40 border-[#0066fe]/50 bg-[#eef4fc]/40 shadow-inner' : ''
+                      draggedIndex === idx ? 'opacity-40 border-[#e50914]/50 bg-[#fee2e2]/40 shadow-inner' : ''
                     }`}
                   >
                     <GripVertical className="w-4 h-4 text-gray-400 shrink-0" />
@@ -195,7 +195,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
 
             {/* Brand Settings */}
             <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-850">
-              <h3 className="text-[12px] font-bold text-[#0066fe] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Studio Details</h3>
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Studio Details</h3>
               
               <div className="flex flex-col">
                 <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Studio / Brand Name</label>
@@ -203,7 +203,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                   type="text" 
                   value={config.studioName}
                   onChange={(e) => setConfig({ ...config, studioName: e.target.value })}
-                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                 />
               </div>
 
@@ -214,7 +214,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                     type="text" 
                     value={config.phone}
                     onChange={(e) => setConfig({ ...config, phone: e.target.value })}
-                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                   />
                 </div>
                 <div className="flex flex-col">
@@ -223,7 +223,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                     type="email" 
                     value={config.email}
                     onChange={(e) => setConfig({ ...config, email: e.target.value })}
-                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                   />
                 </div>
               </div>
@@ -234,14 +234,14 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                   type="text" 
                   value={config.address}
                   onChange={(e) => setConfig({ ...config, address: e.target.value })}
-                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                 />
               </div>
             </div>
 
             {/* Accent Color Theme */}
             <div className="space-y-3 pt-4 border-t border-gray-100 dark:border-gray-850">
-              <h3 className="text-[12px] font-bold text-[#0066fe] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Accent Color Theme</h3>
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Accent Color Theme</h3>
               
               <div className="flex flex-wrap gap-2">
                 {colorPresets.map((preset) => (
@@ -251,7 +251,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                     onClick={() => setConfig({ ...config, accentColor: preset.hex })}
                     className={`px-3 py-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
                       config.accentColor === preset.hex
-                        ? 'bg-gray-100 dark:bg-gray-800 border-[#0066fe] text-[#0066fe] dark:text-white shadow-sm'
+                        ? 'bg-gray-100 dark:bg-gray-800 border-[#e50914] text-[#e50914] dark:text-white shadow-sm'
                         : 'bg-white dark:bg-[#1c1f24] border-gray-200/60 dark:border-gray-800 text-gray-500 hover:bg-gray-50'
                     }`}
                   >
@@ -277,7 +277,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
 
             {/* Document Styles */}
             <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-850">
-              <h3 className="text-[12px] font-bold text-[#0066fe] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Document Styles</h3>
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Document Styles</h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
@@ -330,7 +330,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                   value={config.watermarkUrl}
                   onChange={(e) => setConfig({ ...config, watermarkUrl: e.target.value })}
                   placeholder="e.g. https://domain.com/logo.png"
-                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13px] font-medium" 
+                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13px] font-medium" 
                 />
               </div>
 
@@ -347,14 +347,14 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                   step="0.01"
                   value={config.watermarkOpacity}
                   onChange={(e) => setConfig({ ...config, watermarkOpacity: parseFloat(e.target.value) })}
-                  className="w-full h-1.5 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-[#0066fe]" 
+                  className="w-full h-1.5 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-[#e50914]" 
                 />
               </div>
             </div>
 
             {/* Bank Info */}
             <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-850">
-              <h3 className="text-[12px] font-bold text-[#0066fe] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Payment Details</h3>
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Payment Details</h3>
               
               <div className="flex flex-col">
                 <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Account Holder Name</label>
@@ -362,7 +362,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                   type="text" 
                   value={config.bankName}
                   onChange={(e) => setConfig({ ...config, bankName: e.target.value })}
-                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                 />
               </div>
 
@@ -373,7 +373,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                     type="text" 
                     value={config.bankAccount}
                     onChange={(e) => setConfig({ ...config, bankAccount: e.target.value })}
-                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                   />
                 </div>
                 <div className="flex flex-col">
@@ -382,7 +382,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                     type="text" 
                     value={config.bankIfsc}
                     onChange={(e) => setConfig({ ...config, bankIfsc: e.target.value })}
-                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[13.5px] font-medium" 
+                    className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13.5px] font-medium" 
                   />
                 </div>
               </div>
@@ -391,11 +391,11 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
             {/* Terms and Conditions */}
             <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-850">
               <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2">
-                <h3 className="text-[12px] font-bold text-[#0066fe] dark:text-white uppercase tracking-wider">Terms & Conditions</h3>
+                <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider">Terms & Conditions</h3>
                 <button
                   type="button"
                   onClick={handleAddTerm}
-                  className="flex items-center gap-1 text-[#0066fe] dark:text-blue-400 hover:bg-[#0066fe]/10 px-2 py-1 rounded-lg transition-colors font-bold text-[11px] cursor-pointer"
+                  className="flex items-center gap-1 text-[#e50914] dark:text-blue-400 hover:bg-[#e50914]/10 px-2 py-1 rounded-lg transition-colors font-bold text-[11px] cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Term
@@ -405,13 +405,13 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
               <div className="space-y-3">
                 {config.terms.map((term, index) => (
                   <div key={index} className="flex items-start gap-2">
-                    <span className="w-6 h-8 flex items-center justify-center font-bold text-[#0066fe] dark:text-gray-400 text-[13px]">{index + 1}.</span>
+                    <span className="w-6 h-8 flex items-center justify-center font-bold text-[#e50914] dark:text-gray-400 text-[13px]">{index + 1}.</span>
                     <textarea
                       rows={2}
                       value={term}
                       onChange={(e) => handleTermChange(index, e.target.value)}
                       placeholder="Enter legal terms or payment milestones..."
-                      className="flex-1 bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 p-2.5 rounded-xl focus:outline-none focus:border-[#0066fe] dark:text-white text-[12.5px] font-medium resize-none"
+                      className="flex-1 bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 p-2.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[12.5px] font-medium resize-none"
                     />
                     <button
                       type="button"
@@ -439,7 +439,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
             </button>
             <button
               onClick={handleSave}
-              className="flex items-center justify-center gap-1.5 px-5 py-3 bg-[#0066fe] text-white rounded-xl text-[13px] font-bold hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all flex-1 cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-5 py-3 bg-[#e50914] text-white rounded-xl text-[13px] font-bold hover:bg-red-700 shadow-lg shadow-red-500/20 transition-all flex-1 cursor-pointer"
             >
               <Save className="w-4 h-4" />
               Save Config

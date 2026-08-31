@@ -43,7 +43,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
     phone: "+91 7788992712",
     email: "arjunphotographyyy@gmail.com",
     address: "Bhubaneswar, Odisha - 751030",
-    accentColor: "#0066fe",
+    accentColor: "#e50914",
     bankName: "BABUL SAMAL",
     bankAccount: "39149567096",
     bankIfsc: "SBIN0000068",
@@ -54,9 +54,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       "Booking retainer is non-refundable."
     ],
     sectionsOrder: ['header', 'client', 'services', 'payment', 'terms', 'footer'],
-    pageBgColor: "#f0f4fa",
-    headerBgColor: "#eef4fc",
-    footerBgColor: "#0066fe",
+    pageBgColor: "#fdf6f6",
+    headerBgColor: "#fef2f2",
+    footerBgColor: "#e50914",
     watermarkUrl: "/logo.jpeg",
     watermarkOpacity: 0.08
   });
@@ -73,9 +73,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
           
           // Backwards compatibility fallbacks
           if (!parsed.sectionsOrder) parsed.sectionsOrder = ['header', 'client', 'services', 'payment', 'terms', 'footer'];
-          if (!parsed.pageBgColor) parsed.pageBgColor = "#f0f4fa";
-          if (!parsed.headerBgColor) parsed.headerBgColor = "#eef4fc";
-          if (!parsed.footerBgColor) parsed.footerBgColor = parsed.accentColor || "#0066fe";
+          if (!parsed.pageBgColor) parsed.pageBgColor = "#fdf6f6";
+          if (!parsed.headerBgColor) parsed.headerBgColor = "#fef2f2";
+          if (!parsed.footerBgColor) parsed.footerBgColor = parsed.accentColor || "#e50914";
           if (parsed.watermarkUrl === undefined) parsed.watermarkUrl = "https://cdn-icons-png.flaticon.com/512/685/685655.png";
           if (parsed.watermarkOpacity === undefined) parsed.watermarkOpacity = 0.05;
 
@@ -311,7 +311,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       <style>
       @page{size:A4;margin:10mm}
       *{box-sizing:border-box}
-      body{margin:0;background:${templateConfig.pageBgColor || '#f0f4fa'};font-family:Arial,Helvetica,sans-serif;color:#333;padding:20px}
+      body{margin:0;background:${templateConfig.pageBgColor || '#fdf6f6'};font-family:Arial,Helvetica,sans-serif;color:#333;padding:20px}
       .container{max-width:800px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.05);border:1px solid #eee;display:flex;flex-direction:column;justify-content:space-between;min-height:98vh;position:relative;}
       .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;height:320px;opacity:${templateConfig.watermarkOpacity !== undefined ? templateConfig.watermarkOpacity : 0.05};background-image:url('${templateConfig.watermarkUrl || ''}');background-repeat:no-repeat;background-position:center;background-size:contain;pointer-events:none;z-index:0;}
       .header{background:${templateConfig.headerBgColor || '#fdf2f8'};color:${templateConfig.accentColor};padding:24px;display:flex;justify-content:space-between;position:relative;z-index:1;}
@@ -414,14 +414,14 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
         {/* Client details card */}
         <div className="glass-card p-6 bg-white border border-gray-200/50 rounded-2xl space-y-4 shadow-sm">
           <h3 className="text-base font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
-            <User className="w-5 h-5 text-[#0066fe]" />
+            <User className="w-5 h-5 text-[#e50914]" />
             Client Particulars
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Full Name</label>
               <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[15px]" 
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
                 placeholder="e.g. Alexandra Vane" 
                 value={formData.customerName}
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
@@ -431,7 +431,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Phone Number</label>
               <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[15px]" 
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
                 placeholder="+91 90000 00000" 
                 value={formData.phone}
                 onChange={e => setFormData({ ...formData, phone: e.target.value })}
@@ -441,7 +441,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             <div className="flex flex-col md:col-span-2">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Email Address</label>
               <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[15px]" 
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
                 placeholder="alex@example.com" 
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -454,14 +454,14 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
         {/* Shoot details */}
         <div className="glass-card p-6 bg-white border border-gray-200/50 rounded-2xl space-y-4 shadow-sm">
           <h3 className="text-base font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
-            <Calendar className="w-5 h-5 text-[#0066fe]" />
+            <Calendar className="w-5 h-5 text-[#e50914]" />
             Shoot Particulars
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Event Type</label>
               <select 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] cursor-pointer"
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px] cursor-pointer"
                 value={formData.eventType}
                 onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
               >
@@ -474,7 +474,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Event Date</label>
               <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[15px]" 
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
                 type="date"
                 value={formData.bookingDate}
                 onChange={e => setFormData({ ...formData, bookingDate: e.target.value })}
@@ -485,7 +485,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
               <div className="relative">
                 <MapPin className="absolute left-0 top-3 text-gray-400 w-4 h-4" />
                 <input 
-                  className="w-full bg-transparent border-b border-gray-300 py-2 pl-6 focus:outline-none focus:border-[#0066fe] text-[15px]" 
+                  className="w-full bg-transparent border-b border-gray-300 py-2 pl-6 focus:outline-none focus:border-[#e50914] text-[15px]" 
                   placeholder="e.g. Studio A or hotel venue name" 
                   value={formData.location}
                   onChange={e => setFormData({ ...formData, location: e.target.value })}
@@ -496,7 +496,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             <div className="flex flex-col md:col-span-2">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Link to Project Case</label>
               <select 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#0066fe] text-[15px] cursor-pointer"
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px] cursor-pointer"
                 value={selectedProjectId}
                 onChange={e => setSelectedProjectId(e.target.value)}
               >
@@ -515,7 +515,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             <h3 className="text-base font-bold text-gray-800">Line Items Pricing</h3>
             <button 
               onClick={handleAddService}
-              className="flex items-center gap-1 text-[#0066fe] hover:bg-[#0066fe]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-bold text-[12px]"
+              className="flex items-center gap-1 text-[#e50914] hover:bg-[#e50914]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-bold text-[12px]"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Item
@@ -528,7 +528,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                 <div className="col-span-12 md:col-span-5 flex flex-col">
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Service Title</label>
                   <input 
-                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#0066fe] text-[14px]" 
+                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px]" 
                     placeholder="e.g. Cinematic Video Editing" 
                     value={service.name}
                     onChange={e => handleServiceChange(service.id, 'name', e.target.value)}
@@ -538,7 +538,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                 <div className="col-span-4 md:col-span-2 flex flex-col">
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Qty</label>
                   <input 
-                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#0066fe] text-[14px]" 
+                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px]" 
                     value={service.quantity}
                     onChange={e => handleServiceChange(service.id, 'quantity', parseInt(e.target.value) || 0)}
                     type="number"
@@ -548,7 +548,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                 <div className="col-span-6 md:col-span-3 flex flex-col">
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Price (₹)</label>
                   <input 
-                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#0066fe] text-[14px]" 
+                    className="bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[14px]" 
                     value={service.price}
                     onChange={e => handleServiceChange(service.id, 'price', parseInt(e.target.value) || 0)}
                     type="number"
@@ -576,7 +576,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
               <div className="flex justify-between items-center text-gray-400 text-[12px] uppercase tracking-wider">
                 <span>Retainer Discount</span>
                 <input 
-                  className="w-24 bg-transparent border-b border-gray-300 text-right focus:outline-none focus:border-[#0066fe] text-[13px] font-extrabold"
+                  className="w-24 bg-transparent border-b border-gray-300 text-right focus:outline-none focus:border-[#e50914] text-[13px] font-extrabold"
                   value={formData.discount}
                   onChange={e => setFormData({ ...formData, discount: parseInt(e.target.value) || 0 })}
                   type="number"
@@ -601,7 +601,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             <button 
               onClick={handleSave} 
               disabled={loading}
-              className="w-full flex items-center justify-center bg-[#0066fe] hover:bg-blue-600 text-white py-3.5 rounded-xl transition-all font-bold text-[14px] shadow-lg shadow-blue-500/20 cursor-pointer disabled:opacity-50"
+              className="w-full flex items-center justify-center bg-[#e50914] hover:bg-red-700 text-white py-3.5 rounded-xl transition-all font-bold text-[14px] shadow-lg shadow-red-500/20 cursor-pointer disabled:opacity-50"
             >
               {loading ? 'Saving...' : quotationId ? 'Save Changes' : 'Generate Quotation'}
             </button>
@@ -624,9 +624,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
 
             <button 
               onClick={handleCopyPaymentLink}
-              className="w-full flex items-center justify-center gap-1 bg-white border border-gray-200 hover:bg-gray-50 text-[#0066fe] py-3 rounded-xl transition-all font-bold text-[13px] cursor-pointer shadow-sm"
+              className="w-full flex items-center justify-center gap-1 bg-white border border-gray-200 hover:bg-gray-50 text-[#e50914] py-3 rounded-xl transition-all font-bold text-[13px] cursor-pointer shadow-sm"
             >
-              <LinkIcon className="w-4.5 h-4.5 text-[#0066fe]" />
+              <LinkIcon className="w-4.5 h-4.5 text-[#e50914]" />
               Copy Payment Link
             </button>
           </div>
