@@ -16,9 +16,14 @@ import { generateOTPEmailHtml } from '@/lib/emailTemplates';
 const resend = new Resend(process.env.RESEND_API_KEY || 'default_key');
 
 export async function getEventTypes() {
-  await connectToDatabase();
-  const types = await EventType.find({}).sort({ name: 1 }).lean();
-  return JSON.parse(JSON.stringify(types));
+  try {
+    await connectToDatabase();
+    const types = await EventType.find({}).sort({ name: 1 }).lean();
+    return JSON.parse(JSON.stringify(types));
+  } catch (e) {
+    console.error('getEventTypes error:', e);
+    return [];
+  }
 }
 
 export async function createEventType(name: string) {
@@ -34,20 +39,30 @@ export async function createEventType(name: string) {
 }
 
 export async function getProjects() {
-  await connectToDatabase();
-  const projects = await Project.find({}).sort({ createdAt: -1 }).lean();
-  return JSON.parse(JSON.stringify(projects));
+  try {
+    await connectToDatabase();
+    const projects = await Project.find({}).sort({ createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(projects));
+  } catch (e) {
+    console.error('getProjects error:', e);
+    return [];
+  }
 }
 
 export async function getProjectById(id: string) {
-  await connectToDatabase();
-  const project = await Project.findById(id).lean() as any;
-  if (!project) return null;
+  try {
+    await connectToDatabase();
+    const project = await Project.findById(id).lean() as any;
+    if (!project) return null;
 
-  project.quotationsList = await Quotation.find({ projectId: id }).sort({ createdAt: -1 }).lean();
-  project.paymentsList = await Payment.find({ projectId: id }).sort({ date: -1 }).lean();
+    project.quotationsList = await Quotation.find({ projectId: id }).sort({ createdAt: -1 }).lean();
+    project.paymentsList = await Payment.find({ projectId: id }).sort({ date: -1 }).lean();
 
-  return JSON.parse(JSON.stringify(project));
+    return JSON.parse(JSON.stringify(project));
+  } catch (e) {
+    console.error('getProjectById error:', e);
+    return null;
+  }
 }
 
 export async function createProject(data: any) {
@@ -86,9 +101,14 @@ export async function deleteProject(id: string) {
 }
 
 export async function getPayments() {
-  await connectToDatabase();
-  const payments = await Payment.find({}).sort({ date: -1 }).lean();
-  return JSON.parse(JSON.stringify(payments));
+  try {
+    await connectToDatabase();
+    const payments = await Payment.find({}).sort({ date: -1 }).lean();
+    return JSON.parse(JSON.stringify(payments));
+  } catch (e) {
+    console.error('getPayments error:', e);
+    return [];
+  }
 }
 
 export async function createPayment(data: any) {
@@ -152,9 +172,14 @@ export async function deletePayment(id: string) {
 }
 
 export async function getQuotations() {
-  await connectToDatabase();
-  const quotations = await Quotation.find({}).sort({ createdAt: -1 }).lean();
-  return JSON.parse(JSON.stringify(quotations));
+  try {
+    await connectToDatabase();
+    const quotations = await Quotation.find({}).sort({ createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(quotations));
+  } catch (e) {
+    console.error('getQuotations error:', e);
+    return [];
+  }
 }
 
 export async function createQuotation(data: any) {
@@ -165,9 +190,14 @@ export async function createQuotation(data: any) {
 }
 
 export async function getQuotationById(id: string) {
-  await connectToDatabase();
-  const quotation = await Quotation.findById(id).lean();
-  return JSON.parse(JSON.stringify(quotation));
+  try {
+    await connectToDatabase();
+    const quotation = await Quotation.findById(id).lean();
+    return JSON.parse(JSON.stringify(quotation));
+  } catch (e) {
+    console.error('getQuotationById error:', e);
+    return null;
+  }
 }
 
 export async function updateQuotation(id: string, data: any) {
@@ -185,9 +215,14 @@ export async function deleteQuotation(id: string) {
 }
 
 export async function getBookings() {
-  await connectToDatabase();
-  const bookings = await Booking.find({}).sort({ date: 1 }).lean();
-  return JSON.parse(JSON.stringify(bookings));
+  try {
+    await connectToDatabase();
+    const bookings = await Booking.find({}).sort({ date: 1 }).lean();
+    return JSON.parse(JSON.stringify(bookings));
+  } catch (e) {
+    console.error('getBookings error:', e);
+    return [];
+  }
 }
 
 export async function createBooking(data: any) {
@@ -197,58 +232,79 @@ export async function createBooking(data: any) {
 }
 
 export async function getDashboardStats() {
-  await connectToDatabase();
-  const totalRevenueAgg = await Payment.aggregate([
-    { $match: { status: 'PAID' } },
-    { $group: { _id: null, total: { $sum: '$amount' } } }
-  ]);
-  const revenue = totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;
+  try {
+    await connectToDatabase();
+    const totalRevenueAgg = await Payment.aggregate([
+      { $match: { status: 'PAID' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const revenue = totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;
 
-  const totalProjectValueAgg = await Project.aggregate([
-    { $group: { _id: null, total: { $sum: '$totalValue' } } }
-  ]);
-  const totalProjectValue = totalProjectValueAgg.length > 0 ? totalProjectValueAgg[0].total : 0;
+    const totalProjectValueAgg = await Project.aggregate([
+      { $group: { _id: null, total: { $sum: '$totalValue' } } }
+    ]);
+    const totalProjectValue = totalProjectValueAgg.length > 0 ? totalProjectValueAgg[0].total : 0;
 
-  const pendingPaymentsAmount = Math.max(0, totalProjectValue - revenue);
+    const pendingPaymentsAmount = Math.max(0, totalProjectValue - revenue);
 
-  const totalBookings = await Booking.countDocuments();
-  const totalQuotations = await Quotation.countDocuments();
-  const totalProjects = await Project.countDocuments();
-  const finishedProjects = await Project.countDocuments({ status: 'Completed' });
-  const pendingProjects = await Project.countDocuments({ status: { $ne: 'Completed' } });
+    const totalBookings = await Booking.countDocuments();
+    const totalQuotations = await Quotation.countDocuments();
+    const totalProjects = await Project.countDocuments();
+    const finishedProjects = await Project.countDocuments({ status: 'Completed' });
+    const pendingProjects = await Project.countDocuments({ status: { $ne: 'Completed' } });
 
-  const totalCrew = await Crew.countDocuments();
-  const projectsWithCrew = await Project.find({
-    status: { $ne: 'Completed' },
-    'crewBlueprint.assignedCrewId': { $exists: true, $ne: null }
-  }, { crewBlueprint: 1 }).lean();
-  const assignedCrewIds = new Set();
-  projectsWithCrew.forEach((p: any) => {
-    p.crewBlueprint?.forEach((c: any) => {
-      if (c.assignedCrewId) assignedCrewIds.add(c.assignedCrewId.toString());
+    const totalCrew = await Crew.countDocuments();
+    const projectsWithCrew = await Project.find({
+      status: { $ne: 'Completed' },
+      'crewBlueprint.assignedCrewId': { $exists: true, $ne: null }
+    }, { crewBlueprint: 1 }).lean();
+    const assignedCrewIds = new Set();
+    projectsWithCrew.forEach((p: any) => {
+      p.crewBlueprint?.forEach((c: any) => {
+        if (c.assignedCrewId) assignedCrewIds.add(c.assignedCrewId.toString());
+      });
     });
-  });
-  const totalCrewAssigned = assignedCrewIds.size;
-  const totalCrewNotAssigned = totalCrew - totalCrewAssigned;
+    const totalCrewAssigned = assignedCrewIds.size;
+    const totalCrewNotAssigned = totalCrew - totalCrewAssigned;
 
-  return {
-    totalQuotations,
-    totalBookings,
-    pendingPaymentsAmount,
-    revenue,
-    totalProjects,
-    finishedProjects,
-    pendingProjects,
-    totalCrew,
-    totalCrewAssigned,
-    totalCrewNotAssigned
-  };
+    return {
+      totalQuotations,
+      totalBookings,
+      pendingPaymentsAmount,
+      revenue,
+      totalProjects,
+      finishedProjects,
+      pendingProjects,
+      totalCrew,
+      totalCrewAssigned,
+      totalCrewNotAssigned
+    };
+  } catch (e) {
+    console.error('getDashboardStats error:', e);
+    return {
+      totalQuotations: 0,
+      totalBookings: 0,
+      pendingPaymentsAmount: 0,
+      revenue: 0,
+      totalProjects: 0,
+      finishedProjects: 0,
+      pendingProjects: 0,
+      totalCrew: 0,
+      totalCrewAssigned: 0,
+      totalCrewNotAssigned: 0
+    };
+  }
 }
 
 export async function getCrew() {
-  await connectToDatabase();
-  const crew = await Crew.find({}).sort({ location: 1, name: 1 }).lean();
-  return JSON.parse(JSON.stringify(crew));
+  try {
+    await connectToDatabase();
+    const crew = await Crew.find({}).sort({ location: 1, name: 1 }).lean();
+    return JSON.parse(JSON.stringify(crew));
+  } catch (e) {
+    console.error('getCrew error:', e);
+    return [];
+  }
 }
 
 export async function createCrew(data: any) {

@@ -73,13 +73,13 @@ export default function PaymentsPage() {
     }
   };
 
-  const isPaid = (p: Payment) => p.status === 'PAID' || p.status === 'Verified';
+  const isPaid = (p: Payment) => p && (p.status === 'PAID' || p.status === 'Verified');
   
-  const totalReceived = payments.filter(isPaid).reduce((sum, p) => sum + p.amount, 0);
-  const pendingAmount = payments.filter(p => p.status === 'PENDING' || p.status === 'Pending Verification').reduce((sum, p) => sum + p.amount, 0);
-  const todayCollections = payments
-    .filter(p => isPaid(p) && dayjs(p.date).isSame(dayjs(), 'day'))
-    .reduce((sum, p) => sum + p.amount, 0);
+  const totalReceived = Array.isArray(payments) ? payments.filter(isPaid).reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
+  const pendingAmount = Array.isArray(payments) ? payments.filter(p => p && (p.status === 'PENDING' || p.status === 'Pending Verification')).reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
+  const todayCollections = Array.isArray(payments) ? payments
+    .filter(p => isPaid(p) && p?.date && dayjs(p.date).isValid() && dayjs(p.date).isSame(dayjs(), 'day'))
+    .reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-gray-800">
@@ -103,7 +103,7 @@ export default function PaymentsPage() {
             <div className="mt-2 text-[26px] font-extrabold text-gray-900 tracking-tight">₹{pendingAmount.toLocaleString()}</div>
           </div>
           <div className="text-[11px] text-gray-400 font-semibold">
-            {payments.filter(p => p.status === 'PENDING').length} awaiting verification
+            {Array.isArray(payments) ? payments.filter(p => p && (p.status === 'PENDING' || p.status === 'Pending Verification')).length : 0} awaiting verification
           </div>
         </div>
 
@@ -115,7 +115,7 @@ export default function PaymentsPage() {
           </div>
           <div className="text-[11px] text-gray-400 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-            {payments.filter(p => isPaid(p) && dayjs(p.date).isSame(dayjs(), 'day')).length} payments processed
+            {Array.isArray(payments) ? payments.filter(p => isPaid(p) && p?.date && dayjs(p.date).isValid() && dayjs(p.date).isSame(dayjs(), 'day')).length : 0} payments processed
           </div>
         </div>
 
@@ -150,54 +150,59 @@ export default function PaymentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {payments.map(payment => (
-                  <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="font-bold text-gray-800">{payment.customerName}</p>
-                        <p className="text-[11px] text-gray-400 font-semibold">{payment.phone}</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 font-semibold text-gray-600">{payment.paymentMethod}</td>
-                    <td className="px-6 py-4 font-extrabold text-gray-900 text-right">₹{payment.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4 font-semibold text-gray-500">{dayjs(payment.date).format('DD MMM YYYY, hh:mm A')}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${isPaid(payment) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
-                        {payment.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {payment.screenshotUrl && (
-                          <button 
-                            onClick={() => setSelectedScreenshot(payment.screenshotUrl)}
-                            className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-                            title="View Screenshot Proof"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        )}
-                        
-                        {!isPaid(payment) && (
-                          <button 
-                            onClick={() => setPaymentToVerify(payment.id)}
-                            className="px-3 py-1 bg-[#e50914] hover:bg-red-700 text-white text-[11px] font-bold rounded-lg shadow-sm cursor-pointer"
-                          >
-                            Verify
-                          </button>
-                        )}
+                {Array.isArray(payments) && payments.map((payment, pIdx) => {
+                  const paymentId = payment.id || (payment as any)._id || `pmt-${pIdx}`;
+                  return (
+                    <tr key={paymentId} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-bold text-gray-800">{payment.customerName || 'Anonymous Client'}</p>
+                          <p className="text-[11px] text-gray-400 font-semibold">{payment.phone || ''}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-gray-600">{payment.paymentMethod || 'UPI QR'}</td>
+                      <td className="px-6 py-4 font-extrabold text-gray-900 text-right">₹{(payment.amount || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 font-semibold text-gray-500">
+                        {payment.date && dayjs(payment.date).isValid() ? dayjs(payment.date).format('DD MMM YYYY, hh:mm A') : 'Recently'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${isPaid(payment) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
+                          {payment.status || 'Pending'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {payment.screenshotUrl && (
+                            <button 
+                              onClick={() => setSelectedScreenshot(payment.screenshotUrl)}
+                              className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                              title="View Screenshot Proof"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          )}
+                          
+                          {!isPaid(payment) && (
+                            <button 
+                              onClick={() => setPaymentToVerify(paymentId)}
+                              className="px-3 py-1 bg-[#e50914] hover:bg-red-700 text-white text-[11px] font-bold rounded-lg shadow-sm cursor-pointer"
+                            >
+                              Verify
+                            </button>
+                          )}
 
-                        <button 
-                          onClick={() => setPaymentToDelete(payment.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                          title="Delete Payment"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          <button 
+                            onClick={() => setPaymentToDelete(paymentId)}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                            title="Delete Payment"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {payments.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-gray-400 font-semibold">
@@ -243,9 +248,14 @@ export default function PaymentsPage() {
               className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914] cursor-pointer"
             >
               <option value="">Do not link to project</option>
-              {projects.map(p => (
-                <option key={p.id} value={p.id}>{p.projectNumber} - {p.name}</option>
-              ))}
+              {projects.map((p, pIdx) => {
+                const projId = p._id || p.id || `proj-select-${pIdx}`;
+                return (
+                  <option key={projId} value={projId}>
+                    {p.projectNumber || 'PRJ'} - {p.name || 'Untitled Case'}
+                  </option>
+                );
+              })}
             </select>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
