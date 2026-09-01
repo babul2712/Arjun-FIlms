@@ -33,7 +33,9 @@ export default function Sidebar() {
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const { theme, toggleTheme } = useUIStore();
+  const theme = useUIStore((state) => state.theme);
+  const toggleTheme = useUIStore((state) => state.toggleTheme);
+  const toggleNotificationDrawer = useUIStore((state) => state.toggleNotificationDrawer);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -102,6 +104,7 @@ export default function Sidebar() {
 
         {/* Notification Bell */}
         <button 
+          onClick={toggleNotificationDrawer}
           className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-[#e50914] dark:hover:text-red-300 hover:bg-[#fef2f2] dark:hover:bg-red-950/40 transition-all cursor-pointer relative active:scale-95"
           title="Notifications"
         >

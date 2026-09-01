@@ -9,6 +9,7 @@ import Booking from '@/lib/models/Booking';
 import Crew from '@/lib/models/Crew';
 import EventType from '@/lib/models/EventType';
 import Otp from '@/lib/models/Otp';
+import Notification from '@/lib/models/Notification';
 import { Resend } from 'resend';
 import bcrypt from 'bcryptjs';
 import { generateOTPEmailHtml } from '@/lib/emailTemplates';
@@ -121,6 +122,21 @@ export async function createPayment(data: any) {
       date: data.date ? new Date(data.date) : new Date()
     };
     const payment = await Payment.create(paymentData);
+    
+    // Auto-create notification for new payment
+    try {
+      await Notification.create({
+        title: 'New Client Payment Received',
+        message: `${paymentData.customerName || 'A client'} submitted ₹${Number(paymentData.amount).toLocaleString('en-IN')} via ${paymentData.paymentMethod || 'UPI'}`,
+        type: 'payment',
+        link: '/payments',
+        amount: Number(paymentData.amount),
+        read: false
+      });
+    } catch (notifErr) {
+      console.warn('Failed to auto-create notification for payment:', notifErr);
+    }
+
     revalidatePath('/dashboard', 'layout');
     revalidatePath('/payments', 'layout');
     return JSON.parse(JSON.stringify(payment));
@@ -394,5 +410,134 @@ export async function verifyLoginOTP(email: string, otp: string): Promise<{ succ
     return { success: true };
   } else {
     return { success: false, error: 'Invalid OTP' };
+  }
+}
+
+// ----------------------------------------------------
+// NOTIFICATION SYSTEM SERVER ACTIONS
+// ----------------------------------------------------
+
+export async function getNotifications() {
+  try {
+    await connectToDatabase();
+    
+    // Seed initial notifications if collection is empty
+    const count = await Notification.countDocuments();
+    if (count === 0) {
+      const initialNotifs = [
+        {
+          title: 'Welcome to Arjun Films CRM',
+          message: 'Client case management, shoot calendar, and invoice generation is active.',
+          type: 'project',
+          link: '/dashboard',
+          read: false,
+          createdAt: new Date()
+        },
+        {
+          title: 'Upcoming Shoot Schedule',
+          message: 'Review client bookings and crew assignment blueprint in the calendar.',
+          type: 'shoot',
+          link: '/calendar',
+          read: false,
+          createdAt: new Date(Date.now() - 3600000)
+        }
+      ];
+
+      // Check if there are pending payments to add
+      const pendingPayments = await Payment.find({ status: 'PENDING' }).sort({ date: -1 }).limit(3).lean();
+      for (const p of pendingPayments) {
+        initialNotifs.push({
+          title: 'Payment Awaiting Verification',
+          message: `${p.customerName || 'A client'} submitted ₹${Number(p.amount).toLocaleString('en-IN')} via ${p.paymentMethod || 'UPI'}`,
+          type: 'payment',
+          link: '/payments',
+          read: false,
+          createdAt: p.date ? new Date(p.date) : new Date()
+        });
+      }
+
+      await Notification.insertMany(initialNotifs);
+    }
+
+    const notifications = await Notification.find({}).sort({ createdAt: -1 }).limit(50).lean();
+    return JSON.parse(JSON.stringify(notifications));
+  } catch (error) {
+    console.error('getNotifications error:', error);
+    return [];
+  }
+}
+
+export async function createNotification(data: {
+  title: string;
+  message: string;
+  type?: 'payment' | 'shoot' | 'project' | 'quotation' | 'crew';
+  link?: string;
+  amount?: number;
+  read?: boolean;
+}) {
+  try {
+    await connectToDatabase();
+    const notif = await Notification.create({
+      title: data.title,
+      message: data.message,
+      type: data.type || 'payment',
+      link: data.link || '/dashboard',
+      amount: data.amount,
+      read: data.read || false,
+      createdAt: new Date()
+    });
+    revalidatePath('/dashboard', 'layout');
+    return JSON.parse(JSON.stringify(notif));
+  } catch (error) {
+    console.error('createNotification error:', error);
+    return null;
+  }
+}
+
+export async function markNotificationAsRead(id: string) {
+  try {
+    await connectToDatabase();
+    const updated = await Notification.findByIdAndUpdate(id, { read: true }, { new: true });
+    revalidatePath('/dashboard', 'layout');
+    return JSON.parse(JSON.stringify(updated));
+  } catch (error) {
+    console.error('markNotificationAsRead error:', error);
+    return null;
+  }
+}
+
+export async function markAllNotificationsAsRead() {
+  try {
+    await connectToDatabase();
+    await Notification.updateMany({ read: false }, { read: true });
+    revalidatePath('/dashboard', 'layout');
+    return { success: true };
+  } catch (error) {
+    console.error('markAllNotificationsAsRead error:', error);
+    return { success: false };
+  }
+}
+
+export async function deleteNotification(id: string) {
+  try {
+    await connectToDatabase();
+    await Notification.findByIdAndDelete(id);
+    revalidatePath('/dashboard', 'layout');
+    return { success: true };
+  } catch (error) {
+    console.error('deleteNotification error:', error);
+    return { success: false };
+  }
+}
+
+export async function clearAllNotifications() {
+  try {
+    await connectToDatabase();
+    await Notification.deleteMany({ read: true });
+    revalidatePath('/dashboard', 'layout');
+    return { success: true };
+  } catch (error) {
+    console.error('clearAllNotifications error:', error);
+    return { success: false };
   }
 }

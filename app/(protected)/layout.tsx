@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
+import NotificationDrawer from '@/components/layout/NotificationDrawer';
 import { useUIStore } from '@/store/uiStore';
 
 export default function ProtectedLayout({
@@ -30,6 +31,7 @@ export default function ProtectedLayout({
           {children}
         </div>
       </main>
+      <NotificationDrawer />
     </div>
   );
 }

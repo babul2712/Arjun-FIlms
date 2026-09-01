@@ -7,7 +7,7 @@ import { useUIStore } from '@/store/uiStore';
 
 export default function Topbar() {
   const pathname = usePathname();
-  const { toggleFilterPanel } = useUIStore();
+  const { toggleFilterPanel, toggleNotificationDrawer } = useUIStore();
 
   if (pathname === '/dashboard') return null;
 
@@ -26,17 +26,16 @@ export default function Topbar() {
     <header className="flex justify-between items-center px-8 h-20 w-full bg-transparent sticky top-0 z-40">
       {/* Title */}
       <div>
-        <h2 className="text-[20px] font-extrabold text-gray-800 tracking-tight">{currentTitle}</h2>
+        <h2 className="text-[20px] font-extrabold text-gray-800 dark:text-white tracking-tight">{currentTitle}</h2>
       </div>
-
 
       {/* Right controls */}
       <div className="flex items-center gap-4">
         {/* Search */}
-        <div className="hidden sm:flex items-center px-4 py-2 bg-[#fee2e2]/30 rounded-full border border-gray-200/20 w-64 focus-within:ring-1 focus-within:ring-[#e50914]/50">
+        <div className="hidden sm:flex items-center px-4 py-2 bg-[#fee2e2]/30 dark:bg-gray-800/40 rounded-full border border-gray-200/20 dark:border-gray-700/50 w-64 focus-within:ring-1 focus-within:ring-[#e50914]/50">
           <Search className="text-gray-400 w-[18px] h-[18px] mr-2" />
           <input 
-            className="bg-transparent border-none focus:outline-none focus:ring-0 text-[13px] font-medium w-full placeholder:text-gray-400" 
+            className="bg-transparent border-none focus:outline-none focus:ring-0 text-[13px] font-medium w-full placeholder:text-gray-400 text-gray-800 dark:text-gray-200" 
             placeholder="Search studio records..." 
             type="text"
           />
@@ -54,9 +53,13 @@ export default function Topbar() {
         )}
 
         {/* Notifications */}
-        <button className="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-all cursor-pointer relative">
+        <button 
+          onClick={toggleNotificationDrawer}
+          className="p-2.5 bg-gray-100 dark:bg-gray-800/60 hover:bg-[#fee2e2]/50 dark:hover:bg-red-950/40 text-gray-600 dark:text-gray-300 hover:text-[#e50914] rounded-xl transition-all cursor-pointer relative active:scale-95"
+          title="Open Notifications"
+        >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500" />
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#e50914] ring-2 ring-white dark:ring-[#121418] animate-pulse" />
         </button>
       </div>
     </header>

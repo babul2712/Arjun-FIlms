@@ -118,3 +118,18 @@ export interface Staff {
   charges: number;
   createdAt: string;
 }
+
+export type NotificationType = 'payment' | 'shoot' | 'project' | 'quotation' | 'crew';
+
+export interface NotificationItem {
+  _id?: string;
+  id?: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  link?: string;
+  read: boolean;
+  amount?: number;
+  createdAt: string;
+}
+
