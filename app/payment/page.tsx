@@ -59,37 +59,87 @@ export default function PaymentPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size exceeds 10MB limit');
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error('File size exceeds 20MB limit');
       return;
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setScreenshotUrl(result);
-      setPreviewLocalUrl(result);
-      toast.success('Payment receipt attached!');
+    reader.onload = (event) => {
+      const rawResult = event.target?.result as string;
+      
+      // Attempt lightweight canvas compression for lightning-fast uploads
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.8);
+            setScreenshotUrl(compressed);
+            setPreviewLocalUrl(compressed);
+            toast.success('Payment receipt attached & optimized!');
+            return;
+          }
+        } catch (e) {
+          console.warn('Canvas compression fallback:', e);
+        }
+        setScreenshotUrl(rawResult);
+        setPreviewLocalUrl(rawResult);
+        toast.success('Payment receipt attached!');
+      };
+      img.onerror = () => {
+        setScreenshotUrl(rawResult);
+        setPreviewLocalUrl(rawResult);
+        toast.success('Payment receipt attached!');
+      };
+      img.src = rawResult;
     };
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!screenshotUrl) {
-      toast.error('Please attach your payment receipt / screenshot');
+    if (!formData.customerName.trim()) {
+      toast.error('Please enter your full name');
       return;
     }
-    
+    if (!formData.phone.trim()) {
+      toast.error('Please enter your phone number');
+      return;
+    }
     if (!formData.amount || Number(formData.amount) <= 0) {
       toast.error('Please enter a valid amount');
+      return;
+    }
+    if (!screenshotUrl) {
+      toast.error('Please attach your payment receipt / screenshot');
       return;
     }
 
     setIsSubmitting(true);
     try {
       await createPayment({
-        ...formData,
+        customerName: formData.customerName.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
         amount: Number(formData.amount),
         paymentMethod: method === 'qr' ? 'UPI QR' : method === 'id' ? 'UPI ID' : 'Bank Transfer',
         screenshotUrl,
@@ -97,8 +147,9 @@ export default function PaymentPage() {
       });
       setIsSuccess(true);
       toast.success('Payment receipt submitted successfully!');
-    } catch (err) {
-      toast.error('Failed to submit payment details. Please try again.');
+    } catch (err: any) {
+      console.error('Payment submission error:', err);
+      toast.error(err?.message || 'Failed to submit payment details. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

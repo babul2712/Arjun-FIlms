@@ -112,9 +112,22 @@ export async function getPayments() {
 }
 
 export async function createPayment(data: any) {
-  await connectToDatabase();
-  const payment = await Payment.create(data);
-  return JSON.parse(JSON.stringify(payment));
+  try {
+    await connectToDatabase();
+    const paymentData = {
+      ...data,
+      customerId: data.customerId || data.phone || 'client_' + Date.now(),
+      status: data.status || 'PENDING',
+      date: data.date ? new Date(data.date) : new Date()
+    };
+    const payment = await Payment.create(paymentData);
+    revalidatePath('/dashboard', 'layout');
+    revalidatePath('/payments', 'layout');
+    return JSON.parse(JSON.stringify(payment));
+  } catch (err: any) {
+    console.error('createPayment error:', err);
+    throw new Error(err?.message || 'Failed to record payment');
+  }
 }
 
 export async function verifyPayment(id: string, projectId?: string) {
