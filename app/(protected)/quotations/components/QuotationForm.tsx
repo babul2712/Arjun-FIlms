@@ -282,11 +282,11 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             </h3>
             <span className="text-[11px] font-bold text-[#e50914] bg-[#fee2e2]/60 px-2.5 py-0.5 rounded-full flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
-              {selectedTemplate === 'invoice1' ? 'Template 1 (Neat Minimal)' : 'Template 2 (Modern Bento)'}
+              {AVAILABLE_TEMPLATES.find(t => t.id === selectedTemplate)?.name || 'Template 1'}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             {AVAILABLE_TEMPLATES.map((tmpl) => {
               const isSelected = selectedTemplate === tmpl.id;
               return (

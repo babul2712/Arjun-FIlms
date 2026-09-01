@@ -9,8 +9,14 @@ export const AVAILABLE_TEMPLATES: TemplateOption[] = [
   {
     id: 'invoice1',
     name: 'Template 1 (Neat Minimal Studio)',
-    badge: 'Neat & Clean (Reference)',
+    badge: 'Neat & Clean (Reference 1)',
     description: 'Modern editorial layout with bold title, circular studio logo, lined pricing table, handwritten signature & cursive Thank You.'
+  },
+  {
+    id: 'invoice3',
+    name: 'Template 3 (Corporate Modern Crimson)',
+    badge: 'Liceria & Co. Style (Reference 2)',
+    description: 'High-contrast corporate design with bold red INVOICE title, dark-header striped table, 3-badge contact footer, and curved crimson wave.'
   },
   {
     id: 'classic',
@@ -605,11 +611,338 @@ export function generateClassicHTML(data: QuotationData): string {
 }
 
 /**
+ * Generate Invoice 3 (Corporate Modern Crimson - Liceria & Co. Replica)
+ * Pixel-perfect match to Screenshot 2026-09-02 at 12.03.32 AM.png
+ */
+export function generateInvoice3HTML(data: QuotationData): string {
+  const cfg = data.templateConfig || {};
+  const studioName = cfg.studioName || 'ARJUN FILMS';
+  const studioPhone = cfg.phone || '+91 7788992712';
+  const studioEmail = cfg.email || 'arjunphotographyyy@gmail.com';
+  const studioAddress = cfg.address || 'Bhubaneswar, Odisha - 751030';
+  const bankName = cfg.bankName || 'State Bank of India';
+  const bankAccount = cfg.bankAccount || '39149567096';
+  const bankIfsc = cfg.bankIfsc || 'SBIN0000068';
+  
+  let resolvedLogo = cfg.watermarkUrl;
+  if (!resolvedLogo || resolvedLogo.includes('flaticon.com') || resolvedLogo.includes('685655')) {
+    resolvedLogo = '/logo.jpeg';
+  }
+  if (typeof window !== 'undefined' && resolvedLogo.startsWith('/')) {
+    resolvedLogo = window.location.origin + resolvedLogo;
+  }
+
+  const invoiceRaw = data.quotationId ? data.quotationId.slice(-4).replace(/\D/g, '') : '2712';
+  const invoiceFormatted = `0000${invoiceRaw.padStart(4, '0')}`.slice(-7);
+  
+  const invoiceDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const eventDate = data.bookingDate 
+    ? new Date(data.bookingDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : invoiceDate;
+
+  // Table rows HTML with alternating zebra striping
+  const rowsHtml = data.services.map((item, idx) => {
+    const qty = item.quantity || 1;
+    const unitPrice = Number(item.price) || 0;
+    const total = qty * unitPrice;
+    const isEven = idx % 2 === 0;
+    const rowBg = isEven ? '#f1f3f5' : '#ffffff';
+
+    const descLines = item.description 
+      ? item.description.split('\n').map(l => l.trim()).filter(Boolean)
+      : [];
+
+    return `
+      <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
+        <td style="padding: 13px 18px; vertical-align: top;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px;">
+            ${item.name || 'SERVICE LINE ITEM'}
+          </div>
+          ${descLines.length > 0 ? `
+            <div style="margin-top: 4px; font-size: 11px; color: #64748b; line-height: 1.45;">
+              ${descLines.map(d => `<div>• ${d.replace(/^[•\-\*]\s*/, '')}</div>`).join('')}
+            </div>
+          ` : ''}
+        </td>
+        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 500;">
+          ₹${unitPrice.toLocaleString('en-IN')}
+        </td>
+        <td style="padding: 13px 18px; text-align: center; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 600;">
+          ${qty}
+        </td>
+        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12.5px; color: #1e293b; font-weight: 700;">
+          ₹${total.toLocaleString('en-IN')}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const subTotal = Number(data.subTotal) || 0;
+  const discount = Number(data.discount) || 0;
+  const grandTotal = Number(data.grandTotal) || (subTotal - discount);
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice - ${studioName}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      margin: 0;
+      padding: 24px 0;
+      display: flex;
+      justify-content: center;
+    }
+    .invoice-card {
+      width: 780px;
+      min-height: 1100px;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .main-body {
+      padding: 48px 50px 24px 50px;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="invoice-card">
+  <div class="main-body">
+    
+    <!-- Top Header: Logo/Studio (Left) & Giant Red INVOICE (Right) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 24px;">
+      
+      <!-- Left: Brand Logo & Title -->
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #e50914; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(229,9,20,0.25);">
+          <img src="${resolvedLogo}" alt="Studio Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'" />
+        </div>
+        <div>
+          <h1 style="font-size: 20px; font-weight: 900; color: #1e293b; letter-spacing: 0.5px; text-transform: uppercase; margin: 0; font-family: 'Arial Black', Arial, sans-serif;">
+            ${studioName}
+          </h1>
+          <p style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">
+            Photography & Cinema
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Bold Red INVOICE Title -->
+      <div>
+        <h2 style="font-size: 42px; font-weight: 900; color: #e50914; letter-spacing: 1px; margin: 0; text-transform: uppercase; line-height: 1; font-family: 'Arial Black', Arial, sans-serif;">
+          INVOICE
+        </h2>
+      </div>
+    </div>
+
+    <!-- Client Info (Left) & Invoice Meta (Right) -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 28px;">
+      <!-- Left Client Meta -->
+      <div style="line-height: 1.45;">
+        <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">
+          ${data.customerName || 'Client Name'}
+        </h3>
+        <p style="font-size: 12px; color: #64748b; font-weight: 500;">
+          Event Date: <span style="color: #334155; font-weight: 700;">${eventDate}</span>
+        </p>
+        <p style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
+          ${data.location || 'Bhubaneswar, Odisha'}
+        </p>
+        <p style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
+          ${data.email || studioEmail}
+        </p>
+        <p style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
+          ${data.phone || '+91 7788992712'}
+        </p>
+      </div>
+
+      <!-- Right Invoice Number -->
+      <div style="text-align: right;">
+        <div style="font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase;">
+          INVOICE
+        </div>
+        <div style="font-size: 26px; font-weight: 700; color: #1e293b; letter-spacing: 2px; font-family: 'Courier New', Courier, monospace; margin-top: 2px;">
+          ${invoiceFormatted}
+        </div>
+        <div style="font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 3px;">
+          Issued: ${invoiceDate}
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div style="margin-top: 26px; border-radius: 4px; overflow: hidden; border: 1px solid #e2e8f0;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="background: #1e2229; color: #ffffff;">
+            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;">
+              PRODUCT / SERVICES
+            </th>
+            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; width: 110px;">
+              PRICE
+            </th>
+            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: center; width: 75px;">
+              QTY
+            </th>
+            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; width: 120px;">
+              TOTAL
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Payment Data (Left) & Totals (Right) -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 32px;">
+      
+      <!-- Left: Payment Data -->
+      <div style="width: 55%; line-height: 1.6; font-size: 11.5px;">
+        <div style="font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-size: 12px;">
+          PAYMENT DATA:
+        </div>
+        <div style="color: #475569;">
+          <span style="font-weight: 700; color: #1e293b;">ACCOUNT NO:</span> ${bankAccount}
+        </div>
+        <div style="color: #475569;">
+          <span style="font-weight: 700; color: #1e293b;">NAME:</span> ${studioName}
+        </div>
+        <div style="color: #475569;">
+          <span style="font-weight: 700; color: #1e293b;">BANK & IFSC:</span> ${bankName} (${bankIfsc})
+        </div>
+        <div style="color: #475569;">
+          <span style="font-weight: 700; color: #1e293b;">PAYMENT METHOD:</span> UPI / QR / NET BANKING / CASH
+        </div>
+      </div>
+
+      <!-- Right: Subtotal & Grand Total -->
+      <div style="width: 40%; text-align: right;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #334155; margin-bottom: 6px; font-weight: 700;">
+          <span style="text-transform: uppercase; color: #64748b;">SUBTOTAL</span>
+          <span>₹${subTotal.toLocaleString('en-IN')}</span>
+        </div>
+
+        ${discount > 0 ? `
+          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #16a34a; margin-bottom: 6px; font-weight: 700;">
+            <span style="text-transform: uppercase;">DISCOUNT</span>
+            <span>- ₹${discount.toLocaleString('en-IN')}</span>
+          </div>
+        ` : ''}
+
+        <div style="border-top: 1.5px solid #cbd5e1; margin: 10px 0 8px 0;"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span style="font-size: 15px; font-weight: 900; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">TOTAL</span>
+          <span style="font-size: 22px; font-weight: 900; color: #0f172a;">₹${grandTotal.toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms and Conditions -->
+    <div style="margin-top: 32px; border-top: 1.5px solid #0f172a; padding-top: 16px;">
+      <h4 style="font-size: 12.5px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+        TERMS AND CONDITIONS
+      </h4>
+      <p style="font-size: 10.5px; color: #64748b; line-height: 1.6; text-align: justify;">
+        ${data.termsConditions || '50% advance booking deposit is required to confirm reservation. Final high-resolution edited photo gallery and 4K cinematic film deliverables are provided within 25 working days. Client cancellations within 14 days of shoot date are non-refundable. High-speed raw cloud storage is archived for 60 days following handover.'}
+      </p>
+    </div>
+
+    <!-- Contact Info (3 Red Badges) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 14px;">
+      
+      <!-- Phone Badge -->
+      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+        <div style="width: 32px; height: 32px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 14px; shrink: 0;">
+          📞
+        </div>
+        <div style="font-size: 10.5px; color: #334155; line-height: 1.35; font-weight: 600;">
+          <div>${studioPhone}</div>
+          <div>+91 9437000000</div>
+        </div>
+      </div>
+
+      <!-- Email / Web Badge -->
+      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+        <div style="width: 32px; height: 32px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 14px; shrink: 0;">
+          🌐
+        </div>
+        <div style="font-size: 10.5px; color: #334155; line-height: 1.35; font-weight: 600;">
+          <div>${studioEmail}</div>
+          <div>www.arjunfilms.com</div>
+        </div>
+      </div>
+
+      <!-- Location Badge -->
+      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+        <div style="width: 32px; height: 32px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 14px; shrink: 0;">
+          📍
+        </div>
+        <div style="font-size: 10.5px; color: #334155; line-height: 1.35; font-weight: 600;">
+          <div>${studioAddress}</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Dual-Layer Bottom Geometric Wave (Red) & Base Bar (Navy/Charcoal) -->
+  <div style="width: 100%; margin-top: auto; overflow: hidden; line-height: 0;">
+    <svg viewBox="0 0 780 50" style="display: block; width: 100%; height: 38px;" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="redWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ff001e" />
+          <stop offset="50%" stop-color="#e50914" />
+          <stop offset="100%" stop-color="#b8050e" />
+        </linearGradient>
+      </defs>
+      <path d="M 0,38 Q 220,0 400,38 T 780,38 L 780,50 L 0,50 Z" fill="url(#redWaveGrad)" />
+    </svg>
+    <div style="background: #1e2229; height: 36px; width: 100%;"></div>
+  </div>
+
+</div>
+
+</body>
+</html>
+  `;
+}
+
+/**
  * Universal Switcher
  */
 export function generateQuotationHTML(data: QuotationData, templateId: string = 'invoice1'): string {
   if (templateId === 'invoice1') {
     return generateInvoice1HTML(data);
   }
+  if (templateId === 'invoice3') {
+    return generateInvoice3HTML(data);
+  }
   return generateClassicHTML(data);
 }
+

@@ -186,7 +186,20 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                 >
                   <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Template 1</div>
                   <div className="text-[10px] font-extrabold text-[#e50914] mt-0.5">Neat Minimal Studio</div>
-                  <div className="text-[10px] text-gray-500 mt-1">Reference editorial layout with circular logo & cursive thank you.</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Editorial layout with circular logo & cursive thank you.</div>
+                </div>
+
+                <div 
+                  onClick={() => setConfig({ ...config, defaultTemplateId: 'invoice3' })}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    config.defaultTemplateId === 'invoice3'
+                      ? 'border-[#e50914] bg-[#fee2e2]/40 dark:bg-red-950/20'
+                      : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1c1f24]'
+                  }`}
+                >
+                  <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Template 3</div>
+                  <div className="text-[10px] font-extrabold text-[#e50914] mt-0.5">Corporate Modern Crimson</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Liceria & Co. bold red title, dark header table & wave bar.</div>
                 </div>
 
                 <div 
@@ -199,7 +212,7 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                 >
                   <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Template 2</div>
                   <div className="text-[10px] font-extrabold text-[#e50914] mt-0.5">Modern Bento Cards</div>
-                  <div className="text-[10px] text-gray-500 mt-1">Structured bento cards with 50/30/20 payment milestones.</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Structured bento cards with 50/30/20 milestones.</div>
                 </div>
               </div>
             </div>
