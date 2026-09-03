@@ -438,45 +438,6 @@ export async function verifyLoginOTP(email: string, otp: string): Promise<{ succ
 export async function getNotifications() {
   try {
     await connectToDatabase();
-    
-    // Seed initial notifications if collection is empty
-    const count = await Notification.countDocuments();
-    if (count === 0) {
-      const initialNotifs = [
-        {
-          title: 'Welcome to Arjun Films CRM',
-          message: 'Client case management, shoot calendar, and invoice generation is active.',
-          type: 'project',
-          link: '/dashboard',
-          read: false,
-          createdAt: new Date()
-        },
-        {
-          title: 'Upcoming Shoot Schedule',
-          message: 'Review client bookings and crew assignment blueprint in the calendar.',
-          type: 'shoot',
-          link: '/calendar',
-          read: false,
-          createdAt: new Date(Date.now() - 3600000)
-        }
-      ];
-
-      // Check if there are pending payments to add
-      const pendingPayments = await Payment.find({ status: 'PENDING' }).sort({ date: -1 }).limit(3).lean();
-      for (const p of pendingPayments) {
-        initialNotifs.push({
-          title: 'Payment Awaiting Verification',
-          message: `${p.customerName || 'A client'} submitted ₹${Number(p.amount).toLocaleString('en-IN')} via ${p.paymentMethod || 'UPI'}`,
-          type: 'payment',
-          link: '/payments',
-          read: false,
-          createdAt: p.date ? new Date(p.date) : new Date()
-        });
-      }
-
-      await Notification.insertMany(initialNotifs);
-    }
-
     const notifications = await Notification.find({}).sort({ createdAt: -1 }).limit(50).lean();
     return JSON.parse(JSON.stringify(notifications));
   } catch (error) {

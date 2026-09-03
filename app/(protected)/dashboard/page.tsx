@@ -1,39 +1,27 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getProjects, getDashboardStats, createProject, getPayments, createPayment } from '@/services/api';
-import { createCrew, createBooking, createQuotation } from '@/app/actions';
-import { Project, Payment } from '@/lib/types';
+import { getProjects, getDashboardStats, getPayments } from '@/services/api';
+import { Project } from '@/lib/types';
 import { 
   Search, 
   Plus, 
-  MapPin, 
-  Home, 
-  BookOpen, 
   CreditCard, 
-  ArrowDown, 
-  ArrowUp, 
-  MoreHorizontal, 
   Shield, 
-  TrendingUp, 
   Wallet, 
-  ChevronDown,
-  Database,
-  ArrowDownLeft,
-  ArrowUpRight,
-  ExternalLink,
-  X,
-  Star,
-  Calendar,
-  AlertCircle,
-  Grid,
-  FolderPlus,
-  Users,
-  FileText,
-  UserCheck,
-  UserMinus,
-  Briefcase,
-  Link2
+  ArrowUpRight, 
+  ExternalLink, 
+  X, 
+  Star, 
+  Calendar, 
+  AlertCircle, 
+  Grid, 
+  Users, 
+  FileText, 
+  UserCheck, 
+  UserMinus, 
+  Briefcase, 
+  Link2 
 } from 'lucide-react';
 import ProjectCard from '@/components/dashboard/ProjectCard';
 import FiltersPanel from '@/components/dashboard/FiltersPanel';
@@ -67,7 +55,6 @@ export default function DashboardPage() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [monthlyRevenue, setMonthlyRevenue] = useState<number[]>(new Array(12).fill(0));
   const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
 
   // Toggle card states
   const [showBookings, setShowBookings] = useState(false);
@@ -208,275 +195,9 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSeedData = async () => {
-    setSeeding(true);
-    try {
-      // 1. Create the 6 projects totaling 475k value
-      const p1 = await createProject({
-        name: 'Vazquez Maria Luisana',
-        phone: '9876543210',
-        email: 'luisana@example.com',
-        location: 'Mexico',
-        eventType: 'Green Card (Family-Based)',
-        totalValue: 120000,
-        status: 'Booked',
-        isStarred: true,
-        eventDate: new Date().toISOString(),
-        services: [
-          { name: 'I-130', status: 'Request client authorization', daysLeft: 14 },
-          { name: 'I-485', status: 'Assemble Packet', daysLeft: 3 }
-        ]
-      });
-
-      const p2 = await createProject({
-        name: 'Spiritto Milagros',
-        phone: '9123456789',
-        email: 'milagros@example.com',
-        location: 'Mexico',
-        eventType: 'Student visas',
-        totalValue: 85000,
-        status: 'Booked',
-        isStarred: true,
-        eventDate: new Date().toISOString(),
-        services: [
-          { name: 'N-864', status: 'Attorney review FOIA', daysLeft: 1 }
-        ]
-      });
-
-      const p3 = await createProject({
-        name: 'Bustamante Alejandro',
-        phone: '9988776655',
-        email: 'alejandro@example.com',
-        location: 'Mexico',
-        eventType: 'Green Card',
-        totalValue: 95000,
-        status: 'Booked',
-        isStarred: true,
-        eventDate: new Date().toISOString(),
-        services: [
-          { name: 'Work permit request', status: 'Approved', daysLeft: 11 },
-          { name: 'N-400', status: 'Assemble Packet', daysLeft: 9 }
-        ]
-      });
-
-      const p4 = await createProject({
-        name: 'Cooper Lee Leonardo',
-        phone: '9911223344',
-        email: 'leonardo@example.com',
-        location: 'USA',
-        eventType: 'Work permit',
-        totalValue: 45000,
-        status: 'Booked',
-        isStarred: false,
-        eventDate: new Date().toISOString(),
-        services: [
-          { name: 'N-400', status: 'Assemble Packet', daysLeft: 3 }
-        ]
-      });
-
-      const p5 = await createProject({
-        name: 'Espinoza Lorena',
-        phone: '9955443322',
-        email: 'lorena@example.com',
-        location: 'Mexico',
-        eventType: 'Student and visitors visas',
-        totalValue: 60000,
-        status: 'Booked',
-        isStarred: false,
-        eventDate: new Date().toISOString(),
-        services: [
-          { name: 'I-360: VAWA', status: 'Request client authorization', daysLeft: 14 }
-        ]
-      });
-
-      const p6 = await createProject({
-        name: 'Romero Guido',
-        phone: '9966554433',
-        email: 'guido@example.com',
-        location: 'Mexico',
-        eventType: 'Citizenship & naturalization',
-        totalValue: 70000,
-        status: 'Booked',
-        isStarred: false,
-        eventDate: new Date().toISOString(),
-        services: [
-          { name: 'I-360: VAWA', status: 'Request client authorization', daysLeft: 14 }
-        ]
-      });
-
-      // 2. Create the 6 paid payments totaling 475k to match totalValue, with dates distributed over different months
-      const currentYear = new Date().getFullYear();
-      await createPayment({
-        projectId: p1.id,
-        customerName: p1.name,
-        phone: p1.phone,
-        amount: 120000,
-        paymentMethod: 'UPI QR',
-        status: 'PAID',
-        date: new Date(currentYear, 0, 15).toISOString() // Jan
-      });
-
-      await createPayment({
-        projectId: p2.id,
-        customerName: p2.name,
-        phone: p2.phone,
-        amount: 85000,
-        paymentMethod: 'UPI QR',
-        status: 'PAID',
-        date: new Date(currentYear, 2, 10).toISOString() // Mar
-      });
-
-      await createPayment({
-        projectId: p3.id,
-        customerName: p3.name,
-        phone: p3.phone,
-        amount: 95000,
-        paymentMethod: 'UPI QR',
-        status: 'PAID',
-        date: new Date(currentYear, 4, 18).toISOString() // May
-      });
-
-      await createPayment({
-        projectId: p4.id,
-        customerName: p4.name,
-        phone: p4.phone,
-        amount: 45000,
-        paymentMethod: 'UPI QR',
-        status: 'PAID',
-        date: new Date(currentYear, 6, 25).toISOString() // Jul
-      });
-
-      await createPayment({
-        projectId: p5.id,
-        customerName: p5.name,
-        phone: p5.phone,
-        amount: 60000,
-        paymentMethod: 'UPI QR',
-        status: 'PAID',
-        date: new Date(currentYear, 7, 5).toISOString() // Aug
-      });
-
-      await createPayment({
-        projectId: p6.id,
-        customerName: p6.name,
-        phone: p6.phone,
-        amount: 70000,
-        paymentMethod: 'UPI QR',
-        status: 'PAID',
-        date: new Date(currentYear, 9, 12).toISOString() // Oct
-      });
-
-      // 3. Create 3 Bookings
-      await createBooking({
-        client: 'Vazquez Maria Luisana',
-        date: new Date(currentYear, 8, 15),
-        venue: 'Bhubaneswar Venue 1',
-        package: 'Family Green Card Pack',
-        status: 'Upcoming',
-        advancePaid: 120000,
-        pending: 0
-      });
-
-      await createBooking({
-        client: 'Spiritto Milagros',
-        date: new Date(currentYear, 9, 20),
-        venue: 'Bhubaneswar Venue 2',
-        package: 'Student Visa Pack',
-        status: 'Upcoming',
-        advancePaid: 85000,
-        pending: 0
-      });
-
-      await createBooking({
-        client: 'Bustamante Alejandro',
-        date: new Date(currentYear, 10, 5),
-        venue: 'Bhubaneswar Venue 3',
-        package: 'Work Permit Package',
-        status: 'Upcoming',
-        advancePaid: 95000,
-        pending: 0
-      });
-
-      // 4. Create Crew members
-      await createCrew({
-        name: 'Davidson Theresa',
-        role: 'Lead Photographer',
-        location: 'Mumbai',
-        phone: '9876543201',
-        address: '123 Studio Lane',
-        charges: 15000
-      });
-      await createCrew({
-        name: 'Veronica Manriquez',
-        role: 'Assistant Photographer',
-        location: 'Pune',
-        phone: '9876543202',
-        address: '456 Focus Way',
-        charges: 8000
-      });
-      await createCrew({
-        name: 'Harris Jennifer',
-        role: 'Video Editor',
-        location: 'Goa',
-        phone: '9876543203',
-        address: '789 Cut Street',
-        charges: 10000
-      });
-      // 5. Create Quotations
-      await createQuotation({
-        customerName: 'Rahul Sharma',
-        phone: '9876543210',
-        email: 'rahul@example.com',
-        location: 'Bhubaneswar, Odisha',
-        bookingDate: new Date(currentYear, 7, 15).toISOString().split('T')[0],
-        eventType: 'Wedding',
-        services: [
-          { name: 'Candid Photography', quantity: 1, price: 25000 },
-          { name: 'Cinematic Videography', quantity: 1, price: 35000 }
-        ],
-        subTotal: 60000,
-        grandTotal: 60000,
-        discount: 0,
-        paymentTerms: '50% Advance, 50% on Delivery'
-      });
-
-      await createQuotation({
-        customerName: 'Sanjana Rout',
-        phone: '9876543211',
-        email: 'sanjana@example.com',
-        location: 'Cuttack, Odisha',
-        bookingDate: new Date(currentYear, 8, 20).toISOString().split('T')[0],
-        eventType: 'Pre-wedding Session',
-        services: [
-          { name: 'Pre-wedding Portraiture', quantity: 1, price: 15000 },
-          { name: 'Drone Videography', quantity: 1, price: 10000 }
-        ],
-        subTotal: 25000,
-        grandTotal: 23000,
-        discount: 2000,
-        paymentTerms: '50% Advance, 50% on Delivery'
-      });
-      toast.success('Database seeded successfully with dynamic data matching layout metrics!');
-      loadData();
-    } catch (e) {
-      toast.error('Failed to seed database');
-    } finally {
-      setSeeding(false);
-    }
-  };
-
   if (loading) {
     return <DashboardSkeleton />;
   }
-
-  // Horizontal avatars list for "Quick send"
-  const quickAssignAvatars = [
-    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80', // Davidson Theresa
-    'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=80&h=80&q=80', // Veronica Manriquez
-    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80', // Collins Kimberly
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&h=80&q=80', // Staff
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80'
-  ];
 
   // Dynamic values
   const currentMonthIdx = new Date().getMonth();
@@ -508,21 +229,9 @@ export default function DashboardPage() {
                 <input 
                   type="text" 
                   className="bg-transparent border-none focus:outline-none text-[12.5px] font-semibold text-gray-700 dark:text-white placeholder:text-gray-400 w-full"
-                  placeholder="Search product"
+                  placeholder="Search project"
                 />
               </div>
-
-              {/* Db Seeder */}
-              {stats.totalProjects < 6 && (
-                <button
-                  onClick={handleSeedData}
-                  disabled={seeding}
-                  className="p-3 bg-[#fee2e2]/40 hover:bg-[#fee2e2] border border-[#fecaca]/40 text-[#e50914] dark:bg-[#16181c] dark:hover:bg-gray-800 dark:border-gray-800 dark:text-[#8efa1d] rounded-2xl cursor-pointer active:scale-95 transition-all shadow-sm"
-                  title="Seed Database"
-                >
-                  <Database className="w-5 h-5 animate-pulse" />
-                </button>
-              )}
             </div>
           </div>
 
@@ -573,16 +282,16 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Statistics Metric Cards (7 columns - 2x2 layout) */}
-            <div className="md:col-span-7 grid grid-cols-2 gap-4">
+            {/* Metric Cards (7 columns) */}
+            <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
               
-              {/* Card 1: Payments Recv. */}
+              {/* Card 1: Payments Received */}
               <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[28px] p-5 flex flex-col justify-between h-[115px]">
                 <div className="flex justify-between items-start">
-                  <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800/40 flex items-center justify-center text-gray-550 dark:text-gray-400 border border-gray-200/20 dark:border-gray-800/20">
-                    <TrendingUp className="w-4.5 h-4.5 text-green-600 dark:text-[#8efa1d]" />
+                  <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800/40 flex items-center justify-center text-gray-555 dark:text-gray-400 border border-gray-200/20 dark:border-gray-800/20">
+                    <Wallet className="w-4.5 h-4.5 text-[#e50914] dark:text-[#8efa1d]" />
                   </span>
-                  <span className="text-[9px] text-green-600 dark:text-[#8efa1d] font-extrabold uppercase bg-green-50 dark:bg-[#8efa1d]/10 px-2 py-0.5 rounded-md border border-green-100/50 dark:border-[#8efa1d]/10">+17.6%</span>
+                  <span className="text-[9px] text-emerald-500 font-extrabold uppercase bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-100/50 dark:border-emerald-500/10">Active</span>
                 </div>
                 <div>
                   <h3 className="text-[18px] font-black text-[#1a1c22] dark:text-white">₹{stats.revenue.toLocaleString('en-IN')}</h3>
@@ -596,7 +305,7 @@ export default function DashboardPage() {
                   <span className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800/40 flex items-center justify-center text-gray-555 dark:text-gray-400 border border-gray-200/20 dark:border-gray-800/20">
                     <CreditCard className="w-4.5 h-4.5 text-rose-500" />
                   </span>
-                  <span className="text-[9px] text-rose-500 font-extrabold uppercase bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-100/50 dark:border-rose-500/10">-0.12%</span>
+                  <span className="text-[9px] text-rose-500 font-extrabold uppercase bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-100/50 dark:border-rose-500/10">Due</span>
                 </div>
                 <div>
                   <h3 className="text-[18px] font-black text-[#1a1c22] dark:text-white">₹{stats.pendingPaymentsAmount.toLocaleString('en-IN')}</h3>
@@ -703,37 +412,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Right Panel section (lg:col-span-4) */}
+        {/* Right Panel section (lg:col-span-4) */}
         <div className="lg:col-span-4 space-y-6">
           
-          {/* Quick send (avatars feed) */}
-          <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 space-y-4">
-            <div>
-              <h4 className="text-[14px] font-extrabold text-gray-800 dark:text-white">Quick send</h4>
-              <p className="text-[11px] text-gray-400 font-semibold mt-0.5">View your income in a certain period of time</p>
-            </div>
-            
-            <div className="flex items-center gap-2.5">
-              {/* Avatars horizontals */}
-              <div className="flex items-center pl-2">
-                {quickAssignAvatars.map((url, idx) => (
-                  <img 
-                    key={idx}
-                    src={url}
-                    alt="Crew member avatar" 
-                    className="w-10 h-10 rounded-full border-2 border-white dark:border-[#16181c] -ml-2 first:ml-0 shadow-md object-cover"
-                  />
-                ))}
-                <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-[#16181c] -ml-2 flex items-center justify-center text-[10px] font-bold text-gray-550 dark:text-gray-400 shadow-md">
-                  +3
-                </div>
-              </div>
-              
-              <button className="w-9 h-9 rounded-full bg-[#fdf2f2] dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 flex items-center justify-center text-gray-505 dark:text-gray-300 cursor-pointer transition-colors ml-auto border border-gray-200/20 dark:border-gray-700/20 active:scale-95">
-                <ChevronRightIcon className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
           {/* Minimalist Studio Cash / Treasury Card */}
           <div className="bg-gradient-to-br from-[#16181f] via-[#111317] to-[#0a0b0d] border border-gray-800/80 rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[175px] group hover:border-[#e50914]/40 transition-all duration-300">
             {/* Ambient Red Glow */}
@@ -844,64 +525,20 @@ export default function DashboardPage() {
                         title={`${bar.m}: ₹${bar.val.toLocaleString('en-IN')}`}
                       />
                     </div>
-                    <span className="text-[9px] font-extrabold text-gray-400 dark:text-gray-500 uppercase mt-2 tracking-wider">{bar.m}</span>
+                    <span className={`text-[9px] mt-2 font-bold ${isActive ? 'text-[#e50914] dark:text-[#8efa1d]' : 'text-gray-400 dark:text-gray-600'}`}>
+                      {bar.m}
+                    </span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Quick actions box */}
-          <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 space-y-4">
-            <h4 className="text-[14px] font-extrabold text-gray-855 dark:text-white">Quick Action</h4>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="bg-[#fdf2f2] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-805/30">
-                <ArrowDownLeft className="w-5 h-5 text-gray-555 dark:text-gray-400 mx-auto mb-2" />
-                <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 block">Received</span>
-              </div>
-              <div className="bg-[#fdf2f2] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-805/30">
-                <ArrowUpRight className="w-5 h-5 text-gray-555 dark:text-gray-400 mx-auto mb-2" />
-                <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 block">Request</span>
-              </div>
-              <div className="bg-[#fdf2f2] dark:bg-gray-800/20 hover:bg-gray-100 dark:hover:bg-gray-800/40 rounded-2xl p-3 text-center cursor-pointer transition-colors border border-gray-200/20 dark:border-gray-850/30">
-                <MoreHorizontal className="w-5 h-5 text-gray-555 dark:text-gray-400 mx-auto mb-2" />
-                <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 block">More</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Starter Plan Promotion Box */}
-          <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 relative overflow-hidden flex flex-col justify-between min-h-[175px] group">
-            {/* Glowing red element absolute positioned in backdrop */}
-            <div 
-              className={`absolute -bottom-8 -right-8 w-24 h-24 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-500 ${
-                theme === 'dark' ? 'bg-[#8efa1d]/10' : 'bg-[#e50914]/5'
-              }`} 
-            />
-            
-            <div>
-              <h4 className="text-[16px] font-extrabold text-gray-800 dark:text-white">Starter Plan</h4>
-              <p className="text-[12.5px] text-gray-400 dark:text-gray-400 font-bold mt-2 leading-relaxed">
-                Upgrade to the enterprise plan & get attractive discounts
-              </p>
-            </div>
-            
-            <button 
-              className={`w-full text-[13px] font-black py-3.5 rounded-2xl mt-4 cursor-pointer active:scale-95 transition-all shadow-md ${
-                theme === 'dark'
-                  ? 'bg-[#8efa1d] hover:bg-[#a5f841] text-[#0b0c0e]'
-                  : 'bg-[#e50914] hover:bg-red-700 text-white'
-              }`}
-            >
-              Upgrade Plan
-            </button>
-          </div>
-
         </div>
 
       </div>
 
-      {/* Bottom Section: Active Cases & Prospects Directory (from arjun-crm-main) */}
+      {/* Bottom Section: Active Cases & Prospects Directory */}
       <div className="border-t border-gray-200/40 dark:border-gray-800/20 pt-8 mt-8 space-y-6">
         
         {/* Section Sub-header & Action controls */}
@@ -1025,16 +662,17 @@ export default function DashboardPage() {
               <div className="glass-card rounded-[32px] p-16 text-center max-w-md mx-auto space-y-6 bg-white dark:bg-[#16181c] border border-gray-200/50 dark:border-gray-800/40 shadow-sm">
                 <Grid className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 stroke-1" />
                 <h3 className="text-[17px] font-extrabold text-gray-700 dark:text-gray-300">No projects found</h3>
-                <p className="text-[13px] text-gray-400 dark:text-gray-505 font-medium">Click Seed Demo or create a new case to populate this dashboard.</p>
+                <p className="text-[13px] text-gray-400 dark:text-gray-505 font-medium">Create a new project to populate this dashboard.</p>
               </div>
             ) : (
               <div className={`grid grid-cols-1 md:grid-cols-2 ${selectedProject ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} gap-8`}>
                 {filteredProjects.map((project) => (
                   <ProjectCard 
-                    key={project.id} 
+                    key={project.id || project._id} 
                     project={project} 
                     onSelect={(p) => setSelectedProject(p)}
                     onMilestoneHover={handleMilestoneHover}
+                    onStarToggle={handleStarToggle}
                   />
                 ))}
               </div>
@@ -1051,15 +689,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3.5">
                     <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm shrink-0">
                       <img 
-                        src={
-                          selectedProject.name.includes('Luisana') ? 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80' :
-                          selectedProject.name.includes('Milagros') ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80' :
-                          selectedProject.name.includes('Alejandro') ? 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80' :
-                          selectedProject.name.includes('Leonardo') ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80' :
-                          selectedProject.name.includes('Lorena') ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80' :
-                          selectedProject.name.includes('Guido') ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80' :
-                          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'
-                        }
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedProject.name)}&background=e50914&color=fff&bold=true&size=128`}
                         alt={selectedProject.name}
                         className="w-full h-full object-cover"
                       />
@@ -1076,10 +706,33 @@ export default function DashboardPage() {
                   
                   <div className="flex items-center gap-1">
                     <button 
-                      onClick={() => {}}
-                      className="p-1.5 text-amber-400 hover:bg-gray-55 rounded-lg transition-colors cursor-pointer"
+                      onClick={async () => {
+                        const projId = selectedProject._id || selectedProject.id;
+                        if (!projId) return;
+                        const nextStarred = !selectedProject.isStarred;
+                        handleStarToggle(projId, nextStarred);
+                        try {
+                          const { toggleProjectStar } = await import('@/app/actions');
+                          const res = await toggleProjectStar(projId);
+                          if (res.success) {
+                            toast.success(nextStarred ? `⭐ Bookmarked ${selectedProject.name}` : `Removed bookmark for ${selectedProject.name}`);
+                          } else {
+                            handleStarToggle(projId, !nextStarred);
+                            toast.error('Failed to update bookmark');
+                          }
+                        } catch (e) {
+                          handleStarToggle(projId, !nextStarred);
+                          toast.error('Failed to update bookmark');
+                        }
+                      }}
+                      className={`p-2 rounded-xl transition-all cursor-pointer ${
+                        selectedProject.isStarred 
+                          ? 'text-amber-400 bg-amber-50 dark:bg-amber-950/40' 
+                          : 'text-gray-400 hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
+                      title={selectedProject.isStarred ? 'Remove Bookmark' : 'Bookmark Case'}
                     >
-                      <Star className="w-4.5 h-4.5 fill-current" />
+                      <Star className={`w-5 h-5 ${selectedProject.isStarred ? 'fill-current text-amber-400' : ''}`} />
                     </button>
                     <button 
                       onClick={() => setSelectedProject(null)}
@@ -1090,24 +743,24 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Assignee Details Rows */}
+                {/* Assignee / Contact Details Rows */}
                 <div className="grid grid-cols-2 gap-y-4 gap-x-4 border-t border-b border-gray-100 dark:border-gray-800 py-4 text-[12px] text-gray-505 dark:text-gray-404 font-semibold">
                   <div>
-                    <span className="text-gray-400 dark:text-gray-550 block font-medium">Attorney</span>
-                    <span className="text-gray-805 dark:text-gray-200 font-extrabold block mt-0.5">Davidson Theresa</span>
+                    <span className="text-gray-400 dark:text-gray-550 block font-medium">Contact Phone</span>
+                    <span className="text-gray-805 dark:text-gray-200 font-extrabold block mt-0.5 truncate">{selectedProject.phone || 'N/A'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 dark:text-gray-555 block font-medium">Case Type</span>
+                    <span className="text-gray-400 dark:text-gray-555 block font-medium">Event Type</span>
                     <span className="text-gray-805 dark:text-gray-200 font-extrabold block mt-0.5">{selectedProject.eventType}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 dark:text-gray-555 block font-medium">Paralegal</span>
-                    <span className="text-gray-855 dark:text-gray-200 font-extrabold block mt-0.5">Veronica Manriquez</span>
+                    <span className="text-gray-400 dark:text-gray-555 block font-medium">Location / Venue</span>
+                    <span className="text-gray-855 dark:text-gray-200 font-extrabold block mt-0.5 truncate">{selectedProject.location || 'Studio'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 dark:text-gray-555 block font-medium">Created Date</span>
+                    <span className="text-gray-400 dark:text-gray-555 block font-medium">Event Date</span>
                     <span className="text-gray-855 dark:text-gray-200 font-extrabold block mt-0.5">
-                      {dayjs(selectedProject.createdAt).format('MMM DD, YYYY')}
+                      {selectedProject.eventDate ? dayjs(selectedProject.eventDate).format('MMM DD, YYYY') : dayjs(selectedProject.createdAt).format('MMM DD, YYYY')}
                     </span>
                   </div>
                 </div>
@@ -1115,14 +768,14 @@ export default function DashboardPage() {
                 {/* Services List Table */}
                 <div className="space-y-3">
                   <div className="flex justify-between text-[11px] text-gray-400 dark:text-gray-505 font-bold uppercase tracking-wider px-1">
-                    <span>Services</span>
-                    <span>Stages</span>
+                    <span>Deliverables</span>
+                    <span>Status</span>
                     <span>Days Left</span>
                   </div>
 
                   <div className="space-y-2">
                     {(selectedProject.services && selectedProject.services.length > 0 ? selectedProject.services : [
-                      { name: 'I-130', status: 'Request client authorization', daysLeft: 14 }
+                      { name: selectedProject.eventType || 'Full Shoot Coverage', status: selectedProject.status || 'Booked', daysLeft: 7 }
                     ]).map((service, idx) => (
                       <div key={idx} className="flex items-center justify-between py-2 px-3 bg-gray-55/60 dark:bg-[#24272c] rounded-xl border border-gray-100 dark:border-gray-800/35 text-[12px]">
                         <span className="font-bold text-gray-700 dark:text-gray-300 truncate max-w-[130px]">{service.name}</span>
@@ -1142,11 +795,11 @@ export default function DashboardPage() {
                 {/* Action buttons */}
                 <div className="pt-2">
                   <button 
-                    onClick={() => router.push(`/projects/${selectedProject.id}`)}
+                    onClick={() => router.push(`/projects/${selectedProject.id || selectedProject._id}`)}
                     className="w-full flex items-center justify-center gap-1.5 py-3.5 bg-[#0a0b0d] dark:bg-[#8efa1d] text-white dark:text-[#0b0c0e] hover:bg-gray-900 dark:hover:bg-[#a5f841] rounded-xl text-[13px] font-bold shadow-md transition-all cursor-pointer active:scale-95"
                   >
                     <ExternalLink className="w-4 h-4 text-white dark:text-[#0b0c0e]" />
-                    Open Full Case Dashboard
+                    Open Project Details
                   </button>
                 </div>
 

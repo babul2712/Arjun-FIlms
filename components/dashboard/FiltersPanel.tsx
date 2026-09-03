@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Calendar as CalendarIcon, RefreshCw } from 'lucide-react';
+import { X, Filter, RefreshCw, Camera, MapPin, CheckCircle2 } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 
 interface FiltersPanelProps {
@@ -11,62 +11,65 @@ interface FiltersPanelProps {
 export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
   const { filterPanelOpen, setFilterPanelOpen } = useUIStore();
   const [selectedStatus, setSelectedStatus] = useState<string>('');
-  const [selectedStage, setSelectedStage] = useState<string>('');
-  const [selectedDateRange, setSelectedDateRange] = useState<string>('This month');
-  const [selectedNationality, setSelectedNationality] = useState<string>('');
+  const [selectedEventType, setSelectedEventType] = useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
 
   if (!filterPanelOpen) return null;
 
   const handleClearAll = () => {
     setSelectedStatus('');
-    setSelectedStage('');
-    setSelectedDateRange('This month');
-    setSelectedNationality('');
-    onFilterChange({ status: '', stage: '', dateRange: '', nationality: '' });
+    setSelectedEventType('');
+    setSelectedLocation('');
+    onFilterChange({ status: '', eventType: '', location: '' });
   };
 
   const handleStatusSelect = (status: string) => {
     const nextStatus = selectedStatus === status ? '' : status;
     setSelectedStatus(nextStatus);
-    onFilterChange({ status: nextStatus, stage: selectedStage, dateRange: selectedDateRange, nationality: selectedNationality });
+    onFilterChange({ status: nextStatus, eventType: selectedEventType, location: selectedLocation });
   };
 
-  const handleStageSelect = (stage: string) => {
-    const nextStage = selectedStage === stage ? '' : stage;
-    setSelectedStage(nextStage);
-    onFilterChange({ status: selectedStatus, stage: nextStage, dateRange: selectedDateRange, nationality: selectedNationality });
+  const handleEventTypeSelect = (type: string) => {
+    const nextType = selectedEventType === type ? '' : type;
+    setSelectedEventType(nextType);
+    onFilterChange({ status: selectedStatus, eventType: nextType, location: selectedLocation });
+  };
+
+  const handleLocationChange = (loc: string) => {
+    setSelectedLocation(loc);
+    onFilterChange({ status: selectedStatus, eventType: selectedEventType, location: loc });
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-80 bg-white border-l border-gray-200 shadow-2xl flex flex-col p-6 overflow-y-auto custom-scrollbar animate-fade-in">
+    <div className="fixed inset-y-0 right-0 z-50 w-84 bg-white dark:bg-[#16181c] border-l border-gray-200/80 dark:border-gray-800/80 shadow-2xl flex flex-col p-6 overflow-y-auto custom-scrollbar animate-fade-in text-gray-800 dark:text-white">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
-        <h3 className="text-[18px] font-bold text-gray-800 flex items-center gap-2">
-          <CalendarIcon className="w-5 h-5 text-[#e50914]" />
-          Filters
+      <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-6">
+        <h3 className="text-[17px] font-extrabold text-gray-800 dark:text-white flex items-center gap-2">
+          <Filter className="w-5 h-5 text-[#e50914]" />
+          Project Filters
         </h3>
         <div className="flex items-center gap-3">
           <button 
             onClick={handleClearAll}
-            className="text-[12px] font-bold text-gray-400 hover:text-[#e50914] cursor-pointer flex items-center gap-1"
+            className="text-[12px] font-bold text-gray-400 hover:text-[#e50914] cursor-pointer flex items-center gap-1 transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            Clear all
+            Reset
           </button>
           <button 
             onClick={() => setFilterPanelOpen(false)}
-            className="p-1 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full cursor-pointer"
+            className="p-1.5 text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Consultation Status Section */}
+      {/* Project Status Section */}
       <div className="space-y-3 mb-6">
-        <h4 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Consultation Status</h4>
+        <h4 className="text-[11px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Project Status</h4>
         <div className="grid grid-cols-2 gap-2">
-          {['Not scheduled', 'Missed', 'Not required', 'Invitation sent', 'Scheduled', 'Completed'].map((status) => {
+          {['Lead', 'Booked', 'In Progress', 'Completed', 'Negotiation'].map((status) => {
             const isSel = selectedStatus === status;
             return (
               <button
@@ -75,7 +78,7 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
                 className={`px-3 py-2 text-[12px] font-bold rounded-xl border text-center cursor-pointer transition-all ${
                   isSel 
                     ? 'bg-[#e50914] text-white border-[#e50914] shadow-sm' 
-                    : 'bg-white text-gray-600 border-gray-200/60 hover:border-[#e50914]'
+                    : 'bg-gray-50/60 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 border-gray-200/50 dark:border-gray-800 hover:border-[#e50914]'
                 }`}
               >
                 {status}
@@ -85,90 +88,44 @@ export default function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
         </div>
       </div>
 
-      {/* Services Stages Section */}
+      {/* Event / Package Type Section */}
       <div className="space-y-3 mb-6">
-        <h4 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Services Stages</h4>
+        <h4 className="text-[11px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+          <Camera className="w-3.5 h-3.5" />
+          Event & Package Type
+        </h4>
         <div className="flex flex-col gap-2">
-          {['Less than 2 days left', 'Service not started', 'Hard deadline'].map((stage) => {
-            const isSel = selectedStage === stage;
+          {['Wedding', 'Pre-Wedding Shoot', 'Cinematography', 'Reception', 'Commercial & Fashion', 'Birthday / Event'].map((type) => {
+            const isSel = selectedEventType === type;
             return (
               <button
-                key={stage}
-                onClick={() => handleStageSelect(stage)}
+                key={type}
+                onClick={() => handleEventTypeSelect(type)}
                 className={`w-full px-4 py-2.5 text-left text-[12px] font-bold rounded-xl border cursor-pointer transition-all ${
                   isSel 
-                    ? 'bg-[#e50914] text-white border-[#e50914]' 
-                    : 'bg-white text-gray-600 border-gray-200/60 hover:border-[#e50914]'
+                    ? 'bg-[#e50914] text-white border-[#e50914] shadow-sm' 
+                    : 'bg-gray-50/60 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 border-gray-200/50 dark:border-gray-800 hover:border-[#e50914]'
                 }`}
               >
-                {stage}
+                {type}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Created Date Section with Simulated Calendar */}
-      <div className="space-y-3 mb-6">
-        <h4 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Created Date</h4>
-        <div className="grid grid-cols-4 gap-1.5 mb-3">
-          {['Today', 'Yesterday', 'This week', 'This month'].map((range) => (
-            <button
-              key={range}
-              onClick={() => setSelectedDateRange(range)}
-              className={`py-1.5 px-1 text-[10px] font-bold rounded-lg border text-center cursor-pointer transition-all ${
-                selectedDateRange === range 
-                  ? 'bg-gray-100 border-gray-300 text-gray-800' 
-                  : 'bg-white border-gray-200/60 text-gray-500 hover:border-[#e50914]'
-              }`}
-            >
-              {range}
-            </button>
-          ))}
-        </div>
-
-        {/* September 2024 Grid matching mockup */}
-        <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200/50">
-          <div className="flex items-center justify-between text-[11px] font-bold text-gray-700 mb-2">
-            <span>September 2024</span>
-          </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px]">
-            {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => (
-              <span key={d} className="font-bold text-gray-400">{d}</span>
-            ))}
-            {/* Days padding */}
-            {[...Array(4)].map((_, i) => <span key={`pad-${i}`} />)}
-            {/* Days list */}
-            {[...Array(30)].map((_, i) => {
-              const day = i + 1;
-              const isSelected = day === 10 || day === 14;
-              return (
-                <span 
-                  key={day} 
-                  className={`py-1 font-bold rounded-md ${
-                    isSelected ? 'bg-[#e50914] text-white font-extrabold shadow-sm' : 'text-gray-600'
-                  }`}
-                >
-                  {day}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Nationality Filter Section */}
+      {/* Location / Venue Section */}
       <div className="space-y-3">
-        <h4 className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Nationality</h4>
+        <h4 className="text-[11px] font-extrabold text-gray-400 dark:text-gray-505 uppercase tracking-widest flex items-center gap-1.5">
+          <MapPin className="w-3.5 h-3.5" />
+          Shoot Location / Venue
+        </h4>
         <input 
           type="text" 
-          value={selectedNationality}
-          onChange={(e) => {
-            setSelectedNationality(e.target.value);
-            onFilterChange({ status: selectedStatus, stage: selectedStage, dateRange: selectedDateRange, nationality: e.target.value });
-          }}
-          className="w-full bg-transparent border border-gray-200 rounded-xl p-3 text-[13px] focus:outline-none focus:border-[#e50914]"
-          placeholder="Start typing nationality..."
+          value={selectedLocation}
+          onChange={(e) => handleLocationChange(e.target.value)}
+          className="w-full bg-gray-50/60 dark:bg-gray-800/40 border border-gray-200/60 dark:border-gray-800 rounded-xl p-3 text-[12.5px] font-semibold focus:outline-none focus:border-[#e50914] placeholder:text-gray-400 dark:text-white transition-all"
+          placeholder="e.g. Bhubaneswar, Puri, Cuttack..."
         />
       </div>
     </div>

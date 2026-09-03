@@ -310,15 +310,7 @@ export default function ProjectsListPage() {
                 <div className="flex items-center gap-3.5">
                   <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0">
                     <img 
-                      src={
-                        selectedProject.name.includes('Luisana') ? 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80' :
-                        selectedProject.name.includes('Milagros') ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80' :
-                        selectedProject.name.includes('Alejandro') ? 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80' :
-                        selectedProject.name.includes('Leonardo') ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80' :
-                        selectedProject.name.includes('Lorena') ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80' :
-                        selectedProject.name.includes('Guido') ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80' :
-                        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'
-                      }
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedProject.name)}&background=e50914&color=fff&bold=true&size=128`}
                       alt={selectedProject.name}
                       className="w-full h-full object-cover"
                     />
@@ -372,38 +364,39 @@ export default function ProjectsListPage() {
                 </div>
               </div>
 
-              {/* Assignee Details Rows */}
+              {/* Contact / Project Details Rows */}
               <div className="grid grid-cols-2 gap-y-4 gap-x-4 border-t border-b border-gray-100 py-4 text-[12px] text-gray-500 font-semibold">
                 <div>
-                  <span className="text-gray-400 block font-medium">Attorney</span>
-                  <span className="text-gray-800 font-extrabold block mt-0.5">Davidson Theresa</span>
+                  <span className="text-gray-400 block font-medium">Contact Phone</span>
+                  <span className="text-gray-800 font-extrabold block mt-0.5 truncate">{selectedProject.phone || 'N/A'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 block font-medium">Case Type</span>
+                  <span className="text-gray-400 block font-medium">Event Type</span>
                   <span className="text-gray-800 font-extrabold block mt-0.5">{selectedProject.eventType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 block font-medium">Paralegal</span>
-                  <span className="text-gray-800 font-extrabold block mt-0.5">Veronica Manriquez</span>
+                  <span className="text-gray-400 block font-medium">Location / Venue</span>
+                  <span className="text-gray-800 font-extrabold block mt-0.5 truncate">{selectedProject.location || 'Studio'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 block font-medium">Created Date</span>
-                  <span className="text-gray-800 font-extrabold block mt-0.5">{dayjs(selectedProject.createdAt).format('MMM DD, YYYY')}</span>
+                  <span className="text-gray-400 block font-medium">Event Date</span>
+                  <span className="text-gray-800 font-extrabold block mt-0.5">
+                    {selectedProject.eventDate ? dayjs(selectedProject.eventDate).format('MMM DD, YYYY') : dayjs(selectedProject.createdAt).format('MMM DD, YYYY')}
+                  </span>
                 </div>
               </div>
 
               {/* Services List Table */}
               <div className="space-y-3">
                 <div className="flex justify-between text-[11px] text-gray-400 font-bold uppercase tracking-wider px-1">
-                  <span>Services</span>
-                  <span>Stages</span>
+                  <span>Deliverables</span>
+                  <span>Status</span>
                   <span>Days Left</span>
                 </div>
 
                 <div className="space-y-2">
                   {(selectedProject.services && selectedProject.services.length > 0 ? selectedProject.services : [
-                    { name: 'I-130', status: 'Request client authorization', daysLeft: 14 },
-                    { name: 'I-485', status: 'Assemble Packet', daysLeft: 3 }
+                    { name: selectedProject.eventType || 'Full Shoot Coverage', status: selectedProject.status || 'Booked', daysLeft: 7 }
                   ]).map((service, idx) => (
                     <div key={idx} className="flex items-center justify-between py-2 px-3 bg-gray-50/60 rounded-xl border border-gray-100 text-[12px]">
                       <span className="font-bold text-gray-700 truncate max-w-[130px]">{service.name}</span>
