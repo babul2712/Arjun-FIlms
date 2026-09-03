@@ -104,6 +104,7 @@ export interface Project {
   bookingId?: string;
   expenses: { _id?: string; date: string; description: string; amount: number }[];
   services?: IServiceStage[];
+  isStarred?: boolean;
   createdAt: string;
 }
 

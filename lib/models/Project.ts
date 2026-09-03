@@ -32,6 +32,7 @@ export interface IProject extends Document {
   
   expenses: { date: Date; description: string; amount: number }[];
   services: IServiceStage[];
+  isStarred?: boolean;
   
   createdAt: Date;
 }
@@ -72,6 +73,7 @@ const ProjectSchema: Schema = new Schema({
     amount: { type: Number, required: true }
   }],
   services: [ServiceStageSchema],
+  isStarred: { type: Boolean, default: false },
   
   createdAt: { type: Date, default: Date.now },
 });

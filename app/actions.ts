@@ -93,6 +93,24 @@ export async function updateProject(id: string, data: any) {
   return JSON.parse(JSON.stringify(project));
 }
 
+export async function toggleProjectStar(id: string) {
+  try {
+    await connectToDatabase();
+    const proj = await Project.findById(id);
+    if (!proj) return { success: false, error: 'Project not found' };
+
+    proj.isStarred = !proj.isStarred;
+    await proj.save();
+
+    revalidatePath('/dashboard', 'layout');
+    revalidatePath('/projects', 'layout');
+    return { success: true, isStarred: proj.isStarred, project: JSON.parse(JSON.stringify(proj)) };
+  } catch (err: any) {
+    console.error('toggleProjectStar error:', err);
+    return { success: false, error: err?.message };
+  }
+}
+
 export async function deleteProject(id: string) {
   await connectToDatabase();
   await Project.findByIdAndDelete(id);

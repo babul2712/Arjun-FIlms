@@ -74,7 +74,7 @@ export default function DashboardPage() {
   const [showFinished, setShowFinished] = useState(false);
 
   // Cases lists tab & details drawer state
-  const [activeTab, setActiveTab] = useState<'active' | 'leads'>('active');
+  const [activeTab, setActiveTab] = useState<'active' | 'leads' | 'starred'>('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [hoveredMilestone, setHoveredMilestone] = useState<any | null>(null);
@@ -115,14 +115,16 @@ export default function DashboardPage() {
   }, []);
 
   // Filter functionality
-  const applyFiltering = (dataList: Project[], tab: 'active' | 'leads', search: string) => {
+  const applyFiltering = (dataList: Project[], tab: 'active' | 'leads' | 'starred', search: string) => {
     let filtered = [...dataList];
     
     // Tab filter
     if (tab === 'active') {
       filtered = filtered.filter(p => p.status === 'Booked' || p.status === 'Completed' || p.status === 'Negotiation');
-    } else {
+    } else if (tab === 'leads') {
       filtered = filtered.filter(p => p.status === 'Lead' || p.status === 'Qualified');
+    } else if (tab === 'starred') {
+      filtered = filtered.filter(p => p.isStarred);
     }
 
     // Search query filter
@@ -138,10 +140,21 @@ export default function DashboardPage() {
     setFilteredProjects(filtered);
   };
 
-  const handleTabChange = (tab: 'active' | 'leads') => {
+  const handleTabChange = (tab: 'active' | 'leads' | 'starred') => {
     setActiveTab(tab);
     applyFiltering(projects, tab, searchQuery);
     setSelectedProject(null); // Clear drawer focus
+  };
+
+  const handleStarToggle = (projectId: string, isStarred: boolean) => {
+    setProjects(prev => {
+      const updated = prev.map(p => (p._id === projectId || p.id === projectId) ? { ...p, isStarred } : p);
+      applyFiltering(updated, activeTab, searchQuery);
+      return updated;
+    });
+    if (selectedProject && (selectedProject._id === projectId || selectedProject.id === projectId)) {
+      setSelectedProject(prev => prev ? { ...prev, isStarred } : null);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -888,11 +901,11 @@ export default function DashboardPage() {
         {/* Section Sub-header & Action controls */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           
-          {/* Left Tabs: Active Cases vs New prospects */}
-          <div className="flex bg-[#fee2e2]/40 dark:bg-[#16181c] p-1.5 rounded-[22px] border border-[#fecaca]/40 dark:border-gray-800/40 backdrop-blur-md">
+          {/* Left Tabs: Active Cases vs New prospects vs Starred */}
+          <div className="flex bg-[#fee2e2]/40 dark:bg-[#16181c] p-1.5 rounded-[22px] border border-[#fecaca]/40 dark:border-gray-800/40 backdrop-blur-md gap-1">
             <button 
               onClick={() => handleTabChange('active')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-[14px] font-bold cursor-pointer transition-all ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-[13.5px] font-bold cursor-pointer transition-all ${
                 activeTab === 'active' 
                   ? 'bg-white dark:bg-[#24272c] text-[#1a1c22] dark:text-white shadow-sm' 
                   : 'text-gray-505 hover:text-gray-850 dark:hover:text-gray-205'
@@ -904,7 +917,7 @@ export default function DashboardPage() {
             
             <button 
               onClick={() => handleTabChange('leads')}
-              className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-[14px] font-bold cursor-pointer transition-all ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-[13.5px] font-bold cursor-pointer transition-all ${
                 activeTab === 'leads' 
                   ? 'bg-white dark:bg-[#24272c] text-[#1a1c22] dark:text-white shadow-sm' 
                   : 'text-gray-505 hover:text-gray-850 dark:hover:text-gray-205'
@@ -912,6 +925,21 @@ export default function DashboardPage() {
             >
               <span>New prospects</span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#e50914]" />
+            </button>
+
+            <button 
+              onClick={() => handleTabChange('starred')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-[18px] text-[13.5px] font-bold cursor-pointer transition-all ${
+                activeTab === 'starred' 
+                  ? 'bg-white dark:bg-[#24272c] text-[#1a1c22] dark:text-white shadow-sm' 
+                  : 'text-gray-505 hover:text-gray-850 dark:hover:text-gray-205'
+              }`}
+            >
+              <Star className={`w-4 h-4 ${activeTab === 'starred' ? 'fill-amber-400 text-amber-500' : 'text-amber-400'}`} />
+              <span>Starred</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-extrabold">
+                {projects.filter(p => p.isStarred).length}
+              </span>
             </button>
           </div>
 

@@ -1,14 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import { Project } from '@/lib/types';
 import dayjs from 'dayjs';
+import { toggleProjectStar } from '@/app/actions';
+import { toast } from 'sonner';
 
 interface ProjectCardProps {
   project: Project;
   onSelect: (project: Project) => void;
   onMilestoneHover?: (milestone: any, rect: DOMRect | null) => void;
+  onStarToggle?: (projectId: string, isStarred: boolean) => void;
 }
 
 // Client profiles mapper to perfectly align mock data with Unsplash images and details from the mockup
@@ -30,7 +33,7 @@ const getClientDetails = (name: string) => {
   }
   if (name.includes('Milagros')) {
     return {
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80',
       flag: '🇲🇽',
       nationality: 'Mexican',
       language: 'English',
@@ -38,14 +41,13 @@ const getClientDetails = (name: string) => {
       paralegal: 'Collins Kimberly',
       duration: '4 mo 5 d',
       contacts: [
-        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80',
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80'
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80'
       ]
     };
   }
-  if (name.includes('Alejandro')) {
+  if (name.includes('Alejandro') || name.includes('Bustamante')) {
     return {
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80',
+      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80',
       flag: '🇲🇽',
       nationality: 'Mexican',
       language: 'Spanish',
@@ -53,29 +55,27 @@ const getClientDetails = (name: string) => {
       paralegal: 'Harris Jennifer',
       duration: '7 mo 12 d',
       contacts: [
-        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80',
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&h=80&q=80',
-        'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=80&h=80&q=80'
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80',
+        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80'
       ]
     };
   }
-  if (name.includes('Leonardo')) {
+  if (name.includes('Leonardo') || name.includes('Cooper')) {
     return {
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80',
       flag: '🇺🇸',
       nationality: 'American',
       language: 'English',
       attorney: 'Johnson Mary',
       paralegal: 'Collins Kimberly',
       duration: '6 d',
-      contacts: [
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80'
-      ]
+      contacts: []
     };
   }
-  if (name.includes('Lorena')) {
+  if (name.includes('Lorena') || name.includes('Espinoza')) {
     return {
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&h=150&q=80',
       flag: '🇲🇽',
       nationality: 'Mexican',
       language: 'Spanish',
@@ -83,14 +83,14 @@ const getClientDetails = (name: string) => {
       paralegal: 'Wellington Elizabeth',
       duration: '24 mo 5 d',
       contacts: [
-        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80',
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80'
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80',
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80'
       ]
     };
   }
-  if (name.includes('Guido')) {
+  if (name.includes('Guido') || name.includes('Romero')) {
     return {
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80',
       flag: '🇲🇽',
       nationality: 'Mexican',
       language: 'Spanish',
@@ -98,31 +98,55 @@ const getClientDetails = (name: string) => {
       paralegal: 'Harris Jennifer',
       duration: '7 d',
       contacts: [
-        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80',
-        'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=80&h=80&q=80'
+        'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=80&h=80&q=80'
       ]
     };
   }
-  // Default fallback details
+  // Fallback defaults for custom client cases
   return {
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80',
-    flag: '🇲🇽',
-    nationality: 'Mexican',
-    language: 'Spanish',
-    attorney: 'Davidson Theresa',
-    paralegal: 'Veronica Manriquez',
-    duration: '15 d',
-    contacts: [
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80'
-    ]
+    flag: '🇮🇳',
+    nationality: 'Indian',
+    language: 'English',
+    attorney: 'Arjun Lead',
+    paralegal: 'Studio Team',
+    duration: 'Active',
+    contacts: []
   };
 };
 
-export default function ProjectCard({ project, onSelect, onMilestoneHover }: ProjectCardProps) {
+export default function ProjectCard({ project, onSelect, onMilestoneHover, onStarToggle }: ProjectCardProps) {
   const details = getClientDetails(project.name);
+  const [starred, setStarred] = useState<boolean>(Boolean(project.isStarred));
 
-  // Determine if this project is starred to match mockup's starred and unstarred look
-  const isStarred = project.name.includes('Luisana') || project.name.includes('Milagros') || project.name.includes('Alejandro');
+  useEffect(() => {
+    setStarred(Boolean(project.isStarred));
+  }, [project.isStarred]);
+
+  const handleToggleStar = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const projId = project._id || project.id;
+    if (!projId) return;
+
+    const nextStarred = !starred;
+    setStarred(nextStarred); // Optimistic UI update
+
+    try {
+      const res = await toggleProjectStar(projId);
+      if (res.success) {
+        toast.success(nextStarred ? `⭐ Bookmarked ${project.name}` : `Removed bookmark for ${project.name}`);
+        if (onStarToggle) {
+          onStarToggle(projId, nextStarred);
+        }
+      } else {
+        setStarred(!nextStarred); // Rollback on failure
+        toast.error('Failed to update bookmark');
+      }
+    } catch (err) {
+      setStarred(!nextStarred);
+      toast.error('Failed to update bookmark');
+    }
+  };
 
   // Helper to determine the color of the status badge matching the designs
   const getStatusColors = (status: string) => {
@@ -178,12 +202,13 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover }: Pro
         <div className="inverted-radius-right"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <button 
-            onClick={(e) => { e.stopPropagation(); }}
-            className={`w-[52px] h-[52px] bg-[#ededed] dark:bg-[#24272c] hover:bg-gray-250 dark:hover:bg-gray-800 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-95 ${
-              isStarred ? 'text-[#f2a93b]' : 'text-gray-400 hover:text-[#f2a93b]'
+            onClick={handleToggleStar}
+            className={`w-[52px] h-[52px] bg-[#ededed] dark:bg-[#24272c] hover:bg-gray-250 dark:hover:bg-gray-800 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-90 group/star ${
+              starred ? 'text-[#f2a93b] shadow-amber-500/20' : 'text-gray-400 hover:text-[#f2a93b]'
             }`}
+            title={starred ? 'Remove Bookmark' : 'Bookmark Case'}
           >
-            <Star className={`w-[18px] h-[18px] ${isStarred ? 'fill-current' : ''}`} />
+            <Star className={`w-[18px] h-[18px] transition-transform group-hover/star:scale-110 ${starred ? 'fill-current text-[#f2a93b]' : ''}`} />
           </button>
         </div>
       </div>

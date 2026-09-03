@@ -28,7 +28,7 @@ export default function ProjectsListPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-  const [activeTab, setActiveTab] = useState<'active' | 'leads'>('active');
+  const [activeTab, setActiveTab] = useState<'active' | 'leads' | 'starred'>('active');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { toggleFilterPanel } = useUIStore();
@@ -56,14 +56,16 @@ export default function ProjectsListPage() {
     loadData();
   }, []);
 
-  const applyFiltering = (dataList: Project[], tab: 'active' | 'leads', search: string) => {
+  const applyFiltering = (dataList: Project[], tab: 'active' | 'leads' | 'starred', search: string) => {
     let filtered = [...dataList];
     
     // Tab filter
     if (tab === 'active') {
       filtered = filtered.filter(p => p.status === 'Booked' || p.status === 'Completed' || p.status === 'Negotiation');
-    } else {
+    } else if (tab === 'leads') {
       filtered = filtered.filter(p => p.status === 'Lead' || p.status === 'Qualified');
+    } else if (tab === 'starred') {
+      filtered = filtered.filter(p => p.isStarred);
     }
 
     // Search query filter
@@ -79,10 +81,21 @@ export default function ProjectsListPage() {
     setFilteredProjects(filtered);
   };
 
-  const handleTabChange = (tab: 'active' | 'leads') => {
+  const handleTabChange = (tab: 'active' | 'leads' | 'starred') => {
     setActiveTab(tab);
     applyFiltering(projects, tab, searchQuery);
     setSelectedProject(null); // Clear active card focus
+  };
+
+  const handleStarToggle = (projectId: string, isStarred: boolean) => {
+    setProjects(prev => {
+      const updated = prev.map(p => (p._id === projectId || p.id === projectId) ? { ...p, isStarred } : p);
+      applyFiltering(updated, activeTab, searchQuery);
+      return updated;
+    });
+    if (selectedProject && (selectedProject._id === projectId || selectedProject.id === projectId)) {
+      setSelectedProject(prev => prev ? { ...prev, isStarred } : null);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,10 +169,10 @@ export default function ProjectsListPage() {
       {/* Integrated Header Row matching mockup */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         {/* Left Side: Tabs */}
-        <div className="flex bg-[#fee2e2]/40 p-1.5 rounded-[22px] border border-[#fecaca]/40 backdrop-blur-md">
+        <div className="flex bg-[#fee2e2]/40 p-1.5 rounded-[22px] border border-[#fecaca]/40 backdrop-blur-md gap-1">
           <button 
             onClick={() => handleTabChange('active')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-[14px] font-bold cursor-pointer transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-[13.5px] font-bold cursor-pointer transition-all ${
               activeTab === 'active' 
                 ? 'bg-white text-[#1a1c22] shadow-sm' 
                 : 'text-gray-500 hover:text-gray-800'
@@ -170,7 +183,7 @@ export default function ProjectsListPage() {
           </button>
           <button 
             onClick={() => handleTabChange('leads')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-[14px] font-bold cursor-pointer transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-[13.5px] font-bold cursor-pointer transition-all ${
               activeTab === 'leads' 
                 ? 'bg-white text-[#1a1c22] shadow-sm' 
                 : 'text-gray-500 hover:text-gray-800'
@@ -178,6 +191,20 @@ export default function ProjectsListPage() {
           >
             <span>New prospects</span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#e50914]" />
+          </button>
+          <button 
+            onClick={() => handleTabChange('starred')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-[18px] text-[13.5px] font-bold cursor-pointer transition-all ${
+              activeTab === 'starred' 
+                ? 'bg-white text-[#1a1c22] shadow-sm' 
+                : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <Star className={`w-4 h-4 ${activeTab === 'starred' ? 'fill-amber-400 text-amber-500' : 'text-amber-400'}`} />
+            <span>Starred</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-700 font-extrabold">
+              {projects.filter(p => p.isStarred).length}
+            </span>
           </button>
         </div>
 
@@ -221,11 +248,11 @@ export default function ProjectsListPage() {
             </svg>
           </button>
 
-          {/* Red action trigger button */}
+          {/* Create Button */}
           <button 
             onClick={() => router.push('/projects/create')}
             className="w-12 h-12 rounded-full bg-[#e50914] hover:bg-red-700 text-white flex items-center justify-center shadow-lg shadow-red-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
-            title="Create New Case"
+            title="Create New Project"
           >
             <Plus className="w-[22px] h-[22px] stroke-[2.5]" />
           </button>
@@ -241,10 +268,10 @@ export default function ProjectsListPage() {
         <span>{filteredProjects.length} Cases</span>
       </div>
 
-      {/* Main Grid Area Layout */}
+      {/* Grid: 3 columns default, collapses to 2 when card focused */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Side: Cards Grid */}
+        {/* Main Grid listing */}
         <div className={`col-span-12 ${selectedProject ? 'lg:col-span-8' : 'lg:col-span-12'} transition-all duration-300`}>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
@@ -262,10 +289,11 @@ export default function ProjectsListPage() {
             <div className={`grid grid-cols-1 md:grid-cols-2 ${selectedProject ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} gap-8`}>
               {filteredProjects.map((project) => (
                 <ProjectCard 
-                  key={project.id} 
+                  key={project.id || project._id} 
                   project={project} 
                   onSelect={(p) => setSelectedProject(p)}
                   onMilestoneHover={handleMilestoneHover}
+                  onStarToggle={handleStarToggle}
                 />
               ))}
             </div>
@@ -307,10 +335,33 @@ export default function ProjectsListPage() {
                 
                 <div className="flex items-center gap-1">
                   <button 
-                    onClick={() => {}}
-                    className="p-1.5 text-amber-400 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                    onClick={async () => {
+                      const projId = selectedProject._id || selectedProject.id;
+                      if (!projId) return;
+                      const nextStarred = !selectedProject.isStarred;
+                      handleStarToggle(projId, nextStarred);
+                      try {
+                        const { toggleProjectStar } = await import('@/app/actions');
+                        const res = await toggleProjectStar(projId);
+                        if (res.success) {
+                          toast.success(nextStarred ? `⭐ Bookmarked ${selectedProject.name}` : `Removed bookmark for ${selectedProject.name}`);
+                        } else {
+                          handleStarToggle(projId, !nextStarred);
+                          toast.error('Failed to update bookmark');
+                        }
+                      } catch (e) {
+                        handleStarToggle(projId, !nextStarred);
+                        toast.error('Failed to update bookmark');
+                      }
+                    }}
+                    className={`p-2 rounded-xl transition-all cursor-pointer ${
+                      selectedProject.isStarred 
+                        ? 'text-amber-400 bg-amber-50' 
+                        : 'text-gray-400 hover:text-amber-400 hover:bg-gray-100'
+                    }`}
+                    title={selectedProject.isStarred ? 'Remove Bookmark' : 'Bookmark Case'}
                   >
-                    <Star className="w-4.5 h-4.5 fill-current" />
+                    <Star className={`w-5 h-5 ${selectedProject.isStarred ? 'fill-current text-amber-400' : ''}`} />
                   </button>
                   <button 
                     onClick={() => setSelectedProject(null)}
