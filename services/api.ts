@@ -37,7 +37,9 @@ export const getProjects = async (): Promise<Project[]> => {
     const projects = await actions.getProjects();
     return projects.map((c: any) => ({
       ...c,
-      id: c._id.toString()
+      id: c._id ? c._id.toString() : c.id,
+      _id: c._id ? c._id.toString() : c.id,
+      isStarred: Boolean(c.isStarred)
     }));
   } catch (e) {
     console.error(e);

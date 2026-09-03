@@ -220,6 +220,7 @@ export default function DashboardPage() {
         eventType: 'Green Card (Family-Based)',
         totalValue: 120000,
         status: 'Booked',
+        isStarred: true,
         eventDate: new Date().toISOString(),
         services: [
           { name: 'I-130', status: 'Request client authorization', daysLeft: 14 },
@@ -235,6 +236,7 @@ export default function DashboardPage() {
         eventType: 'Student visas',
         totalValue: 85000,
         status: 'Booked',
+        isStarred: true,
         eventDate: new Date().toISOString(),
         services: [
           { name: 'N-864', status: 'Attorney review FOIA', daysLeft: 1 }
@@ -249,6 +251,7 @@ export default function DashboardPage() {
         eventType: 'Green Card',
         totalValue: 95000,
         status: 'Booked',
+        isStarred: true,
         eventDate: new Date().toISOString(),
         services: [
           { name: 'Work permit request', status: 'Approved', daysLeft: 11 },
@@ -264,6 +267,7 @@ export default function DashboardPage() {
         eventType: 'Work permit',
         totalValue: 45000,
         status: 'Booked',
+        isStarred: false,
         eventDate: new Date().toISOString(),
         services: [
           { name: 'N-400', status: 'Assemble Packet', daysLeft: 3 }
@@ -278,6 +282,7 @@ export default function DashboardPage() {
         eventType: 'Student and visitors visas',
         totalValue: 60000,
         status: 'Booked',
+        isStarred: false,
         eventDate: new Date().toISOString(),
         services: [
           { name: 'I-360: VAWA', status: 'Request client authorization', daysLeft: 14 }
@@ -292,6 +297,7 @@ export default function DashboardPage() {
         eventType: 'Citizenship & naturalization',
         totalValue: 70000,
         status: 'Booked',
+        isStarred: false,
         eventDate: new Date().toISOString(),
         services: [
           { name: 'I-360: VAWA', status: 'Request client authorization', daysLeft: 14 }
