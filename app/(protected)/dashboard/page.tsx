@@ -715,57 +715,42 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Visa Card Panel */}
-          <div className="bg-gradient-to-tr from-[#0b0c0e] via-[#101915] to-[#142d20] border border-[#8efa1d]/10 rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[195px] group hover:border-[#8efa1d]/30 transition-all duration-300">
-            {/* Gloss light effects background */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#8efa1d]/5 rounded-full blur-2xl group-hover:bg-[#8efa1d]/10 transition-all" />
+          {/* Minimalist Studio Cash / Treasury Card */}
+          <div className="bg-gradient-to-br from-[#16181f] via-[#111317] to-[#0a0b0d] border border-gray-800/80 rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[175px] group hover:border-[#e50914]/40 transition-all duration-300">
+            {/* Ambient Red Glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#e50914]/10 rounded-full blur-2xl group-hover:bg-[#e50914]/15 transition-all pointer-events-none" />
 
-            <div className="flex justify-between items-start">
-              <span className="w-10 h-7 rounded bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
-                <svg className="w-7 h-5 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <line x1="2" y1="10" x2="22" y2="10" stroke="currentColor" strokeWidth="2" />
-                </svg>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#e50914] animate-pulse" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-gray-300">Studio Cash Flow</span>
+              </div>
+              <span className="text-[10px] font-bold text-gray-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full">
+                Live Treasury
               </span>
-              <span className="text-[14px] font-black tracking-widest text-gray-300/80 uppercase">VISA</span>
             </div>
             
-            <div className="my-5">
-              <p className="text-[17px] font-bold tracking-[4px] text-gray-200">
-                ****  ****  3892  7835
-              </p>
-            </div>
-
-            <div className="flex justify-between items-end border-t border-gray-800/40 pt-4 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-              <div>
-                <span className="block text-[8px] text-gray-505 mb-0.5">Card Holder</span>
-                <span className="text-gray-300 font-extrabold text-[11px] tracking-wide">Robert Esperanza</span>
-              </div>
-              <div className="text-center">
-                <span className="block text-[8px] text-gray-550 mb-0.5">Valid Thru</span>
-                <span className="text-gray-300 font-extrabold text-[11px]">12/30</span>
-              </div>
-              <div className="text-right">
-                <span className="block text-[8px] text-gray-550 mb-0.5">CVV</span>
-                <span className="text-gray-300 font-extrabold text-[11px]">235</span>
+            <div className="my-3">
+              <span className="text-[10.5px] font-bold text-gray-400 uppercase tracking-wider block">Total Received Balance</span>
+              <div className="text-[26px] font-black tracking-tight text-white mt-1 flex items-baseline gap-2">
+                ₹{stats.revenue.toLocaleString('en-IN')}
+                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                  Verified
+                </span>
               </div>
             </div>
-          </div>
 
-          {/* Card action buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <button className="py-3.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-505 hover:text-gray-808 dark:bg-transparent dark:hover:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-white rounded-2xl text-[13px] font-bold cursor-pointer transition-colors active:scale-95">
-              Deposit
-            </button>
-            <button 
-              className={`py-3.5 rounded-2xl text-[13px] font-black cursor-pointer active:scale-95 transition-colors ${
-                theme === 'dark'
-                  ? 'bg-[#8efa1d] hover:bg-[#a5f841] text-[#0b0c0e] shadow-lg shadow-[#8efa1d]/10'
-                  : 'bg-[#e50914] hover:bg-red-700 text-white shadow-lg shadow-red-500/20'
-              }`}
-            >
-              Transfer
-            </button>
+            <div className="flex justify-between items-center border-t border-gray-800/60 pt-3 text-[11px]">
+              <span className="text-gray-400 font-medium truncate max-w-[170px]">
+                SBI •••• 7096
+              </span>
+              <button 
+                onClick={() => router.push('/payments')}
+                className="text-[11px] font-extrabold text-[#e50914] hover:text-red-400 flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                Payments <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           {/* Cash Flow Bar Chart Under Visa Card */}
