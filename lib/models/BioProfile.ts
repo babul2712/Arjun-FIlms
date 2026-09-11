@@ -60,6 +60,7 @@ export interface IBioProfile extends Document {
   showShareButton: boolean;
   showInquiryButton: boolean;
   fontFamily?: string;
+  themeColor?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -146,6 +147,7 @@ const BioProfileSchema: Schema = new Schema(
     showShareButton: { type: Boolean, default: true },
     showInquiryButton: { type: Boolean, default: true },
     fontFamily: { type: String, default: 'montserrat' },
+    themeColor: { type: String, default: 'crimson' },
   },
   { timestamps: true }
 );

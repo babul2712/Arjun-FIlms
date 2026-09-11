@@ -12,6 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -314,13 +315,13 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                       <Receipt className="w-5 h-5 text-[#e50914]" />
                       Financial Ledger Statement
                     </h4>
-                    <p className="text-[13px] text-gray-400 font-semibold mt-1">Project Total: <strong className="text-gray-900">₹{project.totalValue.toLocaleString()}</strong></p>
+                    <p className="text-[13px] text-gray-400 font-semibold mt-1">Project Total: <strong className="text-gray-900"><AnimatedCashAmount amount={Number(project.totalValue || 0)} /></strong></p>
                   </div>
                   
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Pending Client Payments</span>
-                      <span className="text-[18px] font-extrabold text-[#e50914]">₹{pendingAmount.toLocaleString()}</span>
+                      <span className="text-[18px] font-extrabold text-[#e50914]"><AnimatedCashAmount amount={pendingAmount} colorScheme="crimson" /></span>
                     </div>
                     <button 
                       onClick={() => setShowExpenseModal(true)}
@@ -362,13 +363,13 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                               </span>
                             </td>
                             <td className="px-4 py-3.5 font-bold text-emerald-600 text-right">
-                              {row.type === 'IN' ? `₹${row.amount.toLocaleString()}` : '-'}
+                              {row.type === 'IN' ? <AnimatedCashAmount amount={row.amount} colorScheme="emerald" sparkle={false} /> : '-'}
                             </td>
                             <td className="px-4 py-3.5 font-bold text-rose-600 text-right">
-                              {row.type === 'OUT' ? `₹${row.amount.toLocaleString()}` : '-'}
+                              {row.type === 'OUT' ? <AnimatedCashAmount amount={row.amount} colorScheme="crimson" sparkle={false} /> : '-'}
                             </td>
                             <td className="px-4 py-3.5 font-extrabold text-gray-900 text-right">
-                              ₹{row.runningBalance.toLocaleString()}
+                              <AnimatedCashAmount amount={row.runningBalance} sparkle={false} />
                             </td>
                           </tr>
                         ))
@@ -469,7 +470,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                           </div>
                           <div>
                             <p className="text-[13px] font-bold text-gray-700 truncate max-w-[150px]">Payment Screenshot</p>
-                            <p className="text-[11px] text-gray-400 font-semibold">Amount: ₹{p.amount.toLocaleString()}</p>
+                            <p className="text-[11px] text-gray-400 font-semibold flex items-center gap-1">Amount: <AnimatedCashAmount amount={p.amount} sparkle={false} /></p>
                           </div>
                         </div>
                         <a 

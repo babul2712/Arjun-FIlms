@@ -6,6 +6,8 @@ import { Payment } from '@/lib/types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
+
 dayjs.extend(relativeTime);
 
 export default function RecentActivity() {
@@ -48,7 +50,9 @@ export default function RecentActivity() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[14px] font-black text-emerald-600">+₹{activity.amount.toLocaleString('en-IN')}</p>
+                <p className="text-[14px] font-black text-emerald-600">
+                  <AnimatedCashAmount amount={activity.amount} prefix="+₹" colorScheme="emerald" sparkle={false} />
+                </p>
                 <p className="text-[11px] text-gray-400 font-bold mt-1 uppercase tracking-wider">{dayjs(activity.date).fromNow()}</p>
               </div>
             </div>

@@ -53,6 +53,7 @@ export interface Payment {
   date: string;
   remarks?: string;
   projectId?: string;
+  transactionId?: string;
 }
 
 export type BookingStatus = 'Upcoming' | 'Completed' | 'Cancelled';

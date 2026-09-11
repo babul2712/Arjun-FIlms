@@ -36,7 +36,7 @@ import {
 import { getBioProfileAdmin, updateBioProfile, getStudioStatsAction } from '@/app/actions';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 import { useAuthStore } from '@/store/authStore';
-import { useUIStore, SITE_FONTS, SiteFontId } from '@/store/uiStore';
+import { useUIStore, SITE_FONTS, SiteFontId, THEME_COLORS, ThemeColorId } from '@/store/uiStore';
 import { toast } from 'sonner';
 
 type TabType = 'identity' | 'contact' | 'billing' | 'security' | 'appearance';
@@ -50,7 +50,7 @@ export default function ProfilePage() {
 
   // Auth & UI Store
   const user = useAuthStore((state) => state.user);
-  const { theme, toggleTheme, siteFont, setSiteFont } = useUIStore();
+  const { theme, toggleTheme, siteFont, setSiteFont, themeColor, setThemeColor } = useUIStore();
 
   // Studio Profile Form State
   const [formData, setFormData] = useState({
@@ -77,7 +77,8 @@ export default function ProfilePage() {
     defaultPaymentTerms: '1. 50% advance payment required for date reservation.\n2. 30% payment on the event shoot date.\n3. 20% final balance upon raw previews delivery.',
     slug: 'arjunfilms',
     verified: true,
-    fontFamily: 'montserrat',
+    fontFamily: siteFont || 'montserrat',
+    themeColor: themeColor || 'crimson',
   });
 
   // Security Form State
@@ -108,7 +109,8 @@ export default function ProfilePage() {
       ]);
 
       if (profileRes) {
-        const loadedFont = (profileRes.fontFamily || 'montserrat') as SiteFontId;
+        const loadedFont = (profileRes.fontFamily || siteFont || 'montserrat') as SiteFontId;
+        const loadedThemeColor = (profileRes.themeColor || themeColor || 'crimson') as ThemeColorId;
         setFormData({
           studioName: profileRes.studioName || 'Arjun Films & Photography',
           ownerName: profileRes.ownerName || 'Arjun Samal',
@@ -134,10 +136,14 @@ export default function ProfilePage() {
           slug: profileRes.slug || 'arjunfilms',
           verified: profileRes.verified !== false,
           fontFamily: loadedFont,
+          themeColor: loadedThemeColor,
         });
 
         if (profileRes.fontFamily) {
           setSiteFont(loadedFont);
+        }
+        if (profileRes.themeColor) {
+          setThemeColor(loadedThemeColor);
         }
       }
 
@@ -168,6 +174,12 @@ export default function ProfilePage() {
     try {
       const res = await updateBioProfile(formData, 'arjunfilms');
       if (res.success) {
+        if (formData.fontFamily) {
+          setSiteFont(formData.fontFamily as SiteFontId);
+        }
+        if (formData.themeColor) {
+          setThemeColor(formData.themeColor as ThemeColorId);
+        }
         toast.success('Studio Profile & Settings updated successfully!');
         setIsDirty(false);
       } else {
@@ -943,7 +955,91 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Section 2: Theme Mode Selector */}
+              {/* Section 2: CRM Accent Theme Color (7 Presets) */}
+              <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <h4 className="font-extrabold text-gray-900 dark:text-white text-[15px] flex items-center gap-2">
+                      <Palette className="w-4 h-4 text-[#e50914]" />
+                      CRM Accent Color Theme (7 Presets)
+                    </h4>
+                    <p className="text-[12px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                      Vibrant studio highlights that dynamically adapt in both Light Mode and Cinematic Dark Mode.
+                    </p>
+                  </div>
+                  <span className="self-start sm:self-auto px-3 py-1 bg-red-500/10 border border-red-500/20 text-[#e50914] text-[11px] font-extrabold rounded-full uppercase tracking-wider">
+                    Live Dynamic Color
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-1">
+                  {THEME_COLORS.map((col) => {
+                    const isSelected = (themeColor || 'crimson') === col.id;
+                    return (
+                      <div
+                        key={col.id}
+                        onClick={() => {
+                          setThemeColor(col.id);
+                          handleChange('themeColor', col.id);
+                          toast.success(`Theme accent switched to ${col.name}!`);
+                        }}
+                        className={`relative p-5 rounded-3xl border transition-all duration-200 cursor-pointer text-left flex flex-col justify-between group ${
+                          isSelected
+                            ? 'border-gray-900 dark:border-white bg-gray-50/90 dark:bg-gray-800/80 shadow-lg ring-2 ring-gray-900/20 dark:ring-white/20'
+                            : 'border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/30 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="space-y-3">
+                          {/* Color Swatch Header */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                              <div
+                                className="w-7 h-7 rounded-2xl shadow-md border-2 border-white dark:border-gray-700 shrink-0"
+                                style={{ background: col.previewGradient }}
+                              />
+                              <span className="text-[14px] font-black tracking-tight text-gray-900 dark:text-white">
+                                {col.name}
+                              </span>
+                            </div>
+                            {isSelected ? (
+                              <div
+                                className="w-5 h-5 rounded-full text-white flex items-center justify-center shadow-xs"
+                                style={{ backgroundColor: col.primary }}
+                              >
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full border border-gray-300 dark:border-gray-700 group-hover:border-gray-400" />
+                            )}
+                          </div>
+
+                          <span className="inline-block px-2.5 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                            {col.badge}
+                          </span>
+
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                            {col.description}
+                          </p>
+                        </div>
+
+                        {/* Color Preview Bar */}
+                        <div className="mt-4 pt-3 border-t border-gray-150 dark:border-gray-800/80 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: col.primary }} />
+                            <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: col.hover }} />
+                            <div className="w-3.5 h-3.5 rounded-full border border-gray-200 dark:border-gray-700" style={{ backgroundColor: col.surfaceVariantLight }} />
+                          </div>
+                          <span className="text-[10px] font-mono font-bold text-gray-400 uppercase">
+                            {col.primary}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Section 3: Theme Mode Selector */}
               <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-3">
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">
                   CRM Theme Mode
@@ -981,7 +1077,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Section 3: Quotation Template Info */}
+              {/* Section 4: Quotation Template Info */}
               <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-4">
                 <div>
                   <h4 className="font-extrabold text-gray-800 dark:text-white text-[14px]">

@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { ChevronLeft, ChevronRight, X, Calendar as CalendarIcon, MapPin, Camera, ArrowUpRight } from 'lucide-react';
 import { Project } from '@/lib/types';
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 
 export default function CalendarView({ projects }: { projects: Project[] }) {
   const router = useRouter();
@@ -208,7 +209,7 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
 
                     <div className="mt-3.5 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
                       <span className="text-[13px] font-extrabold text-gray-900 dark:text-white">
-                        ₹{(project.totalValue || 0).toLocaleString()}
+                        <AnimatedCashAmount amount={Number(project.totalValue || 0)} />
                       </span>
                       <button
                         onClick={() => {

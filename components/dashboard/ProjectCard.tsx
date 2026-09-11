@@ -6,6 +6,7 @@ import { Project } from '@/lib/types';
 import dayjs from 'dayjs';
 import { toggleProjectStar } from '@/app/actions';
 import { toast } from 'sonner';
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 
 interface ProjectCardProps {
   project: Project;
@@ -97,7 +98,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
   const displayImage = project.coverImage || clientAvatar;
 
   return (
-    <div 
+    <div
       onClick={() => onSelect(project)}
       className="glass-card glass-card-hover rounded-[32px] p-5 cursor-pointer relative flex flex-col justify-between h-full bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm overflow-hidden"
     >
@@ -106,11 +107,10 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
         <div className="inverted-radius-top"></div>
         <div className="inverted-radius-right"></div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <button 
+          <button
             onClick={handleToggleStar}
-            className={`w-[52px] h-[52px] bg-[#ededed] dark:bg-[#24272c] hover:bg-gray-250 dark:hover:bg-gray-800 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-90 group/star ${
-              starred ? 'text-[#f2a93b] shadow-amber-500/20' : 'text-gray-400 hover:text-[#f2a93b]'
-            }`}
+            className={`w-[52px] h-[52px] bg-[#ededed] dark:bg-[#24272c] hover:bg-gray-250 dark:hover:bg-gray-800 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-90 group/star ${starred ? 'text-[#f2a93b] shadow-amber-500/20' : 'text-gray-400 hover:text-[#f2a93b]'
+              }`}
             title={starred ? 'Remove Bookmark' : 'Bookmark Case'}
           >
             <Star className={`w-[18px] h-[18px] transition-transform group-hover/star:scale-110 ${starred ? 'fill-current text-[#f2a93b]' : ''}`} />
@@ -122,9 +122,9 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
       <div className="flex items-start justify-between pr-[84px]">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm shrink-0 bg-gray-100">
-            <img 
-              src={displayImage} 
-              alt={project.name} 
+            <img
+              src={displayImage}
+              alt={project.name}
               className="w-full h-full object-cover"
             />
           </div>
@@ -174,7 +174,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
           <div>
             <span className="text-gray-400 dark:text-gray-500 block font-semibold uppercase tracking-wider text-[9px]">Total Contract</span>
             <span className="text-[#e50914] dark:text-[#8efa1d] font-black block mt-0.5">
-              ₹{Number(project.totalValue || 0).toLocaleString('en-IN')}
+              <AnimatedCashAmount amount={Number(project.totalValue || 0)} />
             </span>
           </div>
         </div>
@@ -200,8 +200,8 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
           {displayServices.map((service, idx) => {
             const colors = getStatusColors(service.status);
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 onMouseEnter={(e) => {
                   if (onMilestoneHover) {
                     onMilestoneHover(service, e.currentTarget.getBoundingClientRect());
@@ -223,7 +223,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
                 <span className="text-gray-400 dark:text-gray-500 font-bold text-[10px] truncate max-w-[70px]">
                   {service.startedDate ? dayjs(service.startedDate).format('MMM D, YYYY') : dayjs(project.createdAt).format('MMM D, YYYY')}
                 </span>
-                
+
                 {/* Stage Badge */}
                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold truncate max-w-[120px] leading-none shrink-0 ${colors.badge}`}>
                   {service.status}

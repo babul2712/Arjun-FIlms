@@ -28,6 +28,7 @@ import FiltersPanel from '@/components/dashboard/FiltersPanel';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import CalendarView from './components/CalendarView';
 import UniversalSearchBar from '@/components/search/UniversalSearchBar';
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from '@/store/uiStore';
@@ -256,7 +257,7 @@ export default function DashboardPage() {
                 
                 <div className="mt-6">
                   <h2 className="text-[30px] font-black text-[#1a1c22] dark:text-white leading-none">
-                    ₹{stats.revenue.toLocaleString('en-IN')}
+                    <AnimatedCashAmount amount={stats.revenue} sparkle={true} showSparkleBadge={true} />
                   </h2>
                   <p className="text-[10px] text-gray-400 font-extrabold tracking-widest mt-2">TOTAL REVENUE</p>
                 </div>
@@ -294,7 +295,9 @@ export default function DashboardPage() {
                   <span className="text-[9px] text-emerald-500 font-extrabold uppercase bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-100/50 dark:border-emerald-500/10">Active</span>
                 </div>
                 <div>
-                  <h3 className="text-[18px] font-black text-[#1a1c22] dark:text-white">₹{stats.revenue.toLocaleString('en-IN')}</h3>
+                  <h3 className="text-[18px] font-black text-[#1a1c22] dark:text-white">
+                    <AnimatedCashAmount amount={stats.revenue} />
+                  </h3>
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mt-1">Payments Recv.</span>
                 </div>
               </div>
@@ -308,7 +311,9 @@ export default function DashboardPage() {
                   <span className="text-[9px] text-rose-500 font-extrabold uppercase bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-100/50 dark:border-rose-500/10">Due</span>
                 </div>
                 <div>
-                  <h3 className="text-[18px] font-black text-[#1a1c22] dark:text-white">₹{stats.pendingPaymentsAmount.toLocaleString('en-IN')}</h3>
+                  <h3 className="text-[18px] font-black text-[#1a1c22] dark:text-white">
+                    <AnimatedCashAmount amount={stats.pendingPaymentsAmount} />
+                  </h3>
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mt-1">Pending Pay</span>
                 </div>
               </div>
@@ -433,7 +438,7 @@ export default function DashboardPage() {
             <div className="my-3">
               <span className="text-[10.5px] font-bold text-gray-400 uppercase tracking-wider block">Total Received Balance</span>
               <div className="text-[26px] font-black tracking-tight text-white mt-1 flex items-baseline gap-2">
-                ₹{stats.revenue.toLocaleString('en-IN')}
+                <AnimatedCashAmount amount={stats.revenue} colorScheme="white" sparkle={true} />
                 <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
                   Verified
                 </span>
@@ -459,7 +464,7 @@ export default function DashboardPage() {
               <div>
                 <h4 className="text-[14px] font-extrabold text-gray-800 dark:text-white">Cash Flow</h4>
                 <h2 className="text-[22px] font-black text-[#1a1c22] dark:text-white mt-1">
-                  ₹{totalProjectContractsValue.toLocaleString('en-IN')}
+                  <AnimatedCashAmount amount={totalProjectContractsValue} />
                 </h2>
               </div>
               
@@ -489,7 +494,7 @@ export default function DashboardPage() {
                 className="absolute bg-[#0a0b0d] border border-gray-800 text-white text-[9px] font-extrabold px-2.5 py-1 rounded-lg shadow-2xl z-20 pointer-events-none transition-all duration-300"
                 style={{ bottom: '130px', left: `${3 + currentMonthIdx * 8.0}%` }}
               >
-                ₹{monthlyRevenue[currentMonthIdx].toLocaleString('en-IN')}
+                <AnimatedCashAmount amount={monthlyRevenue[currentMonthIdx]} colorScheme="white" />
               </div>
 
               {/* Monthly columns values array */}

@@ -100,6 +100,8 @@ export default function PublicBioLinksView({
 
   return (
     <div
+      data-site-font={profile?.fontFamily || 'montserrat'}
+      data-theme-color={profile?.themeColor || 'crimson'}
       className={`relative min-h-screen w-full transition-colors duration-300 font-sans ${
         isDark ? 'bg-[#090a0d] text-white' : 'bg-[#f8f9fb] text-gray-900'
       } ${isEmbedPreview ? 'rounded-[36px] overflow-hidden' : ''}`}

@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import { verifyPayment, deletePayment, getProjects, getPayments } from '@/app/actions';
 import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -39,12 +40,13 @@ export default function PaymentsPage() {
     try {
       const [paymentsData, projectsData] = await Promise.all([
         getPayments(),
-        getProjects()
+        getProjects(),
       ]);
-      setPayments(paymentsData);
-      setProjects(projectsData);
+      setPayments(Array.isArray(paymentsData) ? paymentsData : []);
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
     } catch (e) {
-      toast.error('Failed to load payments data');
+      console.error(e);
+      toast.error('Failed to load payments or projects');
     } finally {
       setLoading(false);
     }
@@ -57,29 +59,37 @@ export default function PaymentsPage() {
   const handleVerify = async () => {
     if (!paymentToVerify) return;
     try {
-      await verifyPayment(paymentToVerify, selectedProjectId || undefined);
-      toast.success('Payment verified successfully!');
-      setPaymentToVerify(null);
-      setSelectedProjectId('');
-      fetchPaymentsAndProjects();
+      const res = await verifyPayment(paymentToVerify, selectedProjectId || undefined);
+      if (res.success) {
+        toast.success('Payment verified successfully!');
+        setPaymentToVerify(null);
+        setSelectedProjectId('');
+        fetchPaymentsAndProjects();
+      } else {
+        toast.error(res.error || 'Failed to verify payment');
+      }
     } catch (e) {
-      toast.error('Failed to verify payment');
+      toast.error('An error occurred during verification');
     }
   };
 
   const handleDelete = async () => {
     if (!paymentToDelete) return;
     try {
-      await deletePayment(paymentToDelete);
-      toast.success('Payment deleted successfully!');
-      setPaymentToDelete(null);
-      fetchPaymentsAndProjects();
+      const res = await deletePayment(paymentToDelete);
+      if (res && res.success) {
+        toast.success('Payment deleted successfully');
+        setPaymentToDelete(null);
+        fetchPaymentsAndProjects();
+      } else {
+        toast.error((res as any)?.error || 'Failed to delete payment');
+      }
     } catch (e) {
-      toast.error('Failed to delete payment');
+      toast.error('An error occurred while deleting payment');
     }
   };
 
-  const isPaid = (p: Payment) => p && (p.status === 'PAID' || p.status === 'Verified');
+  const isPaid = (p: Payment) => p && (p.status === 'Verified' || p.status === 'PAID');
   
   const totalReceived = Array.isArray(payments) ? payments.filter(isPaid).reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
   const pendingAmount = Array.isArray(payments) ? payments.filter(p => p && (p.status === 'PENDING' || p.status === 'Pending Verification')).reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
@@ -97,6 +107,7 @@ export default function PaymentsPage() {
     return (
       (p.customerName && p.customerName.toLowerCase().includes(s)) ||
       (p.phone && p.phone.toLowerCase().includes(s)) ||
+      (p.transactionId && p.transactionId.toLowerCase().includes(s)) ||
       (p.paymentMethod && p.paymentMethod.toLowerCase().includes(s)) ||
       (p.status && p.status.toLowerCase().includes(s)) ||
       (p.remarks && p.remarks.toLowerCase().includes(s)) ||
@@ -115,7 +126,9 @@ export default function PaymentsPage() {
               Total Received
               <TrendingUp className="text-[#e50914] w-4 h-4" />
             </span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{totalReceived.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <AnimatedCashAmount amount={totalReceived} sparkle={true} showSparkleBadge={true} />
+            </div>
           </div>
         </div>
 
@@ -123,7 +136,9 @@ export default function PaymentsPage() {
         <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider block">Pending Collections</span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{pendingAmount.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <AnimatedCashAmount amount={pendingAmount} />
+            </div>
           </div>
           <div className="text-[11px] text-gray-400 font-semibold">
             {Array.isArray(payments) ? payments.filter(p => p && (p.status === 'PENDING' || p.status === 'Pending Verification')).length : 0} awaiting verification
@@ -134,7 +149,9 @@ export default function PaymentsPage() {
         <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider">Today's Collection</span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{todayCollections.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <AnimatedCashAmount amount={todayCollections} />
+            </div>
           </div>
           <div className="text-[11px] text-gray-400 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
@@ -146,7 +163,9 @@ export default function PaymentsPage() {
         <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider">This Month</span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{totalReceived.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <AnimatedCashAmount amount={totalReceived} />
+            </div>
           </div>
           <div className="flex items-center gap-1 text-green-600 text-[11px] font-bold uppercase">
             <ArrowUp className="w-3.5 h-3.5" />
@@ -240,8 +259,9 @@ export default function PaymentsPage() {
                             <p className="text-[11px] text-gray-400 font-semibold">{payment.phone || ''}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 font-semibold text-gray-600 dark:text-gray-300">{payment.paymentMethod || 'UPI QR'}</td>
-                        <td className="px-6 py-4 font-extrabold text-gray-900 dark:text-white text-right">₹{(payment.amount || 0).toLocaleString()}</td>
+                        <td className="px-6 py-4 font-extrabold text-gray-900 dark:text-white text-right">
+                          <AnimatedCashAmount amount={payment.amount || 0} />
+                        </td>
                         <td className="px-6 py-4 font-semibold text-gray-500 dark:text-gray-400">
                           {payment.date && dayjs(payment.date).isValid() ? dayjs(payment.date).format('DD MMM YYYY, hh:mm A') : 'Recently'}
                         </td>

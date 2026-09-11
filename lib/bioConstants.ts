@@ -349,4 +349,5 @@ export const DEFAULT_BIO_DATA = {
   showShareButton: true,
   showInquiryButton: true,
   fontFamily: 'montserrat',
+  themeColor: 'crimson',
 };

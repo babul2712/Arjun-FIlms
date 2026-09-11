@@ -5,21 +5,24 @@
 :root {
   --background: #fdf6f6;
   --foreground: #1a1c22;
-  
+
   --card-bg: #ffffff;
   --card-border: rgba(229, 9, 20, 0.05);
-  
+
   /* Colors inspired by high-end cinema branding */
-  --primary: #0a0b0d; /* Black/Dark Gray for selected states */
-  --primary-container: #e50914; /* Vibrant signature red for accent buttons */
+  --primary: #0a0b0d;
+  /* Black/Dark Gray for selected states */
+  --primary-container: #e50914;
+  /* Vibrant signature red for accent buttons */
   --on-primary: #ffffff;
   --secondary: #5f6368;
   --surface: #ffffff;
   --surface-variant: #fdf2f2;
   --outline-variant: #fecaca;
 
-  --font-sans: 'Montserrat', sans-serif;
-  --font-active: 'Montserrat', sans-serif;
+  --site-font: var(--font-montserrat, 'Montserrat', sans-serif);
+  --font-sans: var(--site-font);
+  --font-active: var(--site-font);
 }
 
 @theme {
@@ -32,15 +35,155 @@
   --color-surface: var(--surface);
   --color-surface-variant: var(--surface-variant);
   --color-outline-variant: var(--outline-variant);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--site-font);
 }
 
-html, body {
-  font-family: var(--font-sans);
+/* Bulletproof site-wide typography inheritance across all elements */
+html,
+body,
+input,
+button,
+select,
+textarea,
+optgroup,
+p,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+div,
+.font-sans {
+  font-family: var(--site-font), var(--font-sans), var(--font-montserrat), 'Montserrat', sans-serif !important;
+}
+
+/* Data attribute selectors for immediate DOM font switching */
+html[data-site-font="montserrat"],
+body[data-site-font="montserrat"],
+[data-site-font="montserrat"] {
+  --site-font: var(--font-montserrat, 'Montserrat', sans-serif) !important;
+  --font-sans: var(--font-montserrat, 'Montserrat', sans-serif) !important;
+  --font-active: var(--font-montserrat, 'Montserrat', sans-serif) !important;
+}
+
+html[data-site-font="poppins"],
+body[data-site-font="poppins"],
+[data-site-font="poppins"] {
+  --site-font: var(--font-poppins, 'Poppins', sans-serif) !important;
+  --font-sans: var(--font-poppins, 'Poppins', sans-serif) !important;
+  --font-active: var(--font-poppins, 'Poppins', sans-serif) !important;
+}
+
+html[data-site-font="inter"],
+body[data-site-font="inter"],
+[data-site-font="inter"] {
+  --site-font: var(--font-inter, 'Inter', sans-serif) !important;
+  --font-sans: var(--font-inter, 'Inter', sans-serif) !important;
+  --font-active: var(--font-inter, 'Inter', sans-serif) !important;
+}
+
+html[data-site-font="plus-jakarta"],
+body[data-site-font="plus-jakarta"],
+[data-site-font="plus-jakarta"] {
+  --site-font: var(--font-plus-jakarta, 'Plus Jakarta Sans', sans-serif) !important;
+  --font-sans: var(--font-plus-jakarta, 'Plus Jakarta Sans', sans-serif) !important;
+  --font-active: var(--font-plus-jakarta, 'Plus Jakarta Sans', sans-serif) !important;
+}
+
+html[data-site-font="outfit"],
+body[data-site-font="outfit"],
+[data-site-font="outfit"] {
+  --site-font: var(--font-outfit, 'Outfit', sans-serif) !important;
+  --font-sans: var(--font-outfit, 'Outfit', sans-serif) !important;
+  --font-active: var(--font-outfit, 'Outfit', sans-serif) !important;
+}
+
+html[data-site-font="space-grotesk"],
+body[data-site-font="space-grotesk"],
+[data-site-font="space-grotesk"] {
+  --site-font: var(--font-space-grotesk, 'Space Grotesk', sans-serif) !important;
+  --font-sans: var(--font-space-grotesk, 'Space Grotesk', sans-serif) !important;
+  --font-active: var(--font-space-grotesk, 'Space Grotesk', sans-serif) !important;
+}
+
+/* Theme Color Preset Selectors */
+html[data-theme-color="crimson"],
+[data-theme-color="crimson"] {
+  --primary-container: #e50914;
+  --primary-container-hover: #c00710;
+  --primary-container-rgb: 229, 9, 20;
+  --theme-surface-variant: #fef2f2;
+  --theme-border: #fee2e2;
+}
+
+html[data-theme-color="gold"],
+[data-theme-color="gold"] {
+  --primary-container: #d97706;
+  --primary-container-hover: #b45309;
+  --primary-container-rgb: 217, 119, 6;
+  --theme-surface-variant: #fffbeb;
+  --theme-border: #fde68a;
+}
+
+html[data-theme-color="sapphire"],
+[data-theme-color="sapphire"] {
+  --primary-container: #2563eb;
+  --primary-container-hover: #1d4ed8;
+  --primary-container-rgb: 37, 99, 235;
+  --theme-surface-variant: #eff6ff;
+  --theme-border: #bfdbfe;
+}
+
+html[data-theme-color="emerald"],
+[data-theme-color="emerald"] {
+  --primary-container: #059669;
+  --primary-container-hover: #047857;
+  --primary-container-rgb: 5, 150, 105;
+  --theme-surface-variant: #ecfdf5;
+  --theme-border: #bbf7d0;
+}
+
+html[data-theme-color="amethyst"],
+[data-theme-color="amethyst"] {
+  --primary-container: #7c3aed;
+  --primary-container-hover: #6d28d9;
+  --primary-container-rgb: 124, 58, 237;
+  --theme-surface-variant: #f5f3ff;
+  --theme-border: #ddd6fe;
+}
+
+html[data-theme-color="rose"],
+[data-theme-color="rose"] {
+  --primary-container: #f43f5e;
+  --primary-container-hover: #e11d48;
+  --primary-container-rgb: 244, 63, 94;
+  --theme-surface-variant: #fff1f2;
+  --theme-border: #fecdd3;
+}
+
+html[data-theme-color="monochrome"],
+[data-theme-color="monochrome"] {
+  --primary-container: #18181b;
+  --primary-container-hover: #09090b;
+  --primary-container-rgb: 24, 24, 27;
+  --theme-surface-variant: #f4f4f5;
+  --theme-border: #e4e4e7;
+}
+
+.dark[data-theme-color="monochrome"],
+.dark [data-theme-color="monochrome"] {
+  --primary-container: #ffffff;
+  --primary-container-hover: #e4e4e7;
+  --primary-container-rgb: 255, 255, 255;
+  --theme-surface-variant: rgba(255, 255, 255, 0.08);
+  --theme-border: rgba(255, 255, 255, 0.15);
 }
 
 body {
-  background: radial-gradient(circle at 10% 10%, rgba(229, 9, 20, 0.04) 0%, transparent 45%), radial-gradient(circle at 90% 85%, rgba(229, 9, 20, 0.03) 0%, transparent 40%), linear-gradient(135deg, #fdf6f6 0%, #f9f0f0 50%, #fdf8f8 100%);
+  background: radial-gradient(circle at 10% 10%, rgba(var(--primary-container-rgb, 229, 9, 20), 0.04) 0%, transparent 45%), radial-gradient(circle at 90% 85%, rgba(var(--primary-container-rgb, 229, 9, 20), 0.03) 0%, transparent 40%), linear-gradient(135deg, #fdf6f6 0%, #f9f0f0 50%, #fdf8f8 100%);
   background-attachment: fixed;
   color: var(--foreground);
   overflow-x: hidden;
@@ -84,8 +227,15 @@ body {
 
 /* Custom Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -123,23 +273,25 @@ body {
 .inverted-radius-top {
   position: absolute;
   left: -30px;
-  top: 0;
+  top: 0px;
   width: 30px;
   height: 30px;
   background: transparent;
   border-top-right-radius: 30px;
-  box-shadow: 15px -15px 0 15px #ffffff; /* Matches white card color */
+  box-shadow: 15px -15px 0 15px #fdf2f2;
+  /* Matches white card color */
 }
 
 .inverted-radius-right {
   position: absolute;
-  right: 0;
+  right: 0px;
   bottom: -30px;
   width: 30px;
   height: 30px;
   background: transparent;
   border-top-right-radius: 30px;
-  box-shadow: 15px -15px 0 15px #ffffff; /* Matches white card color */
+  box-shadow: 15px -15px 0 15px #fdf2f2;
+  /* Matches white card color */
 }
 
 /* Dark Mode Theme Adjustments */
@@ -156,7 +308,3 @@ body {
 .dark .inverted-radius-right {
   box-shadow: 15px -15px 0 15px #16181c;
 }
-
-
-
-

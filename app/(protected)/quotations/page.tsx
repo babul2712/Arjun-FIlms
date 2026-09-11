@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useRouter } from 'next/navigation';
 import QuotationTemplateDrawer from './components/QuotationTemplateDrawer';
+import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 
 export default function QuotationsDashboardPage() {
   const router = useRouter();
@@ -141,7 +142,7 @@ export default function QuotationsDashboardPage() {
                     <p className="text-[11px] text-gray-400 font-semibold mt-1.5">{quotation.email}</p>
                   </div>
                   <span className="text-[15px] font-extrabold text-gray-900">
-                    ₹{(quotation.grandTotal || 0).toLocaleString()}
+                    <AnimatedCashAmount amount={Number(quotation.grandTotal || 0)} />
                   </span>
                 </div>
 
