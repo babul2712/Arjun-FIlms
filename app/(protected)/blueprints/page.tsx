@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { getCrew, createCrew, updateCrew, deleteCrew } from '@/app/actions';
 import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 
 export default function BlueprintPage() {
   const [crewData, setCrewData] = useState<any[]>([]);
@@ -18,7 +19,8 @@ export default function BlueprintPage() {
     location: '',
     phone: '',
     address: '',
-    charges: ''
+    charges: '',
+    avatarUrl: ''
   });
 
   const fetchData = async () => {
@@ -38,7 +40,7 @@ export default function BlueprintPage() {
   }, []);
 
   const openAddModal = () => {
-    setFormData({ name: '', role: '', location: '', phone: '', address: '', charges: '' });
+    setFormData({ name: '', role: '', location: '', phone: '', address: '', charges: '', avatarUrl: '' });
     setEditingId(null);
     setIsModalOpen(true);
   };
@@ -50,7 +52,8 @@ export default function BlueprintPage() {
       location: crew.location,
       phone: crew.phone,
       address: crew.address,
-      charges: crew.charges.toString()
+      charges: crew.charges.toString(),
+      avatarUrl: crew.avatarUrl || ''
     });
     setEditingId(crew._id);
     setIsModalOpen(true);
@@ -125,10 +128,12 @@ export default function BlueprintPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {crewData.map((crew) => {
-            const avatarUrl = crew.name.includes('Davidson') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80' :
-                             crew.name.includes('Veronica') ? 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&h=150&q=80' :
-                             crew.name.includes('Harris') ? 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&h=150&q=80' :
-                             'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80';
+            const avatarUrl = crew.avatarUrl || (
+              crew.name.includes('Davidson') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80' :
+              crew.name.includes('Veronica') ? 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&h=150&q=80' :
+              crew.name.includes('Harris') ? 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&h=150&q=80' :
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80'
+            );
 
             return (
               <div 
@@ -154,7 +159,7 @@ export default function BlueprintPage() {
                 <div>
                   <div className="flex items-start justify-between pr-[116px]">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0 bg-gray-100">
                         <img 
                           src={avatarUrl} 
                           alt={crew.name} 
@@ -218,7 +223,7 @@ export default function BlueprintPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
           <form 
             onSubmit={handleSubmit}
-            className="relative w-full max-w-md bg-white border border-gray-200 rounded-[32px] shadow-2xl p-6 space-y-4 animate-fade-in text-[13px]"
+            className="relative w-full max-w-md bg-white border border-gray-200 rounded-[32px] shadow-2xl p-6 space-y-4 animate-fade-in text-[13px] max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between border-b border-gray-100 pb-3.5">
               <h3 className="text-[16px] font-extrabold text-gray-800">
@@ -234,6 +239,16 @@ export default function BlueprintPage() {
             </div>
 
             <div className="space-y-4 py-2">
+              <div className="flex flex-col items-center justify-center pb-2">
+                <CloudinaryUpload
+                  value={formData.avatarUrl}
+                  onChange={(url) => setFormData(prev => ({ ...prev, avatarUrl: url }))}
+                  variant="avatar"
+                  folder="crew"
+                  label="Crew Member Photo"
+                />
+              </div>
+
               <div className="flex flex-col">
                 <label className="text-[11px] font-bold text-gray-400/80 uppercase tracking-widest mb-1.5">Full Name</label>
                 <input 

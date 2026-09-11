@@ -24,7 +24,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { UploadButton } from '@/utils/uploadthing';
+import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 import { createPayment } from '@/app/actions';
 
 export default function PaymentPage() {
@@ -527,53 +527,25 @@ export default function PaymentPage() {
               </div>
 
               {/* Section 3: Upload Screenshot Proof */}
+              {/* Step 3: Attach Payment Proof Screenshot */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-gray-150 pb-2">
                   <h2 className="text-[11px] font-extrabold text-[#e50914] uppercase tracking-widest flex items-center gap-1.5">
                     <FileCheck className="w-3.5 h-3.5" />
                     3. Attach Payment Screenshot
                   </h2>
-                  <span className="text-[11px] text-gray-400 font-semibold">JPG / PNG / WebP</span>
+                  <span className="text-[11px] text-gray-400 font-semibold">Cloudinary Secure Upload</span>
                 </div>
 
-                {screenshotUrl ? (
-                  <div className="bg-emerald-50/80 border-2 border-emerald-200 rounded-3xl p-4 flex items-center justify-between shadow-xs">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
-                        <Check className="w-6 h-6 stroke-[3]" />
-                      </div>
-                      <div>
-                        <h4 className="text-[13.5px] font-extrabold text-emerald-950">Payment Proof Attached!</h4>
-                        <p className="text-[11px] font-semibold text-emerald-700 mt-0.5">Ready to verify transaction</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => { setScreenshotUrl(''); setPreviewLocalUrl(''); }}
-                      className="text-[11.5px] font-bold text-rose-600 hover:underline px-3 py-1.5 bg-white rounded-xl border border-rose-200 cursor-pointer"
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-gray-300 hover:border-[#e50914] transition-colors rounded-3xl p-6 bg-[#f8fbff] flex flex-col items-center justify-center text-center group cursor-pointer relative">
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
-                    />
-                    <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 text-[#e50914] flex items-center justify-center shadow-md mb-3 group-hover:scale-105 transition-transform">
-                      <UploadCloud className="w-7 h-7" />
-                    </div>
-                    <h4 className="text-[13.5px] font-extrabold text-gray-800">
-                      Click to upload transaction screenshot
-                    </h4>
-                    <p className="text-[11.5px] text-gray-400 font-semibold mt-1">
-                      Drag and drop or browse from gallery (GPay, PhonePe, or Netbanking receipt)
-                    </p>
-                  </div>
-                )}
+                <CloudinaryUpload
+                  value={screenshotUrl}
+                  onChange={(url) => {
+                    setScreenshotUrl(url);
+                    setPreviewLocalUrl(url);
+                  }}
+                  folder="payments"
+                  placeholder="Click or drag transaction receipt (GPay, PhonePe, Paytm, or NetBanking)"
+                />
               </div>
 
             </div>

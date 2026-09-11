@@ -11,6 +11,7 @@
   "dependencies": {
     "@uploadthing/react": "^7.3.3",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "dayjs": "^1.11.23",
     "html2pdf.js": "^0.14.0",
     "lucide-react": "^1.33.0",

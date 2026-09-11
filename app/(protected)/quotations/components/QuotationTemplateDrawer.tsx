@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, Plus, Trash2, RotateCcw, Save, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
+import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 
 interface TemplateConfig {
   studioName: string;
@@ -373,17 +374,14 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                 </div>
               </div>
 
-              {/* Watermark logo URL */}
-              <div className="flex flex-col pt-2">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Watermark Image URL</label>
-                <input 
-                  type="text" 
-                  value={config.watermarkUrl}
-                  onChange={(e) => setConfig({ ...config, watermarkUrl: e.target.value })}
-                  placeholder="e.g. https://domain.com/logo.png"
-                  className="bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 py-2.5 px-3.5 rounded-xl focus:outline-none focus:border-[#e50914] dark:text-white text-[13px] font-medium" 
-                />
-              </div>
+              {/* Watermark & Invoice Logo with Cloudinary */}
+              <CloudinaryUpload
+                variant="compact"
+                folder="quotations"
+                label="Invoice & Watermark Logo"
+                value={config.watermarkUrl}
+                onChange={(url) => setConfig({ ...config, watermarkUrl: url })}
+              />
 
               {/* Watermark opacity */}
               <div className="flex flex-col">

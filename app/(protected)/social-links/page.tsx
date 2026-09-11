@@ -36,6 +36,7 @@ import {
 import DynamicBioIcon from '@/components/ui/DynamicBioIcon';
 import PublicBioLinksView from '@/components/public/PublicBioLinksView';
 import QrCodeModal from '@/components/ui/QrCodeModal';
+import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 import {
   getBioProfileAdmin,
   updateBioProfile,
@@ -849,15 +850,21 @@ export default function SocialLinksManagerPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                    Avatar / Logo Image URL
-                  </label>
-                  <input
-                    type="text"
+                <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <CloudinaryUpload
+                    variant="compact"
+                    folder="branding"
+                    label="Studio Logo / Avatar"
                     value={profileForm.avatar}
-                    onChange={(e) => setProfileForm({ ...profileForm, avatar: e.target.value })}
-                    className="w-full bg-gray-50 dark:bg-[#1a1d24] border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
+                    onChange={(url) => setProfileForm({ ...profileForm, avatar: url })}
+                  />
+
+                  <CloudinaryUpload
+                    variant="compact"
+                    folder="branding"
+                    label="Cover / Banner Image (Optional)"
+                    value={profileForm.coverImage}
+                    onChange={(url) => setProfileForm({ ...profileForm, coverImage: url })}
                   />
                 </div>
 
@@ -1278,18 +1285,13 @@ export default function SocialLinksManagerPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold uppercase text-gray-400 mb-1.5">
-                  Thumbnail Image URL (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={customForm.thumbnail}
-                  onChange={(e) => setCustomForm({ ...customForm, thumbnail: e.target.value })}
-                  placeholder="https://images.unsplash.com/photo-..."
-                  className="w-full bg-[#1e2229] border border-gray-700 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
-                />
-              </div>
+              <CloudinaryUpload
+                variant="compact"
+                folder="showcase"
+                label="Thumbnail / Preview Image (Optional)"
+                value={customForm.thumbnail}
+                onChange={(url) => setCustomForm({ ...customForm, thumbnail: url })}
+              />
 
               <div className="space-y-2 pt-2">
                 <div className="flex items-center gap-2">

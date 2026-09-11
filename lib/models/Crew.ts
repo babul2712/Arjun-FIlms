@@ -7,6 +7,7 @@ export interface ICrew extends Document {
   phone: string;
   address: string;
   charges: number;
+  avatarUrl?: string;
   createdAt: Date;
 }
 
@@ -17,6 +18,7 @@ const CrewSchema: Schema = new Schema({
   phone: { type: String, required: true },
   address: { type: String, required: true },
   charges: { type: Number, required: true },
+  avatarUrl: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 

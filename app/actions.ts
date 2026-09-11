@@ -722,3 +722,18 @@ export async function resetBioProfileToDefault(slug: string = 'arjunfilms') {
   }
 }
 
+export async function uploadImageToCloudinaryAction(
+  base64Data: string,
+  folder: string = 'general'
+) {
+  try {
+    const { uploadToCloudinary } = await import('@/lib/cloudinary');
+    const res = await uploadToCloudinary(base64Data, folder);
+    return res;
+  } catch (error: any) {
+    console.error('uploadImageToCloudinaryAction error:', error);
+    return { success: false, url: '', error: error?.message || 'Failed to upload image' };
+  }
+}
+
+
