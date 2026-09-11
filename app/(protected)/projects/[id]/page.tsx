@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { 
   ArrowLeft, Users, MapPin, Plus, Receipt, Trash2, 
   Phone, Mail, Calendar, Sparkles, CheckCircle2, FileText, 
-  Clock, DollarSign, Edit3, Image as ImageIcon, Camera, Eye, Download
+  Clock, DollarSign, Edit3, Image as ImageIcon, Camera, Eye, Download, X
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';

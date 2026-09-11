@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { getCrew, createCrew, updateCrew, deleteCrew } from '@/app/actions';
 import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles, ChevronRight, Eye } from 'lucide-react';

@@ -371,7 +371,53 @@ export async function getDashboardStats() {
 export async function getCrew() {
   try {
     await connectToDatabase();
-    const crew = await Crew.find({}).sort({ location: 1, name: 1 }).lean();
+    let crew = await Crew.find({}).sort({ location: 1, name: 1 }).lean();
+    if (!crew || crew.length === 0) {
+      const defaultCrew = [
+        {
+          name: 'Davidson Kumar',
+          role: 'Lead Cinematographer & Drone Pilot',
+          location: 'Bhubaneswar, Odisha',
+          phone: '+91 98765 43210',
+          address: 'Plot 42, Saheed Nagar, Bhubaneswar',
+          charges: 15000,
+          avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&h=400&q=80'
+        },
+        {
+          name: 'Veronica Roy',
+          role: 'Senior Candid & Bridal Photographer',
+          location: 'Cuttack / Bhubaneswar',
+          phone: '+91 91234 56789',
+          address: 'Studio 7, CDA Sector 9, Cuttack',
+          charges: 18000,
+          avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&h=400&q=80'
+        },
+        {
+          name: 'Harris Samal',
+          role: 'Traditional 4K Video Operator',
+          location: 'Puri / Bhubaneswar',
+          phone: '+91 97788 99271',
+          address: 'VIP Road, Puri',
+          charges: 12000,
+          avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&h=400&q=80'
+        },
+        {
+          name: 'Arjun Nayak',
+          role: 'Creative Director & Master Colorist',
+          location: 'Bhubaneswar, Odisha',
+          phone: '+91 77889 92712',
+          address: 'Arjun Studio, Infocity, Bhubaneswar',
+          charges: 25000,
+          avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&h=400&q=80'
+        }
+      ];
+      try {
+        await Crew.insertMany(defaultCrew);
+        crew = await Crew.find({}).sort({ location: 1, name: 1 }).lean();
+      } catch (seedErr) {
+        console.error('Seed error:', seedErr);
+      }
+    }
     return JSON.parse(JSON.stringify(crew));
   } catch (e) {
     console.error('getCrew error:', e);

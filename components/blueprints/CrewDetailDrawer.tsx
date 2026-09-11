@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Phone, 
@@ -41,6 +42,11 @@ export default function CrewDetailDrawer({
   onDelete,
 }: CrewDetailDrawerProps) {
   const [copiedPhone, setCopiedPhone] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -56,7 +62,7 @@ export default function CrewDetailDrawer({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !crew) return null;
+  if (!mounted || !isOpen || !crew) return null;
 
   const avatarUrl = crew.avatarUrl || (
     crew.name.includes('Davidson') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&h=300&q=80' :
@@ -85,8 +91,8 @@ export default function CrewDetailDrawer({
   const isPhoto = (crew.role || '').toLowerCase().includes('photo') || (crew.role || '').toLowerCase().includes('candid') || (crew.role || '').toLowerCase().includes('lead');
   const isEditor = (crew.role || '').toLowerCase().includes('edit');
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] overflow-hidden">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in"
@@ -350,6 +356,7 @@ export default function CrewDetailDrawer({
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
