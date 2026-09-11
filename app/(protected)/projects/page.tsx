@@ -308,9 +308,9 @@ export default function ProjectsListPage() {
               {/* Close and Favorite indicators */}
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0">
+                  <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0 bg-gray-100">
                     <img 
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedProject.name)}&background=e50914&color=fff&bold=true&size=128`}
+                      src={selectedProject.coverImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedProject.name)}&background=e50914&color=fff&bold=true&size=128`}
                       alt={selectedProject.name}
                       className="w-full h-full object-cover"
                     />

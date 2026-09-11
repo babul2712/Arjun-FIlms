@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { createProject, getEventTypes, createEventType } from '@/app/actions';
 import EventTypeSelect from '@/components/ui/EventTypeSelect';
+import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function CreateProjectPage() {
     eventDate: '',
     status: 'Lead',
     totalValue: 0,
+    coverImage: '',
     notes: ''
   });
   const [eventTypes, setEventTypes] = useState<any[]>([]);
@@ -51,7 +53,8 @@ export default function CreateProjectPage() {
         ...formData,
         eventType: finalEventType,
         totalValue: Number(formData.totalValue) || 0,
-        eventDate: formData.eventDate ? new Date(formData.eventDate) : undefined
+        eventDate: formData.eventDate ? new Date(formData.eventDate) : undefined,
+        coverImage: formData.coverImage || ''
       };
       
       const newProject = await createProject(dataToSave);
@@ -89,6 +92,19 @@ export default function CreateProjectPage() {
 
       {/* Main glass card Form */}
       <div className="glass-card p-8 rounded-[24px] bg-white border border-gray-200/50 space-y-6">
+        
+        {/* Project Cover / Event Poster Photo */}
+        <div className="pb-4 border-b border-gray-150">
+          <CloudinaryUpload
+            value={formData.coverImage}
+            onChange={(url) => setFormData(prev => ({ ...prev, coverImage: url }))}
+            variant="compact"
+            folder="projects"
+            label="Project Cover / Event Reference Photo (Optional)"
+            placeholder="Upload project moodboard, event banner or couple preview photo"
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[13px]">
           <div className="flex flex-col">
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Client Name *</label>

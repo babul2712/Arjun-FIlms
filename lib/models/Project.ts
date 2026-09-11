@@ -25,6 +25,8 @@ export interface IProject extends Document {
   status: string;
   notes?: string;
   totalValue: number;
+  coverImage?: string;
+  gallery?: string[];
   
   payments: string[];
   crewBlueprint: CrewBlueprintItem[];
@@ -62,6 +64,8 @@ const ProjectSchema: Schema = new Schema({
   status: { type: String, required: true, default: 'Lead' },
   notes: { type: String },
   totalValue: { type: Number, required: true, default: 0 },
+  coverImage: { type: String, default: '' },
+  gallery: { type: [String], default: [] },
   
   payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
   crewBlueprint: [CrewBlueprintSchema],

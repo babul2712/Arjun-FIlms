@@ -99,6 +99,8 @@ export interface Project {
   status: string;
   notes?: string;
   totalValue: number;
+  coverImage?: string;
+  gallery?: string[];
   payments: string[];
   crewBlueprint: CrewBlueprintItem[];
   bookingId?: string;

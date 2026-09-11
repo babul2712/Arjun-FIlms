@@ -94,6 +94,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
   ];
 
   const clientAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(project.name || 'Client')}&background=e50914&color=fff&bold=true&size=128`;
+  const displayImage = project.coverImage || clientAvatar;
 
   return (
     <div 
@@ -120,9 +121,9 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
       {/* Top section: Profile details */}
       <div className="flex items-start justify-between pr-[84px]">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm shrink-0">
+          <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm shrink-0 bg-gray-100">
             <img 
-              src={clientAvatar} 
+              src={displayImage} 
               alt={project.name} 
               className="w-full h-full object-cover"
             />

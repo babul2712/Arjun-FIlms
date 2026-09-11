@@ -7,17 +7,19 @@ import Link from 'next/link';
 import { 
   ArrowLeft, Users, MapPin, Plus, Receipt, Trash2, 
   Phone, Mail, Calendar, Sparkles, CheckCircle2, FileText, 
-  Clock, DollarSign, Edit3 
+  Clock, DollarSign, Edit3, Image as ImageIcon, Camera, Eye, Download
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
+import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'contacts' | 'ledger' | 'documents' | 'history'>('contacts');
+  const [activeTab, setActiveTab] = useState<'contacts' | 'ledger' | 'photos' | 'documents' | 'history'>('contacts');
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
 
   // Modal states
   const [showExpenseModal, setShowExpenseModal] = useState(false);
@@ -126,6 +128,41 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     }
   };
 
+  const handleUpdateCoverImage = async (url: string) => {
+    try {
+      await updateProject(project._id, { coverImage: url });
+      setProject((prev: any) => ({ ...prev, coverImage: url }));
+      toast.success('Project cover photo updated');
+    } catch (e) {
+      toast.error('Failed to update cover photo');
+    }
+  };
+
+  const handleAddGalleryImage = async (url: string) => {
+    if (!url) return;
+    const currentGallery = project.gallery || [];
+    const updatedGallery = [...currentGallery, url];
+    try {
+      await updateProject(project._id, { gallery: updatedGallery });
+      setProject((prev: any) => ({ ...prev, gallery: updatedGallery }));
+      toast.success('Photo added to project deliverables gallery');
+    } catch (e) {
+      toast.error('Failed to update gallery');
+    }
+  };
+
+  const handleRemoveGalleryImage = async (urlToRemove: string) => {
+    const currentGallery = project.gallery || [];
+    const updatedGallery = currentGallery.filter((u: string) => u !== urlToRemove);
+    try {
+      await updateProject(project._id, { gallery: updatedGallery });
+      setProject((prev: any) => ({ ...prev, gallery: updatedGallery }));
+      toast.success('Photo removed from deliverables gallery');
+    } catch (e) {
+      toast.error('Failed to remove photo');
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this case?')) return;
     try {
@@ -189,6 +226,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             {[
               { id: 'contacts', name: 'Contacts & Crew' },
               { id: 'ledger', name: 'Services & Fees' },
+              { id: 'photos', name: 'Photos & Deliverables' },
               { id: 'documents', name: 'Uploaded Documents' },
               { id: 'history', name: 'History Logs' }
             ].map(tab => (
@@ -341,6 +379,77 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
+            {/* Photos & Deliverables Tab */}
+            {activeTab === 'photos' && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-4">
+                  <div>
+                    <h4 className="text-[16px] font-bold text-gray-800 flex items-center gap-2">
+                      <ImageIcon className="w-5 h-5 text-[#e50914]" />
+                      Project Photos & Client Deliverables
+                    </h4>
+                    <p className="text-[12px] text-gray-400 font-medium mt-0.5">
+                      Upload moodboards, event shoot previews, and client deliverable galleries.
+                    </p>
+                  </div>
+                  <div className="w-full sm:w-auto">
+                    <CloudinaryUpload
+                      variant="compact"
+                      folder="projects"
+                      label="+ Upload Project Photo"
+                      onChange={(url) => {
+                        if (url) handleAddGalleryImage(url);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Gallery Grid */}
+                {(project.gallery || []).length === 0 ? (
+                  <div className="text-center py-16 text-gray-400 font-semibold space-y-3 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 p-8">
+                    <ImageIcon className="w-12 h-12 mx-auto text-gray-300 stroke-1" />
+                    <p className="text-[14px]">No deliverables or photo previews uploaded yet.</p>
+                    <p className="text-[12px] text-gray-400">Use the upload button above to add shoot photos and deliverable previews.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {(project.gallery || []).map((imgUrl: string, idx: number) => (
+                      <div key={idx} className="relative group rounded-2xl overflow-hidden border border-gray-200/60 shadow-sm aspect-square bg-gray-100">
+                        <img src={imgUrl} alt={`Deliverable ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        
+                        {/* Overlay buttons */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
+                          <button
+                            onClick={() => setSelectedGalleryImage(imgUrl)}
+                            className="p-2 bg-white/90 hover:bg-white text-gray-800 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+                            title="View Fullscreen"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <a
+                            href={imgUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-2 bg-white/90 hover:bg-white text-gray-800 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+                            title="Open in new tab"
+                          >
+                            <Download className="w-4 h-4" />
+                          </a>
+                          <button
+                            onClick={() => handleRemoveGalleryImage(imgUrl)}
+                            className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+                            title="Remove Photo"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Documents tab */}
             {activeTab === 'documents' && (
               <div className="space-y-6">
@@ -415,11 +524,17 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
           <div className="glass-card rounded-[24px] p-6 bg-white border border-gray-200/50 space-y-6 shadow-sm">
             {/* User Profile Header */}
             <div className="text-center pb-6 border-b border-gray-100">
-              <div className="w-18 h-18 rounded-full bg-[#fef2f2] text-[#e50914] font-bold flex items-center justify-center text-[28px] mx-auto shadow-sm">
-                {project.name.split(' ').map((n: string) => n[0]).join('')}
+              <div className="flex justify-center pb-2">
+                <CloudinaryUpload
+                  value={project.coverImage || ''}
+                  onChange={handleUpdateCoverImage}
+                  variant="avatar"
+                  folder="projects"
+                  label="Project Photo"
+                />
               </div>
-              <h4 className="text-[16px] font-extrabold text-gray-800 mt-3">{project.name}</h4>
-              <p className="text-[11px] text-[#e50914] font-bold uppercase tracking-wider mt-1">{project.eventType}</p>
+              <h4 className="text-[16px] font-extrabold text-gray-800 mt-2">{project.name}</h4>
+              <p className="text-[11px] text-[#e50914] font-bold uppercase tracking-wider mt-0.5">{project.eventType}</p>
               
               {/* Call/Mail buttons */}
               <div className="flex justify-center gap-3 mt-4">
@@ -605,6 +720,37 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
               >
                 Assign Crew
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Photo Lightbox Modal */}
+      {selectedGalleryImage && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedGalleryImage(null)} />
+          <div className="relative max-w-4xl w-full bg-white dark:bg-[#15181e] rounded-3xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
+            <button 
+              onClick={() => setSelectedGalleryImage(null)}
+              className="absolute right-4 top-4 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full z-10 cursor-pointer transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-full max-h-[75vh] flex items-center justify-center overflow-hidden rounded-2xl mt-8 bg-black/5">
+              <img src={selectedGalleryImage} alt="Project Deliverable Preview" className="max-w-full max-h-[70vh] object-contain rounded-xl" />
+            </div>
+            <div className="flex items-center justify-between w-full pt-4 px-2">
+              <span className="text-[12px] font-bold text-gray-400">Project Deliverable</span>
+              <a
+                href={selectedGalleryImage}
+                target="_blank"
+                rel="noreferrer"
+                download
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#0a0b0d] hover:bg-black text-white text-[12px] font-bold rounded-xl shadow-sm"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download Original
+              </a>
             </div>
           </div>
         </div>
