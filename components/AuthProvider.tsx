@@ -19,7 +19,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       path === '/login' ||
       path === '/payment' ||
       path.startsWith('/payment/') ||
-      path.startsWith('/public-payment')
+      path.startsWith('/public-payment') ||
+      path === '/links' ||
+      path.startsWith('/links/') ||
+      path === '/bio' ||
+      path.startsWith('/bio/') ||
+      path === '/socials' ||
+      path.startsWith('/socials/') ||
+      path === '/connect' ||
+      path.startsWith('/connect/')
     );
   };
 

@@ -10,6 +10,8 @@ import Crew from '@/lib/models/Crew';
 import EventType from '@/lib/models/EventType';
 import Otp from '@/lib/models/Otp';
 import Notification from '@/lib/models/Notification';
+import BioProfile from '@/lib/models/BioProfile';
+import { DEFAULT_BIO_DATA } from '@/lib/bioConstants';
 import { Resend } from 'resend';
 import bcrypt from 'bcryptjs';
 import { generateOTPEmailHtml } from '@/lib/emailTemplates';
@@ -520,3 +522,180 @@ export async function clearAllNotifications() {
     return { success: false };
   }
 }
+
+// ----------------------------------------------------
+// BIO & SOCIAL LINKS SERVER ACTIONS
+// ----------------------------------------------------
+
+export async function getPublicBioProfile(slug: string = 'arjunfilms') {
+  try {
+    await connectToDatabase();
+    let profile = await BioProfile.findOne({ slug }).lean();
+
+    if (!profile) {
+      // Seed default profile
+      const newDoc = await BioProfile.create({ ...DEFAULT_BIO_DATA, slug });
+      profile = JSON.parse(JSON.stringify(newDoc));
+    }
+
+    // Fire & forget: increment public page views count
+    BioProfile.updateOne({ slug }, { $inc: { viewsCount: 1 } }).catch((err: any) =>
+      console.error('Increment views error:', err)
+    );
+
+    const safeProfile = JSON.parse(JSON.stringify(profile));
+
+    // Filter only active links for public viewing and sort by order
+    safeProfile.socialLinks = (safeProfile.socialLinks || [])
+      .filter((link: any) => link.isActive !== false)
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+    safeProfile.customLinks = (safeProfile.customLinks || [])
+      .filter((link: any) => link.isActive !== false)
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+    return safeProfile;
+  } catch (error) {
+    console.error('getPublicBioProfile error, returning default data:', error);
+    return DEFAULT_BIO_DATA;
+  }
+}
+
+export async function getBioProfileAdmin(slug: string = 'arjunfilms') {
+  try {
+    await connectToDatabase();
+    let profile = await BioProfile.findOne({ slug }).lean();
+
+    if (!profile) {
+      const newDoc = await BioProfile.create({ ...DEFAULT_BIO_DATA, slug });
+      profile = JSON.parse(JSON.stringify(newDoc));
+    }
+
+    const safeProfile = JSON.parse(JSON.stringify(profile));
+
+    // Ensure sorted arrays
+    safeProfile.socialLinks = (safeProfile.socialLinks || []).sort(
+      (a: any, b: any) => (a.order || 0) - (b.order || 0)
+    );
+    safeProfile.customLinks = (safeProfile.customLinks || []).sort(
+      (a: any, b: any) => (a.order || 0) - (b.order || 0)
+    );
+
+    return safeProfile;
+  } catch (error) {
+    console.error('getBioProfileAdmin error:', error);
+    return DEFAULT_BIO_DATA;
+  }
+}
+
+export async function updateBioProfile(data: any, slug: string = 'arjunfilms') {
+  try {
+    await connectToDatabase();
+    const updated = await BioProfile.findOneAndUpdate(
+      { slug },
+      { $set: data },
+      { new: true, upsert: true }
+    ).lean();
+
+    revalidatePath('/links');
+    revalidatePath('/bio');
+    revalidatePath('/social-links');
+    return { success: true, profile: JSON.parse(JSON.stringify(updated)) };
+  } catch (error: any) {
+    console.error('updateBioProfile error:', error);
+    return { success: false, error: error?.message || 'Failed to update profile' };
+  }
+}
+
+export async function saveSocialLinks(socialLinks: any[], slug: string = 'arjunfilms') {
+  try {
+    await connectToDatabase();
+    const updated = await BioProfile.findOneAndUpdate(
+      { slug },
+      { $set: { socialLinks } },
+      { new: true, upsert: true }
+    ).lean();
+
+    revalidatePath('/links');
+    revalidatePath('/bio');
+    revalidatePath('/social-links');
+    return { success: true, profile: JSON.parse(JSON.stringify(updated)) };
+  } catch (error: any) {
+    console.error('saveSocialLinks error:', error);
+    return { success: false, error: error?.message || 'Failed to save social links' };
+  }
+}
+
+export async function saveCustomLinks(customLinks: any[], slug: string = 'arjunfilms') {
+  try {
+    await connectToDatabase();
+    const updated = await BioProfile.findOneAndUpdate(
+      { slug },
+      { $set: { customLinks } },
+      { new: true, upsert: true }
+    ).lean();
+
+    revalidatePath('/links');
+    revalidatePath('/bio');
+    revalidatePath('/social-links');
+    return { success: true, profile: JSON.parse(JSON.stringify(updated)) };
+  } catch (error: any) {
+    console.error('saveCustomLinks error:', error);
+    return { success: false, error: error?.message || 'Failed to save custom links' };
+  }
+}
+
+export async function trackBioLinkClick(
+  linkId: string,
+  linkType: 'social' | 'custom',
+  slug: string = 'arjunfilms'
+) {
+  try {
+    await connectToDatabase();
+    if (linkType === 'social') {
+      await BioProfile.updateOne(
+        { slug, 'socialLinks.id': linkId },
+        {
+          $inc: {
+            'socialLinks.$.clickCount': 1,
+            totalClicks: 1,
+          },
+        }
+      );
+    } else {
+      await BioProfile.updateOne(
+        { slug, 'customLinks.id': linkId },
+        {
+          $inc: {
+            'customLinks.$.clickCount': 1,
+            totalClicks: 1,
+          },
+        }
+      );
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('trackBioLinkClick error:', error);
+    return { success: false };
+  }
+}
+
+export async function resetBioProfileToDefault(slug: string = 'arjunfilms') {
+  try {
+    await connectToDatabase();
+    const updated = await BioProfile.findOneAndUpdate(
+      { slug },
+      { $set: DEFAULT_BIO_DATA },
+      { new: true, upsert: true }
+    ).lean();
+
+    revalidatePath('/links');
+    revalidatePath('/bio');
+    revalidatePath('/social-links');
+    return { success: true, profile: JSON.parse(JSON.stringify(updated)) };
+  } catch (error: any) {
+    console.error('resetBioProfileToDefault error:', error);
+    return { success: false, error: error?.message || 'Failed to reset profile' };
+  }
+}
+

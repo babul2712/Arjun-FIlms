@@ -17,6 +17,7 @@ export default function Topbar() {
     '/payments': 'Payments Verified',
     '/projects': 'Client Cases',
     '/blueprints': 'Crew Blueprint Database',
+    '/social-links': 'Bio & Social Links Manager',
   };
 
   const currentTitle = titleMap[pathname] || 

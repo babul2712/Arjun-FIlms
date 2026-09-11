@@ -14,7 +14,8 @@ import {
   LogOut,
   Calendar,
   Sun,
-  Moon
+  Moon,
+  Share2
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
@@ -26,6 +27,7 @@ const navItems = [
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Projects', href: '/projects', icon: Briefcase },
   { name: 'Blueprint', href: '/blueprints', icon: Users },
+  { name: 'Bio Links', href: '/social-links', icon: Share2 },
 ];
 
 export default function Sidebar() {
