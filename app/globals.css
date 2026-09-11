@@ -299,6 +299,12 @@ body {
   background: #0b0c0e;
 }
 
+.dark .glass-card {
+  background: #16181c;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.01);
+}
+
 .dark .notch-inverted-radius-top,
 .dark .notch-inverted-radius-right {
   box-shadow: 10px -10px 0 10px #16181c;
@@ -306,5 +312,5 @@ body {
 
 .dark .inverted-radius-top,
 .dark .inverted-radius-right {
-  box-shadow: 15px -15px 0 15px #16181c;
+  box-shadow: 15px -15px 0 15px #fef4f4;
 }

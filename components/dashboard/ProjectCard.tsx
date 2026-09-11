@@ -100,7 +100,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
   return (
     <div
       onClick={() => onSelect(project)}
-      className="glass-card glass-card-hover rounded-[32px] p-5 cursor-pointer relative flex flex-col justify-between h-full bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm overflow-hidden"
+      className="glass-card glass-card-hover rounded-[32px] p-5 cursor-pointer relative flex flex-col justify-between h-full  dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm overflow-hidden"
     >
       {/* Scoop Notch Corner (Top-Right) */}
       <div className="absolute top-0 right-0 w-[80px] h-[80px] bg-[#fdf6f6] dark:bg-[#0b0c0e] rounded-bl-[28px] z-10 transition-colors">
