@@ -188,30 +188,74 @@ export default function DashboardPage() {
     });
   }, [rawPayments, selectedMonth, selectedYear]);
 
-  // Dynamically compute filtered Dashboard Stats
+  // Precompute verified payments received per project
+  const projectPaidMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    
+    // 1. Map directly via payment.projectId
+    rawPayments.forEach(pay => {
+      if (pay.status === 'Verified' || pay.status === 'PAID') {
+        const amount = Number(pay.amount) || 0;
+        const pId = typeof pay.projectId === 'object' && pay.projectId !== null 
+          ? (pay.projectId as any)._id || (pay.projectId as any).id 
+          : pay.projectId;
+        if (pId) {
+          const strId = String(pId);
+          map[strId] = (map[strId] || 0) + amount;
+        }
+      }
+    });
+
+    // 2. Also map any payments referenced directly in project.payments array
+    projects.forEach(p => {
+      const pId = String(p._id || p.id || '');
+      if (!pId) return;
+      if (Array.isArray(p.payments) && p.payments.length > 0) {
+        let paidFromList = 0;
+        p.payments.forEach((payRef: any) => {
+          const payId = typeof payRef === 'object' && payRef !== null ? (payRef._id || payRef.id) : payRef;
+          const matching = rawPayments.find(rp => String(rp._id || rp.id) === String(payId));
+          if (matching && (matching.status === 'Verified' || matching.status === 'PAID')) {
+            paidFromList += Number(matching.amount) || 0;
+          }
+        });
+        if (paidFromList > (map[pId] || 0)) {
+          map[pId] = paidFromList;
+        }
+      }
+    });
+
+    return map;
+  }, [projects, rawPayments]);
+
+  // Dynamically compute filtered Dashboard Stats with 100% accurate pending & revenue logic
   const displayStats = useMemo(() => {
-    if (selectedMonth === 'all' && selectedYear === 'all') {
-      return stats;
-    }
+    const isAllTime = selectedMonth === 'all' && selectedYear === 'all';
 
-    const filteredRevenue = filteredPaymentsByDate
-      .filter(p => p.status === 'Verified' || p.status === 'PAID')
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    // 1. Calculate Revenue (Sum of all verified/paid payments in active filter)
+    const activePayments = isAllTime 
+      ? rawPayments.filter(p => p.status === 'Verified' || p.status === 'PAID')
+      : filteredPaymentsByDate.filter(p => p.status === 'Verified' || p.status === 'PAID');
+    
+    const computedRevenue = activePayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
-    const filteredPending = filteredProjectsByDate.reduce((sum, p) => {
-      const total = Number(p.totalValue || (p as any).budget || (p as any).amount || 0);
-      const paid = Number((p as any).paidAmount || (p as any).receivedAmount || 0);
-      return sum + Math.max(0, total - paid);
+    // 2. Calculate Pending Payments (Project Total Value minus Paid Amount for active projects)
+    const activeProjects = isAllTime ? projects : filteredProjectsByDate;
+    const computedPending = activeProjects.reduce((sum, p) => {
+      const pId = String(p._id || p.id || '');
+      const paid = projectPaidMap[pId] || 0;
+      const totalVal = Number(p.totalValue || (p as any).budget || (p as any).amount || 0);
+      return sum + Math.max(0, totalVal - paid);
     }, 0);
 
-    const totalProjects = filteredProjectsByDate.length;
-    const finishedProjects = filteredProjectsByDate.filter(p => p.status === 'Completed').length;
-    const pendingProjects = filteredProjectsByDate.filter(p => p.status !== 'Completed').length;
-    const totalBookings = filteredProjectsByDate.filter(p => p.status === 'Booked' || p.status === 'Completed').length;
-    const totalQuotations = filteredProjectsByDate.filter(p => p.status === 'Lead' || p.status === 'Qualified' || p.status === 'Negotiation').length;
+    const totalProjects = activeProjects.length;
+    const finishedProjects = activeProjects.filter(p => p.status === 'Completed').length;
+    const pendingProjects = activeProjects.filter(p => p.status !== 'Completed').length;
+    const totalBookings = activeProjects.filter(p => p.status === 'Booked' || p.status === 'Completed').length;
+    const totalQuotations = activeProjects.filter(p => p.status === 'Lead' || p.status === 'Qualified' || p.status === 'Negotiation').length;
 
     const assignedCrewSet = new Set<string>();
-    filteredProjectsByDate.forEach(p => {
+    activeProjects.forEach(p => {
       (p.crewBlueprint || (p as any).crew || []).forEach((c: any) => {
         if (c.assignedCrewId || c.memberId || c.id || c.name) {
           assignedCrewSet.add(c.assignedCrewId || c.memberId || c.id || c.name);
@@ -221,8 +265,8 @@ export default function DashboardPage() {
 
     return {
       ...stats,
-      revenue: filteredRevenue,
-      pendingPaymentsAmount: filteredPending,
+      revenue: computedRevenue,
+      pendingPaymentsAmount: computedPending,
       totalProjects,
       finishedProjects,
       pendingProjects,
@@ -231,7 +275,7 @@ export default function DashboardPage() {
       totalCrewAssigned: assignedCrewSet.size,
       totalCrewNotAssigned: Math.max(0, stats.totalCrew - assignedCrewSet.size)
     };
-  }, [stats, filteredProjectsByDate, filteredPaymentsByDate, selectedMonth, selectedYear]);
+  }, [stats, projects, rawPayments, filteredProjectsByDate, filteredPaymentsByDate, selectedMonth, selectedYear, projectPaidMap]);
 
   // Compute 12-month revenue curve based on selected year (or current year)
   const displayMonthlyRevenue = useMemo(() => {
@@ -239,8 +283,8 @@ export default function DashboardPage() {
     const monthlySums = new Array(12).fill(0);
     rawPayments.forEach(pay => {
       if (pay.status === 'Verified' || pay.status === 'PAID') {
-        const info = getEntryDateInfo(pay.date || pay.createdAt);
-        if (info && (selectedYear === 'all' || info.year === targetYear)) {
+        const info = getEntryDateInfo(pay.date || (pay as any).createdAt);
+        if (info && info.year === targetYear) {
           monthlySums[info.month] += Number(pay.amount) || 0;
         }
       }
@@ -873,17 +917,22 @@ export default function DashboardPage() {
 
           {/* Cash Flow Bar Chart Under Visa Card */}
           <div className="bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 shadow-sm rounded-[32px] p-6 relative">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start">
               <div>
                 <h4 className="text-[14px] font-extrabold text-gray-800 dark:text-white">Cash Flow</h4>
                 <h2 className="text-[22px] font-black text-[#1a1c22] dark:text-white mt-1">
-                  <AnimatedCashAmount amount={totalProjectContractsValue} />
+                  <AnimatedCashAmount amount={selectedMonth !== 'all' ? displayStats.revenue : displayMonthlyRevenue.reduce((a, b) => a + b, 0)} />
                 </h2>
+                <span className="text-[10px] font-bold text-gray-400 block mt-0.5">
+                  {selectedMonth !== 'all' 
+                    ? `${MONTH_OPTIONS.find(m => m.value === selectedMonth)?.label} Inflow`
+                    : `${selectedYear !== 'all' ? selectedYear : 'Yearly'} Inflow`} • Vol: ₹{totalProjectContractsValue.toLocaleString('en-IN')}
+                </span>
               </div>
               
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 bg-[#fdf2f2] dark:bg-gray-800/40 border border-gray-200/65 dark:border-gray-800 text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded-xl">
-                  {selectedYear !== 'all' ? selectedYear : 'Yearly'}
+                  {selectedMonth !== 'all' ? `${MONTH_OPTIONS.find(m => m.value === selectedMonth)?.label} ${selectedYear !== 'all' ? selectedYear : ''}` : selectedYear !== 'all' ? selectedYear : 'Yearly'}
                 </span>
               </div>
             </div>

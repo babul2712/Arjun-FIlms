@@ -466,7 +466,7 @@ export async function getDashboardStats() {
   try {
     await connectToDatabase();
     const totalRevenueAgg = await Payment.aggregate([
-      { $match: { status: 'PAID' } },
+      { $match: { status: { $in: ['PAID', 'Verified'] } } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
     const revenue = totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;

@@ -110,7 +110,7 @@ export default function PaymentsPage() {
     .reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
   const currentMonthStr = dayjs().format('YYYY-MM');
   const thisMonthPaidPayments = Array.isArray(payments) ? payments.filter(p => isPaid(p) && p?.date && (typeof p.date === 'string' ? p.date.substring(0, 7) === currentMonthStr : dayjs(p.date).format('YYYY-MM') === currentMonthStr)) : [];
-  const thisMonthCollections = thisMonthPaidPayments.reduce((sum, p) => sum + (p?.amount || 0), 0) || totalReceived;
+  const thisMonthCollections = thisMonthPaidPayments.reduce((sum, p) => sum + (p?.amount || 0), 0);
   const pendingCount = Array.isArray(payments) ? payments.filter(p => p && (p.status === 'PENDING' || p.status === 'Pending Verification')).length : 0;
   const todayPaidCount = Array.isArray(payments) ? payments.filter(p => isPaid(p) && p?.date && dayjs(p.date).isValid() && dayjs(p.date).isSame(dayjs(), 'day')).length : 0;
 
