@@ -1221,7 +1221,7 @@ export default function SocialLinksManagerPage() {
                   required
                   value={customForm.title}
                   onChange={(e) => setCustomForm({ ...customForm, title: e.target.value })}
-                  placeholder="🎬 2025 Wedding Cinema Showreel"
+                  placeholder="2025 Wedding Cinema Showreel"
                   className="w-full bg-[#1e2229] border border-gray-700 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
                 />
               </div>
@@ -1279,7 +1279,7 @@ export default function SocialLinksManagerPage() {
                     type="text"
                     value={customForm.badge}
                     onChange={(e) => setCustomForm({ ...customForm, badge: e.target.value })}
-                    placeholder="🔥 Featured"
+                    placeholder="Featured"
                     className="w-full bg-[#1e2229] border border-gray-700 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
                   />
                 </div>

@@ -13,9 +13,12 @@ import {
   AlertCircle,
   ExternalLink,
   Trash2,
-  Link2
+  Link2,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import ProjectCard from '@/components/dashboard/ProjectCard';
+import ProjectListView from '@/components/dashboard/ProjectListView';
 import FiltersPanel from '@/components/dashboard/FiltersPanel';
 import { useUIStore } from '@/store/uiStore';
 import { toast } from 'sonner';
@@ -33,7 +36,7 @@ export default function ProjectsListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const { toggleFilterPanel } = useUIStore();
   
-  // Custom states matching mockup
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [hoveredMilestone, setHoveredMilestone] = useState<any | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number } | null>(null);
@@ -169,7 +172,7 @@ export default function ProjectsListPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-[1600px] mx-auto pb-16 relative font-sans text-gray-800 animate-fade-in">
+    <div className="space-y-8 w-full pb-16 relative font-sans text-gray-800 dark:text-gray-100 animate-fade-in">
       
       {/* Integrated Header Row matching mockup */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -277,13 +280,45 @@ export default function ProjectsListPage() {
         </div>
       </div>
 
-      {/* Cases Counter Badge */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-[#fee2e2]/80 text-[#e50914] rounded-full border border-[#fecaca]/60 w-fit text-[13px] font-bold shadow-sm">
-        <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-        <span>{filteredProjects.length} Cases</span>
+      {/* Controls row: Cases Counter Badge & View Mode Toggle */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2 px-4 py-2 bg-[#fee2e2]/80 text-[#e50914] rounded-full border border-[#fecaca]/60 w-fit text-[13px] font-bold shadow-sm">
+          <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span>{filteredProjects.length} Cases</span>
+        </div>
+
+        {/* View Mode Toggle (Cards / Grid vs List / Table) */}
+        <div className="flex items-center bg-[#fee2e2]/40 dark:bg-[#16181c] p-1 rounded-2xl border border-[#fecaca]/40 dark:border-gray-800/40 shadow-xs">
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-extrabold transition-all cursor-pointer ${
+              viewMode === 'grid'
+                ? 'bg-white dark:bg-[#24272c] text-[#e50914] dark:text-[#8efa1d] shadow-sm'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+            }`}
+            title="Cards Grid View"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>Cards</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-extrabold transition-all cursor-pointer ${
+              viewMode === 'list'
+                ? 'bg-white dark:bg-[#24272c] text-[#e50914] dark:text-[#8efa1d] shadow-sm'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+            }`}
+            title="Compact List / Table View"
+          >
+            <List className="w-3.5 h-3.5" />
+            <span>List</span>
+          </button>
+        </div>
       </div>
 
       {/* Grid: 3 columns default, collapses to 2 when card focused */}
@@ -292,19 +327,19 @@ export default function ProjectsListPage() {
         {/* Main Grid listing */}
         <div className={`col-span-12 ${selectedProject ? 'lg:col-span-8' : 'lg:col-span-12'} transition-all duration-300`}>
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="glass-card rounded-[32px] h-[340px] bg-white/50" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-pulse">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="glass-card rounded-[32px] h-[340px] bg-white/50 dark:bg-gray-800/40" />
               ))}
             </div>
           ) : filteredProjects.length === 0 ? (
-            <div className="glass-card rounded-[32px] p-16 text-center max-w-md mx-auto space-y-6 bg-white border border-gray-200/50">
-              <Grid className="w-16 h-16 mx-auto text-gray-300 stroke-1" />
-              <h3 className="text-[17px] font-extrabold text-gray-700">No projects found</h3>
+            <div className="glass-card rounded-[32px] p-16 text-center max-w-md mx-auto space-y-6 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800">
+              <Grid className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 stroke-1" />
+              <h3 className="text-[17px] font-extrabold text-gray-700 dark:text-gray-200">No projects found</h3>
               <p className="text-[13px] text-gray-400 font-medium">Create a new case to populate this directory.</p>
             </div>
-          ) : (
-            <div className={`grid grid-cols-1 md:grid-cols-2 ${selectedProject ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} gap-8`}>
+          ) : viewMode === 'grid' ? (
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${selectedProject ? 'lg:grid-cols-2 xl:grid-cols-3' : 'lg:grid-cols-3 xl:grid-cols-4'} gap-8`}>
               {filteredProjects.map((project) => (
                 <ProjectCard 
                   key={project.id || project._id} 
@@ -315,6 +350,14 @@ export default function ProjectsListPage() {
                 />
               ))}
             </div>
+          ) : (
+            <ProjectListView
+              projects={filteredProjects}
+              selectedProject={selectedProject}
+              onSelect={(p) => setSelectedProject(p)}
+              onMilestoneHover={handleMilestoneHover}
+              onStarToggle={handleStarToggle}
+            />
           )}
         </div>
 
@@ -354,7 +397,7 @@ export default function ProjectsListPage() {
                         const { toggleProjectStar } = await import('@/app/actions');
                         const res = await toggleProjectStar(projId);
                         if (res.success) {
-                          toast.success(nextStarred ? `⭐ Bookmarked ${selectedProject.name}` : `Removed bookmark for ${selectedProject.name}`);
+                          toast.success(nextStarred ? `Bookmarked ${selectedProject.name}` : `Removed bookmark for ${selectedProject.name}`);
                         } else {
                           handleStarToggle(projId, !nextStarred);
                           toast.error('Failed to update bookmark');

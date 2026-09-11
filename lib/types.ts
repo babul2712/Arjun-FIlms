@@ -5,6 +5,7 @@ export interface User {
   username: string;
   role: Role;
   name: string;
+  avatar?: string;
 }
 
 export interface ServiceItem {

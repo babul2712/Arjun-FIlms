@@ -40,42 +40,42 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
         <div 
           key={dayStr} 
           onClick={() => hasProjects && setSelectedDateData({ date: dayStr, projects: dayProjects })}
-          className={`min-h-[85px] p-2 flex flex-col justify-between transition-colors border-r border-b border-gray-100 dark:border-gray-800/60 ${
+          className={`min-h-[92px] p-2.5 rounded-2xl flex flex-col justify-between transition-all border ${
             !isCurrentMonth 
-              ? 'text-gray-300 dark:text-gray-600 bg-gray-50/40 dark:bg-gray-900/20' 
-              : 'bg-white dark:bg-[#16181c] text-gray-800 dark:text-gray-200'
-          } ${hasProjects ? 'cursor-pointer hover:bg-blue-50/40 dark:hover:bg-blue-950/30' : ''} ${
-            isToday ? 'ring-1.5 ring-inset ring-[#e50914]/40' : ''
+              ? 'text-gray-400/50 dark:text-gray-600 bg-white/30 dark:bg-white/[0.02] backdrop-blur-xs border-gray-150/40 dark:border-gray-800/30' 
+              : 'bg-white/85 dark:bg-[#1c2027]/75 backdrop-blur-md text-gray-800 dark:text-gray-200 border-white/80 dark:border-gray-800/80 hover:bg-white dark:hover:bg-[#222730] hover:border-[#e50914]/40 hover:-translate-y-0.5'
+          } ${hasProjects ? 'cursor-pointer ring-1 ring-red-500/25 bg-gradient-to-b from-white/95 to-red-50/25 dark:from-[#1c2027]/95 dark:to-red-950/25 backdrop-blur-md' : ''} ${
+            isToday ? 'ring-2 ring-[#e50914] border-transparent' : ''
           }`}
         >
           <div className="flex justify-between items-center">
             {isToday ? (
-              <span className="w-5 h-5 rounded-full bg-[#e50914] text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="w-5.5 h-5.5 rounded-full bg-[#e50914] text-white text-[10px] font-black flex items-center justify-center">
                 {formattedDate}
               </span>
             ) : (
-              <span className={`text-[11px] font-bold ${hasProjects ? 'text-[#e50914]' : !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-700 dark:text-gray-300'}`}>
+              <span className={`text-[11.5px] font-extrabold ${hasProjects ? 'text-[#e50914]' : !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-800 dark:text-gray-200'}`}>
                 {formattedDate}
               </span>
             )}
             {hasProjects && (
-              <span className="text-[9px] font-extrabold text-[#e50914] bg-[#eaf2ff] dark:bg-blue-950/40 px-1 rounded">
+              <span className="text-[9px] font-black text-[#e50914] bg-red-50/90 dark:bg-red-950/60 border border-red-200/50 dark:border-red-900/40 px-1.5 py-0.5 rounded-md">
                 {dayProjects.length}
               </span>
             )}
           </div>
 
-          <div className="mt-1 flex flex-col gap-1 overflow-y-auto max-h-[50px] custom-scrollbar">
+          <div className="mt-1 flex flex-col gap-1 overflow-y-auto max-h-[52px] custom-scrollbar">
             {dayProjects.map((p, idx) => {
               const pDate = typeof p.eventDate === 'string' ? p.eventDate.substring(0, 10) : dayjs(p.eventDate).format('YYYY-MM-DD');
               const isPast = dayjs(pDate).isBefore(dayjs().startOf('day'));
               return (
                 <div 
                   key={idx} 
-                  className={`text-[9px] font-bold truncate px-1.5 py-0.5 rounded-md ${
+                  className={`text-[9.5px] font-bold truncate px-2 py-0.5 rounded-lg transition-all ${
                     isPast 
-                      ? 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' 
-                      : 'bg-[#fef2f2] text-[#e50914] border border-[#fee2e2]/60 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900/40'
+                      ? 'bg-gray-100/80 text-gray-500 dark:bg-gray-800/80 dark:text-gray-400' 
+                      : 'bg-red-50/90 text-[#e50914] border border-red-200/70 dark:bg-red-950/60 dark:text-red-300 dark:border-red-900/50'
                   }`}
                   title={p.name}
                 >
@@ -89,7 +89,7 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
       day = day.add(1, 'day');
     }
     rows.push(
-      <div className="grid grid-cols-7 gap-px" key={day.format('YYYY-MM-DD')}>
+      <div className="grid grid-cols-7 gap-2 sm:gap-2.5" key={day.format('YYYY-MM-DD')}>
         {days}
       </div>
     );
@@ -111,7 +111,7 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
             {currentDate.format('MMMM YYYY')}
           </h3>
         </div>
-        <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-white/70 dark:bg-white/[0.06] backdrop-blur-md border border-gray-200/50 dark:border-gray-700/40 p-1 rounded-xl">
           <button 
             onClick={prevMonth} 
             className="p-1.5 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg transition-colors cursor-pointer"
@@ -135,13 +135,13 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 mb-2 text-center bg-gray-50/70 dark:bg-[#1c1f24] py-1.5 rounded-xl">
+      <div className="grid grid-cols-7 gap-2 sm:gap-2.5 mb-2.5 text-center bg-white/40 dark:bg-white/[0.03] backdrop-blur-md py-2 px-1 rounded-2xl border border-white/50 dark:border-white/[0.03]">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
           <div key={d} className="text-[10px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{d}</div>
         ))}
       </div>
 
-      <div className="flex-1 flex flex-col border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden shadow-xs bg-white dark:bg-[#16181c]">
+      <div className="flex-1 flex flex-col gap-2 sm:gap-2.5">
         {rows}
       </div>
 

@@ -101,8 +101,17 @@ export default function UniversalSearchBar({
     ? results 
     : results.filter((item) => item.category === activeCategory);
 
-  // Close when clicking outside
+  // Initial search on mount if hero variant
   useEffect(() => {
+    if (variant === 'hero') {
+      setIsOpen(true);
+      performSearch('');
+    }
+  }, [variant]);
+
+  // Close when clicking outside (only for floating topbar dropdown)
+  useEffect(() => {
+    if (variant === 'hero') return;
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
@@ -110,7 +119,7 @@ export default function UniversalSearchBar({
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [variant]);
 
   // Keyboard navigation inside suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -193,10 +202,10 @@ export default function UniversalSearchBar({
   ];
 
   return (
-    <div ref={containerRef} className={`relative w-full ${className}`}>
+    <div ref={containerRef} className={`relative w-full ${variant === 'hero' ? 'flex-1 flex flex-col min-h-0' : ''} ${className}`}>
       {/* Search Input Bar */}
       <div
-        className={`flex items-center px-4 py-2.5 bg-[#fee2e2]/40 dark:bg-gray-800/40 rounded-2xl border border-gray-200/50 dark:border-gray-700/60 transition-all duration-200 shadow-xs focus-within:bg-white dark:focus-within:bg-[#15181e] focus-within:border-[#e50914]/50 focus-within:ring-2 focus-within:ring-[#e50914]/15 ${
+        className={`flex items-center px-4 py-2.5 bg-[#fee2e2]/40 dark:bg-gray-800/40 rounded-2xl border border-gray-200/50 dark:border-gray-700/60 transition-all duration-200 shadow-xs focus-within:bg-white dark:focus-within:bg-[#15181e] focus-within:border-[#e50914]/50 focus-within:ring-2 focus-within:ring-[#e50914]/15 shrink-0 ${
           variant === 'hero' ? 'py-3.5 px-5 rounded-3xl text-[14px]' : 'text-[13px]'
         }`}
       >
@@ -238,19 +247,27 @@ export default function UniversalSearchBar({
         )}
 
         {/* Keyboard shortcut badge */}
-        <div 
-          onClick={openCommandPalette}
-          className="hidden sm:flex items-center gap-0.5 px-2 py-0.5 rounded-lg bg-gray-200/60 dark:bg-gray-700/60 border border-gray-300/40 dark:border-gray-600/40 text-[10px] font-extrabold text-gray-500 dark:text-gray-300 shrink-0 cursor-pointer hover:bg-gray-300/70 transition-colors"
-          title="Open Command Palette (⌘K)"
-        >
-          <Command className="w-3 h-3" />
-          <span>K</span>
-        </div>
+        {variant !== 'hero' && (
+          <div 
+            onClick={openCommandPalette}
+            className="hidden sm:flex items-center gap-0.5 px-2 py-0.5 rounded-lg bg-gray-200/60 dark:bg-gray-700/60 border border-gray-300/40 dark:border-gray-600/40 text-[10px] font-extrabold text-gray-500 dark:text-gray-300 shrink-0 cursor-pointer hover:bg-gray-300/70 transition-colors"
+            title="Open Command Palette (⌘K)"
+          >
+            <Command className="w-3 h-3" />
+            <span>K</span>
+          </div>
+        )}
       </div>
 
-      {/* Auto-Suggestions Floating Dropdown */}
+      {/* Auto-Suggestions / Results Container */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white/95 dark:bg-[#15181e]/95 backdrop-blur-xl border border-[#fee2e2]/80 dark:border-gray-800 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden animate-fade-in max-h-[460px] flex flex-col">
+        <div
+          className={
+            variant === 'hero'
+              ? 'relative w-full mt-3 z-20 bg-white/95 dark:bg-[#15181e]/95 backdrop-blur-xl border border-[#fee2e2]/80 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-0'
+              : 'absolute top-full left-0 right-0 mt-2 z-50 bg-white/95 dark:bg-[#15181e]/95 backdrop-blur-xl border border-[#fee2e2]/80 dark:border-gray-800 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden animate-fade-in max-h-[460px] flex flex-col'
+          }
+        >
           {/* Category Filter Pills Bar */}
           <div className="flex items-center gap-1.5 px-4 py-3 border-b border-gray-150 dark:border-gray-800 overflow-x-auto custom-scrollbar bg-gray-50/50 dark:bg-gray-900/30">
             {categoryPills.map((pill) => {

@@ -10,7 +10,7 @@ interface CloudinaryUploadProps {
   onChange: (url: string) => void;
   folder?: string;
   label?: string;
-  variant?: 'dropzone' | 'avatar' | 'compact' | 'banner';
+  variant?: 'dropzone' | 'avatar' | 'compact' | 'banner' | 'watermark';
   className?: string;
   placeholder?: string;
   aspectRatio?: 'square' | 'video' | 'banner' | 'auto';
@@ -138,6 +138,110 @@ export default function CloudinaryUpload({
             <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-[#e50914] transition-colors p-2 text-center">
               <Camera className="w-6 h-6 mb-1" />
               <span className="text-[10px] font-bold">Upload</span>
+            </div>
+          )}
+
+          {isUploading && (
+            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20">
+              <Loader2 className="w-6 h-6 animate-spin text-[#e50914]" />
+              <span className="text-[9px] font-bold mt-1">Uploading...</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // --- BANNER / LANDSCAPE VARIANT ---
+  if (variant === 'banner') {
+    return (
+      <div className={`flex flex-col items-center gap-1.5 w-full ${className}`}>
+        {label && <label className="text-xs font-bold text-gray-700 dark:text-gray-300 self-start">{label}</label>}
+        <div
+          onClick={() => !isUploading && fileInputRef.current?.click()}
+          className="relative w-full h-24 sm:h-28 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-[#e50914] bg-gray-50 dark:bg-[#1a1d24] flex items-center justify-center cursor-pointer overflow-hidden group transition-all shadow-sm"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleInputChange}
+            className="hidden"
+          />
+
+          {preview ? (
+            <>
+              <img src={preview} alt="Banner Preview" className="w-full h-full object-cover rounded-2xl" />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity text-[11px] font-bold">
+                <Camera className="w-4 h-4 mb-0.5" />
+                <span>Change Banner</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/60 hover:bg-red-600 text-white flex items-center justify-center text-[10px] transition-colors z-10"
+                title="Remove Banner"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-[#e50914] transition-colors p-2 text-center">
+              <ImageIcon className="w-6 h-6 mb-1" />
+              <span className="text-[11px] font-bold">Upload Banner</span>
+            </div>
+          )}
+
+          {isUploading && (
+            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20">
+              <Loader2 className="w-6 h-6 animate-spin text-[#e50914]" />
+              <span className="text-[9px] font-bold mt-1">Uploading...</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // --- WATERMARK / TRANSPARENT PNG VARIANT ---
+  if (variant === 'watermark') {
+    return (
+      <div className={`flex flex-col items-center gap-1.5 w-full ${className}`}>
+        {label && <label className="text-xs font-bold text-gray-700 dark:text-gray-300 self-start">{label}</label>}
+        <div
+          onClick={() => !isUploading && fileInputRef.current?.click()}
+          className="relative w-full h-24 sm:h-28 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-[#e50914] bg-gray-100/60 dark:bg-black/40 flex items-center justify-center cursor-pointer overflow-hidden group transition-all shadow-sm"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleInputChange}
+            className="hidden"
+          />
+
+          {preview ? (
+            <>
+              <div className="w-full h-full flex items-center justify-center p-2">
+                <img src={preview} alt="Watermark Preview" className="max-h-20 max-w-[85%] object-contain drop-shadow-sm" />
+              </div>
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity text-[11px] font-bold">
+                <Camera className="w-4 h-4 mb-0.5" />
+                <span>Change Watermark</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/60 hover:bg-red-600 text-white flex items-center justify-center text-[10px] transition-colors z-10"
+                title="Remove Watermark"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-[#e50914] transition-colors p-2 text-center">
+              <Camera className="w-6 h-6 mb-1" />
+              <span className="text-[11px] font-bold">Upload PNG</span>
             </div>
           )}
 

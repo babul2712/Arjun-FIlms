@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, FileText, Edit2, Trash2, Calendar, MapPin, Sparkles, X } from 'lucide-react';
+import { Plus, Search, FileText, Edit2, Trash2, Calendar, MapPin, Sparkles, X, LayoutGrid, List } from 'lucide-react';
 import { getQuotations, deleteQuotation } from '@/app/actions';
 import { Quotation } from '@/lib/types';
 import dayjs from 'dayjs';
@@ -17,6 +17,7 @@ export default function QuotationsDashboardPage() {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [quotationToDelete, setQuotationToDelete] = useState<string | null>(null);
   const [showTemplateDrawer, setShowTemplateDrawer] = useState(false);
 
@@ -62,7 +63,7 @@ export default function QuotationsDashboardPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-gray-800 dark:text-gray-100">
+    <div className="space-y-6 w-full pb-12 font-sans text-gray-800 dark:text-gray-100">
       {/* Header section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/60 dark:bg-[#15181e] p-5 rounded-[32px] border border-gray-200/60 dark:border-gray-800 backdrop-blur-md shadow-xs">
         <div>
@@ -97,6 +98,36 @@ export default function QuotationsDashboardPage() {
             )}
           </div>
 
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-[#fdf6f6] dark:bg-gray-800/50 p-1 rounded-2xl border border-[#fee2e2] dark:border-gray-700/60 shadow-xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-extrabold transition-all cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-700 text-[#e50914] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+              }`}
+              title="Cards Grid View"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Cards</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-extrabold transition-all cursor-pointer ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-gray-700 text-[#e50914] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+              }`}
+              title="Compact List / Table View"
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>List</span>
+            </button>
+          </div>
+
           <button 
             onClick={() => setShowTemplateDrawer(true)}
             className="flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-xl text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all cursor-pointer shadow-xs active:scale-98"
@@ -114,10 +145,10 @@ export default function QuotationsDashboardPage() {
         </div>
       </div>
 
-      {/* Main Grid View */}
+      {/* Main Content (Grid or List View) */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[...Array(6)].map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-pulse">
+          {[...Array(8)].map((_, i) => (
             <div key={i} className="glass-card rounded-[24px] h-[200px] bg-white/50 dark:bg-gray-800/40" />
           ))}
         </div>
@@ -131,22 +162,22 @@ export default function QuotationsDashboardPage() {
             {searchQuery ? 'Try searching by a different name, event type or email.' : 'Create client proposals to record and track project quotes.'}
           </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      ) : viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredQuotations.map((quotation) => (
-            <div key={quotation._id || quotation.id} className="glass-card rounded-[24px] p-6 bg-white border border-gray-200/50 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-shadow">
+            <div key={quotation._id || quotation.id} className="glass-card rounded-[24px] p-6 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-shadow">
               <div>
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="text-[15px] font-extrabold text-gray-800 leading-none">{quotation.customerName}</h4>
+                    <h4 className="text-[15px] font-extrabold text-gray-800 dark:text-white leading-none">{quotation.customerName}</h4>
                     <p className="text-[11px] text-gray-400 font-semibold mt-1.5">{quotation.email}</p>
                   </div>
-                  <span className="text-[15px] font-extrabold text-gray-900">
+                  <span className="text-[15px] font-extrabold text-gray-900 dark:text-white">
                     <AnimatedCashAmount amount={Number(quotation.grandTotal || 0)} />
                   </span>
                 </div>
 
-                <div className="mt-4 space-y-2 text-[12px] text-gray-500 font-semibold border-t border-gray-50 pt-4">
+                <div className="mt-4 space-y-2 text-[12px] text-gray-500 dark:text-gray-400 font-semibold border-t border-gray-50 dark:border-gray-800/60 pt-4">
                   <p className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
                     {quotation.bookingDate ? dayjs(quotation.bookingDate).format('DD MMM YYYY') : dayjs(quotation.createdAt).format('DD MMM YYYY')}
@@ -155,23 +186,80 @@ export default function QuotationsDashboardPage() {
                     <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
                     {quotation.location}
                   </p>
-                  <p className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-[#fef2f2] text-[#e50914] mt-2">
+                  <p className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-[#fef2f2] dark:bg-red-950/40 text-[#e50914] dark:text-red-400 mt-2">
                     {quotation.eventType}
                   </p>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 border-t border-gray-50 pt-4 mt-4">
+              <div className="flex justify-end gap-2 border-t border-gray-50 dark:border-gray-800/60 pt-4 mt-4">
                 <button 
                   onClick={() => router.push(`/quotations/edit/${quotation._id || quotation.id}`)}
-                  className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
                   title="Edit Proposal"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => setQuotationToDelete(quotation._id || quotation.id || '')}
-                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                  title="Remove Proposal"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {filteredQuotations.map((quotation) => (
+            <div
+              key={quotation._id || quotation.id}
+              className="w-full bg-white/85 dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800/70 hover:border-[#e50914]/40 p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-white dark:hover:bg-[#1a1e24]"
+            >
+              <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#e50914] border border-red-100 dark:border-red-900/40 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-[14.5px] font-extrabold text-gray-900 dark:text-white truncate">{quotation.customerName}</h4>
+                  <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5 font-semibold">
+                    <span className="text-[#e50914] font-bold">{quotation.eventType || 'Photography'}</span>
+                    <span>•</span>
+                    <span className="truncate">{quotation.email}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[12px] font-bold text-gray-600 dark:text-gray-300 shrink-0">
+                <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                <span>{quotation.bookingDate ? dayjs(quotation.bookingDate).format('DD MMM YYYY') : dayjs(quotation.createdAt).format('DD MMM YYYY')}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[12px] font-semibold text-gray-500 dark:text-gray-400 max-w-[150px] truncate shrink-0">
+                <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <span className="truncate">{quotation.location || 'Studio'}</span>
+              </div>
+
+              <div className="flex flex-col items-start md:items-end shrink-0">
+                <span className="text-[14px] font-black text-[#e50914] dark:text-[#8efa1d]">
+                  <AnimatedCashAmount amount={Number(quotation.grandTotal || 0)} />
+                </span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Proposal Total</span>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button 
+                  onClick={() => router.push(`/quotations/edit/${quotation._id || quotation.id}`)}
+                  className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+                  title="Edit Proposal"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => setQuotationToDelete(quotation._id || quotation.id || '')}
+                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer"
                   title="Remove Proposal"
                 >
                   <Trash2 className="w-4 h-4" />

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getCrew, createCrew, updateCrew, deleteCrew } from '@/app/actions';
-import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles, ChevronRight, Eye, Search, Filter } from 'lucide-react';
+import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles, ChevronRight, Eye, Search, Filter, LayoutGrid, List } from 'lucide-react';
 import { toast } from 'sonner';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 import CrewDetailDrawer from '@/components/blueprints/CrewDetailDrawer';
@@ -12,6 +12,7 @@ export default function BlueprintPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   // Right sidebar details drawer state
   const [selectedCrewForDetail, setSelectedCrewForDetail] = useState<any | null>(null);
@@ -115,7 +116,7 @@ export default function BlueprintPage() {
   });
 
   return (
-    <div className="space-y-8 max-w-[1600px] mx-auto pb-16 animate-fade-in text-gray-800 dark:text-gray-100">
+    <div className="space-y-8 w-full pb-16 animate-fade-in text-gray-800 dark:text-gray-100">
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#fee2e2]/40 dark:bg-gray-800/40 p-5 rounded-[32px] border border-[#fecaca]/40 dark:border-gray-700/50 backdrop-blur-md">
         <div>
@@ -158,38 +159,70 @@ export default function BlueprintPage() {
           )}
         </div>
 
-        {/* Role Quick Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar w-full sm:w-auto pb-1 sm:pb-0">
-          {[
-            { id: 'all', label: 'All Roles' },
-            { id: 'cinematographer', label: 'Cinematographers' },
-            { id: 'photographer', label: 'Photographers' },
-            { id: 'drone', label: 'Drone' },
-            { id: 'editor', label: 'Editors' },
-          ].map((r) => {
-            const isActive = roleFilter === r.id;
-            return (
-              <button
-                key={r.id}
-                type="button"
-                onClick={() => setRoleFilter(r.id)}
-                className={`px-3.5 py-2 rounded-xl text-[12px] font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  isActive
-                    ? 'bg-[#e50914] text-white shadow-md shadow-red-500/10'
-                    : 'bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:border-gray-300'
-                }`}
-              >
-                {r.label}
-              </button>
-            );
-          })}
+        {/* Role Quick Filter Pills & View Mode Toggle */}
+        <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar w-full sm:w-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-2">
+            {[
+              { id: 'all', label: 'All Roles' },
+              { id: 'cinematographer', label: 'Cinematographers' },
+              { id: 'photographer', label: 'Photographers' },
+              { id: 'drone', label: 'Drone' },
+              { id: 'editor', label: 'Editors' },
+            ].map((r) => {
+              const isActive = roleFilter === r.id;
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setRoleFilter(r.id)}
+                  className={`px-3.5 py-2 rounded-xl text-[12px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? 'bg-[#e50914] text-white shadow-md shadow-red-500/10'
+                      : 'bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:border-gray-300'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-white dark:bg-[#15181e] p-1 rounded-2xl border border-gray-200/70 dark:border-gray-800 shadow-xs shrink-0">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-extrabold transition-all cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-gray-100 dark:bg-gray-700 text-[#e50914] shadow-xs'
+                  : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+              }`}
+              title="Cards Grid View"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Cards</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-extrabold transition-all cursor-pointer ${
+                viewMode === 'list'
+                  ? 'bg-gray-100 dark:bg-gray-700 text-[#e50914] shadow-xs'
+                  : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+              }`}
+              title="Compact List / Table View"
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>List</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Grid View */}
+      {/* Main Content (Grid or List View) */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
-          {[...Array(6)].map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-pulse">
+          {[...Array(8)].map((_, i) => (
             <div key={i} className="glass-card rounded-[45px] h-[220px] bg-white/50 dark:bg-gray-800/40" />
           ))}
         </div>
@@ -203,8 +236,8 @@ export default function BlueprintPage() {
             {searchQuery ? 'Try clearing the search or changing the role filter.' : 'Add crew members to register them inside the studio blueprints.'}
           </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      ) : viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredCrew.map((crew) => {
             const avatarUrl = crew.avatarUrl || (
               crew.name.includes('Davidson') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80' :
@@ -220,7 +253,7 @@ export default function BlueprintPage() {
                   setSelectedCrewForDetail(crew);
                   setIsDetailDrawerOpen(true);
                 }}
-                className="glass-card rounded-[45px] p-8 bg-white border border-gray-100/50 shadow-sm flex flex-col justify-between h-full relative overflow-hidden transition-all hover:shadow-xl hover:border-red-200/60 cursor-pointer group"
+                className="glass-card rounded-[45px] p-8 bg-white dark:bg-[#15181e] border border-gray-100/50 dark:border-gray-800 shadow-sm flex flex-col justify-between h-full relative overflow-hidden transition-all hover:shadow-xl hover:border-red-200/60 dark:hover:border-red-900/60 cursor-pointer group"
               >
                 {/* Scoop Notch Corner (Top-Right) matching ProjectCard */}
                 <div className="absolute top-0 right-0 w-[112px] h-[112px] bg-[#fdf6f6] rounded-bl-[45px] z-10 pointer-events-auto">
@@ -302,6 +335,82 @@ export default function BlueprintPage() {
                     title="Remove Record"
                   >
                     <Trash2 className="w-4.5 h-4.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {filteredCrew.map((crew) => {
+            const avatarUrl = crew.avatarUrl || (
+              crew.name.includes('Davidson') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80' :
+              crew.name.includes('Veronica') ? 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&h=150&q=80' :
+              crew.name.includes('Harris') ? 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&h=150&q=80' :
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80'
+            );
+
+            return (
+              <div
+                key={crew._id}
+                onClick={() => {
+                  setSelectedCrewForDetail(crew);
+                  setIsDetailDrawerOpen(true);
+                }}
+                className="w-full bg-white/85 dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800/70 hover:border-[#e50914]/40 p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:bg-white dark:hover:bg-[#1a1e24] cursor-pointer group"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0 bg-gray-100">
+                    <img src={avatarUrl} alt={crew.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-[14.5px] font-extrabold text-gray-900 dark:text-white truncate group-hover:text-[#e50914] transition-colors">
+                      {crew.name}
+                    </h4>
+                    <span className="inline-block bg-[#fef2f2] text-[#e50914] dark:bg-red-950/40 dark:text-red-300 border border-[#fee2e2] dark:border-red-900/40 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md mt-1 leading-none">
+                      {crew.role}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[12px] font-semibold text-gray-600 dark:text-gray-300 shrink-0">
+                  <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <span>{crew.location}</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[12px] font-semibold text-gray-500 dark:text-gray-400 shrink-0">
+                  <Phone className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <span>{crew.phone}</span>
+                </div>
+
+                <div className="flex flex-col items-start md:items-end shrink-0">
+                  <span className="text-[14px] font-black text-gray-900 dark:text-white">
+                    ₹{crew.charges.toLocaleString('en-IN')} <span className="text-[10px] text-gray-400 font-bold">/ day</span>
+                  </span>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Day Rate</span>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(crew);
+                    }}
+                    className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+                    title="Edit Record"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(crew._id);
+                    }}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer"
+                    title="Remove Record"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

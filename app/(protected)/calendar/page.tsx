@@ -21,7 +21,14 @@ import {
   Sparkles,
   Camera,
   CalendarDays,
-  LayoutGrid
+  CalendarClock,
+  LayoutGrid,
+  ShieldCheck,
+  BadgeCheck,
+  Flame,
+  TrendingUp,
+  Award,
+  CheckCheck
 } from 'lucide-react';
 import { getProjects } from '@/app/actions';
 import { Project } from '@/lib/types';
@@ -110,16 +117,18 @@ export default function CalendarPage() {
       days.push(
         <div
           key={dayStr}
-          className={`min-h-[120px] p-2.5 flex flex-col justify-between transition-all border-r border-b border-gray-100 dark:border-gray-800 ${
+          className={`min-h-[125px] p-3 rounded-2xl flex flex-col justify-between transition-all border ${
             !isCurrentMonth
-              ? 'bg-gray-50/50 dark:bg-gray-900/30 text-gray-300 dark:text-gray-600'
-              : 'bg-white dark:bg-[#16181c] text-gray-800 dark:text-gray-200'
-          } ${isToday ? 'ring-2 ring-inset ring-[#e50914]/40 dark:ring-[#e50914]/60' : ''}`}
+              ? 'bg-gray-50/40 dark:bg-gray-900/30 text-gray-400/50 dark:text-gray-600 border-gray-150/40 dark:border-gray-800/30'
+              : 'bg-white dark:bg-[#1c1f26] text-gray-800 dark:text-gray-200 border-gray-200/80 dark:border-gray-800 hover:border-[#e50914]/40'
+          } ${dayEvents.length > 0 ? 'ring-1 ring-red-500/20 bg-gradient-to-b from-white to-red-50/15 dark:from-[#1c1f26] dark:to-red-950/15' : ''} ${
+            isToday ? 'ring-2 ring-[#e50914] border-transparent' : ''
+          }`}
         >
           {/* Day Number Header */}
           <div className="flex justify-between items-center mb-1">
             {isToday ? (
-              <span className="w-6 h-6 rounded-full bg-[#e50914] text-white font-extrabold text-[11px] flex items-center justify-center shadow-sm">
+              <span className="w-6 h-6 rounded-full bg-[#e50914] text-white font-extrabold text-[11px] flex items-center justify-center">
                 {day.format('D')}
               </span>
             ) : (
@@ -141,7 +150,7 @@ export default function CalendarPage() {
                 <div
                   key={event.id || event._id}
                   onClick={() => setSelectedEvent(event)}
-                  className={`p-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition-all hover:scale-[1.02] shadow-xs flex flex-col gap-0.5 ${
+                  className={`p-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-0.5 ${
                     event.status === 'Completed'
                       ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200/60 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300'
                       : event.status === 'Booked'
@@ -167,7 +176,7 @@ export default function CalendarPage() {
     }
 
     rows.push(
-      <div className="grid grid-cols-7" key={day.format('YYYY-MM-DD')}>
+      <div className="grid grid-cols-7 gap-2 sm:gap-3" key={day.format('YYYY-MM-DD')}>
         {days}
       </div>
     );
@@ -180,7 +189,7 @@ export default function CalendarPage() {
   const goToToday = () => setCurrentDate(dayjs());
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16 font-sans text-gray-800 dark:text-gray-100">
+    <div className="space-y-6 w-full pb-16 font-sans text-gray-800 dark:text-gray-100">
       
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/50 dark:bg-[#16181c]/60 p-5 rounded-3xl border border-white/50 dark:border-gray-800/60 backdrop-blur-md shadow-xs">
@@ -233,55 +242,181 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-card p-5 rounded-2xl bg-white dark:bg-[#16181c] border border-gray-200/50 dark:border-gray-800/60 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Shoots This Month</span>
-            <span className="text-[24px] font-extrabold text-gray-900 dark:text-white mt-1 block">
-              {monthProjects.length}
-            </span>
+      {/* Metrics Row - Premium Bento Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        
+        {/* Card 1: Shoots This Month */}
+        <div 
+          onClick={() => setSelectedStatus('ALL')}
+          className="group relative overflow-hidden rounded-[26px] bg-gradient-to-br from-red-500/[0.07] via-white to-red-500/[0.02] dark:from-[#201418] dark:via-[#16181f] dark:to-[#121418] border border-red-500/20 dark:border-red-900/35 hover:border-[#e50914]/60 p-5 shadow-xs hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+        >
+          {/* Ambient Corner Glow */}
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-500/15 dark:bg-red-500/20 rounded-full blur-2xl pointer-events-none group-hover:bg-red-500/30 transition-all" />
+
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#e50914] animate-pulse" />
+                <span className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  Shoots This Month
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-[32px] font-black text-gray-900 dark:text-white leading-none tracking-tight">
+                  {monthProjects.length}
+                </span>
+                <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500">
+                  shoots
+                </span>
+              </div>
+            </div>
+
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#e50914] to-red-600 text-white flex items-center justify-center shadow-md shadow-red-500/25 group-hover:scale-105 transition-transform">
+              <Camera className="w-5 h-5 stroke-[2.2]" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-[#e50914] flex items-center justify-center font-bold">
-            <Camera className="w-5 h-5" />
+
+          <div className="relative z-10 mt-4 pt-3 border-t border-red-100/60 dark:border-red-950/60 flex items-center justify-between text-[11px]">
+            <span className="text-gray-500 dark:text-gray-400 font-bold">
+              Active Schedule
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-black text-[#e50914] bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-full border border-red-200/60 dark:border-red-900/50">
+              <Flame className="w-3 h-3" />
+              Calendar Live
+            </span>
           </div>
         </div>
 
-        <div className="glass-card p-5 rounded-2xl bg-white dark:bg-[#16181c] border border-gray-200/50 dark:border-gray-800/60 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Next 7 Days</span>
-            <span className="text-[24px] font-extrabold text-gray-900 dark:text-white mt-1 block">
-              {next7DaysProjects.length}
-            </span>
+        {/* Card 2: Next 7 Days */}
+        <div 
+          onClick={() => {}}
+          className="group relative overflow-hidden rounded-[26px] bg-gradient-to-br from-amber-500/[0.07] via-white to-amber-500/[0.02] dark:from-[#201b12] dark:via-[#16181f] dark:to-[#121418] border border-amber-500/20 dark:border-amber-900/35 hover:border-amber-500/60 p-5 shadow-xs hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+        >
+          {/* Ambient Corner Glow */}
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/15 dark:bg-amber-500/20 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/30 transition-all" />
+
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  Next 7 Days
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-[32px] font-black text-amber-600 dark:text-amber-400 leading-none tracking-tight">
+                  {next7DaysProjects.length}
+                </span>
+                <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500">
+                  upcoming
+                </span>
+              </div>
+            </div>
+
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-105 transition-transform">
+              <CalendarClock className="w-5 h-5 stroke-[2.2]" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center font-bold">
-            <Clock className="w-5 h-5" />
+
+          <div className="relative z-10 mt-4 pt-3 border-t border-amber-100/60 dark:border-amber-950/60 flex items-center justify-between text-[11px]">
+            <span className="text-gray-500 dark:text-gray-400 font-bold">
+              Immediate Attention
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-black text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/50">
+              <Clock className="w-3 h-3" />
+              This Week
+            </span>
           </div>
         </div>
 
-        <div className="glass-card p-5 rounded-2xl bg-white dark:bg-[#16181c] border border-gray-200/50 dark:border-gray-800/60 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Confirmed Booked</span>
-            <span className="text-[24px] font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">
-              {bookedMonthProjects.length}
-            </span>
+        {/* Card 3: Confirmed Booked */}
+        <div 
+          onClick={() => setSelectedStatus(selectedStatus === 'Booked' ? 'ALL' : 'Booked')}
+          className={`group relative overflow-hidden rounded-[26px] bg-gradient-to-br from-emerald-500/[0.07] via-white to-emerald-500/[0.02] dark:from-[#132018] dark:via-[#16181f] dark:to-[#121418] border p-5 shadow-xs hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between ${
+            selectedStatus === 'Booked' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-emerald-500/20 dark:border-emerald-900/35 hover:border-emerald-500/60'
+          }`}
+        >
+          {/* Ambient Corner Glow */}
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/15 dark:bg-emerald-500/20 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/30 transition-all" />
+
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  Confirmed Booked
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-[32px] font-black text-emerald-600 dark:text-emerald-400 leading-none tracking-tight">
+                  {bookedMonthProjects.length}
+                </span>
+                <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500">
+                  locked
+                </span>
+              </div>
+            </div>
+
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:scale-105 transition-transform">
+              <BadgeCheck className="w-5 h-5 stroke-[2.2]" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-5 h-5" />
+
+          <div className="relative z-10 mt-4 pt-3 border-t border-emerald-100/60 dark:border-emerald-950/60 flex items-center justify-between text-[11px]">
+            <span className="text-gray-500 dark:text-gray-400 font-bold">
+              Deposit & Crew Ready
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-900/50">
+              <ShieldCheck className="w-3 h-3" />
+              Verified
+            </span>
           </div>
         </div>
 
-        <div className="glass-card p-5 rounded-2xl bg-white dark:bg-[#16181c] border border-gray-200/50 dark:border-gray-800/60 shadow-xs flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Completed</span>
-            <span className="text-[24px] font-extrabold text-gray-700 dark:text-gray-300 mt-1 block">
-              {completedMonthProjects.length}
+        {/* Card 4: Completed */}
+        <div 
+          onClick={() => setSelectedStatus(selectedStatus === 'Completed' ? 'ALL' : 'Completed')}
+          className={`group relative overflow-hidden rounded-[26px] bg-gradient-to-br from-blue-500/[0.07] via-white to-blue-500/[0.02] dark:from-[#141b24] dark:via-[#15181e] dark:to-[#101216] border p-5 shadow-xs hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between ${
+            selectedStatus === 'Completed' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-blue-500/20 dark:border-blue-900/35 hover:border-blue-500/60'
+          }`}
+        >
+          {/* Ambient Corner Glow */}
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/15 dark:bg-blue-500/20 rounded-full blur-2xl pointer-events-none group-hover:bg-blue-500/30 transition-all" />
+
+          <div className="relative z-10 flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  Completed
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-[32px] font-black text-blue-600 dark:text-blue-400 leading-none tracking-tight">
+                  {completedMonthProjects.length}
+                </span>
+                <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500">
+                  delivered
+                </span>
+              </div>
+            </div>
+
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
+              <CheckCheck className="w-5 h-5 stroke-[2.2]" />
+            </div>
+          </div>
+
+          <div className="relative z-10 mt-4 pt-3 border-t border-blue-100/60 dark:border-blue-950/60 flex items-center justify-between text-[11px]">
+            <span className="text-gray-500 dark:text-gray-400 font-bold">
+              Delivered & Archived
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-black text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200/60 dark:border-blue-900/50">
+              <Award className="w-3 h-3" />
+              100% Done
             </span>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-600 flex items-center justify-center font-bold">
-            <Sparkles className="w-5 h-5" />
-          </div>
         </div>
+
       </div>
 
       {/* Filter & Month Navigation Bar */}
@@ -375,9 +510,9 @@ export default function CalendarPage() {
           <p className="text-[14px] font-bold text-gray-500">Loading shoot calendar...</p>
         </div>
       ) : viewMode === 'calendar' ? (
-        <div className="glass-card rounded-[28px] overflow-hidden bg-white dark:bg-[#16181c] border border-gray-200/50 dark:border-gray-800 shadow-sm">
+        <div className="space-y-3">
           {/* Day Names Bar */}
-          <div className="grid grid-cols-7 bg-gray-50 dark:bg-[#1c1f24] border-b border-gray-150 dark:border-gray-800 text-center py-3">
+          <div className="grid grid-cols-7 gap-2 sm:gap-3 bg-gray-50/70 dark:bg-gray-800/30 rounded-2xl text-center py-2.5 px-2">
             {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((d) => (
               <div key={d} className="text-[11px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 <span className="hidden md:inline">{d}</span>
@@ -387,7 +522,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Calendar Day Cells */}
-          <div className="divide-y divide-gray-100 dark:divide-gray-850">
+          <div className="space-y-2.5 sm:space-y-3">
             {rows}
           </div>
         </div>
@@ -401,7 +536,7 @@ export default function CalendarPage() {
               <p className="text-[12px] text-gray-400 mt-1">Try clearing your filters or schedule a new shoot.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredProjects.map((project) => {
                 const eventDate = project.eventDate ? dayjs(project.eventDate) : null;
 

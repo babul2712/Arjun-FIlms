@@ -154,9 +154,9 @@ ${otp}
 </div>
 <div class="info-box">
 <p>
-✔ This OTP is valid for <strong>5 minutes</strong>.<br>
-✔ Never share this code with anyone.<br>
-✔ Our team will never ask you for your OTP.
+• This OTP is valid for <strong>5 minutes</strong>.<br>
+• Never share this code with anyone.<br>
+• Our team will never ask you for your OTP.
 </p>
 </div>
 <p class="warning">
@@ -166,11 +166,8 @@ No changes will be made to your account.
 </div>
 <div class="footer">
 <strong>ARJUN FILMS</strong><br><br>
-📷 Instagram :
-@arjun_photographyyy
-<br><br>
-📞 +91 7788992712
-<br><br>
+Instagram : @arjun_photographyyy<br><br>
+Phone : +91 7788992712<br><br>
 © ${year} Arjun Films. All rights reserved.
 </div>
 </div>

@@ -25,6 +25,9 @@ export default function FontThemeProvider({
         if (parsed?.state?.themeColor) {
           applyThemeColor(parsed.state.themeColor);
         }
+        if (parsed?.state?.userAvatar) {
+          useUIStore.getState().setUserAvatar(parsed.state.userAvatar);
+        }
         if (parsed?.state?.theme === 'dark') {
           document.documentElement.classList.add('dark');
         }

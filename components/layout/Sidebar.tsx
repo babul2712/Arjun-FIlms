@@ -16,10 +16,12 @@ import {
   Sun,
   Moon,
   Share2,
-  User
+  User,
+  TrendingUp
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
+import { getBioProfileAdmin } from '@/app/actions';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -28,8 +30,7 @@ const navItems = [
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Projects', href: '/projects', icon: Briefcase },
   { name: 'Blueprint', href: '/blueprints', icon: Users },
-  { name: 'Bio Links', href: '/social-links', icon: Share2 },
-  { name: 'Profile', href: '/profile', icon: User },
+  { name: 'Finance', href: '/finance', icon: TrendingUp },
 ];
 
 export default function Sidebar() {
@@ -37,9 +38,36 @@ export default function Sidebar() {
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
   const theme = useUIStore((state) => state.theme);
   const toggleTheme = useUIStore((state) => state.toggleTheme);
   const toggleNotificationDrawer = useUIStore((state) => state.toggleNotificationDrawer);
+  const userAvatar = useUIStore((state) => state.userAvatar);
+  const setUserAvatar = useUIStore((state) => state.setUserAvatar);
+
+  // Sync studio profile avatar on mount if not yet loaded or on change
+  useEffect(() => {
+    let isMounted = true;
+    const fetchStudioProfile = async () => {
+      try {
+        const bio = await getBioProfileAdmin('arjunfilms');
+        if (bio?.avatar && isMounted) {
+          setUserAvatar(bio.avatar);
+        }
+      } catch (e) {
+        // ignore fallback
+      }
+    };
+    fetchStudioProfile();
+    return () => {
+      isMounted = false;
+    };
+  }, [setUserAvatar]);
+
+  // Reset error when avatar source changes
+  useEffect(() => {
+    setAvatarLoadError(false);
+  }, [userAvatar, user?.avatar]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -48,6 +76,8 @@ export default function Sidebar() {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  const isProfileActive = pathname === '/profile' || pathname === '/social-links';
 
   return (
     <aside className="my-3 ml-3 md:my-4 md:ml-4 h-[calc(100vh-1.5rem)] md:h-[calc(100vh-2rem)] w-20 bg-white/85 dark:bg-[#121418]/90 backdrop-blur-xl border border-[#fee2e2] dark:border-gray-800/80 shadow-xl shadow-red-500/5 rounded-[32px] flex flex-col items-center justify-between py-6 z-50 shrink-0 transition-all">
@@ -131,45 +161,99 @@ export default function Sidebar() {
 
         {/* Profile Avatar */}
         <div className="relative mt-1">
-          <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#fee2e2] dark:border-gray-800 hover:border-[#e50914] dark:hover:border-[#e50914] transition-all cursor-pointer shadow-sm active:scale-95 p-0.5"
-            title="User Profile"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"
-              alt="Profile"
-              className="w-full h-full object-cover rounded-full"
-            />
-          </button>
+          {(() => {
+            const resolvedAvatar = user?.avatar || userAvatar || '/logo.jpeg';
+            const displayName = user?.name || 'Arjun Owner';
+            const initial = displayName.charAt(0).toUpperCase();
+
+            return (
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all cursor-pointer shadow-sm active:scale-95 p-0.5 flex items-center justify-center bg-[#fef2f2] dark:bg-gray-800 ${
+                  isProfileActive
+                    ? 'border-[#e50914] ring-2 ring-red-400/30'
+                    : 'border-[#fee2e2] dark:border-gray-800 hover:border-[#e50914] dark:hover:border-[#e50914]'
+                }`}
+                title={`${displayName} - Profile Settings`}
+              >
+                {resolvedAvatar && !avatarLoadError ? (
+                  <img
+                    src={resolvedAvatar}
+                    alt={displayName}
+                    className="w-full h-full object-cover rounded-full"
+                    onError={() => setAvatarLoadError(true)}
+                  />
+                ) : (
+                  <span className="w-full h-full rounded-full bg-gradient-to-tr from-[#e50914] to-rose-500 text-white font-black text-xs flex items-center justify-center">
+                    {initial}
+                  </span>
+                )}
+              </button>
+            );
+          })()}
 
           {/* Popover Profile Menu */}
           {showProfileMenu && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
-              <div className="absolute bottom-10 left-12 bg-white dark:bg-[#16181c] border border-[#fee2e2] dark:border-gray-800/80 shadow-2xl rounded-2xl p-2.5 z-50 w-52 animate-fade-in text-gray-800 dark:text-white">
-                <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800">
-                  <p className="text-[12px] font-bold text-gray-800 dark:text-gray-200">{user?.name || 'Arjun Owner'}</p>
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{user?.username || 'admin@arjunfilms.com'}</p>
+              <div className="absolute bottom-2 left-16 bg-white dark:bg-[#16181c] border border-[#fee2e2] dark:border-gray-800/80 shadow-2xl rounded-2xl p-2.5 z-50 w-56 animate-fade-in text-gray-800 dark:text-white">
+                <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                    <img
+                      src={user?.avatar || userAvatar || '/logo.jpeg'}
+                      alt="User"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/logo.jpeg';
+                      }}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-bold text-gray-800 dark:text-gray-200 truncate">{user?.name || 'Arjun Owner'}</p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{user?.username || 'admin@arjunfilms.com'}</p>
+                  </div>
                 </div>
-                <Link
-                  href="/profile"
-                  onClick={() => setShowProfileMenu(false)}
-                  className="w-full flex items-center gap-2 px-3 py-2 mt-1 text-[12px] font-bold text-gray-700 dark:text-gray-200 hover:bg-[#fef2f2] dark:hover:bg-red-950/30 rounded-xl cursor-pointer transition-colors"
-                >
-                  <User className="w-4 h-4 text-[#e50914]" />
-                  <span>Studio Profile</span>
-                </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setShowProfileMenu(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 mt-1 text-[12px] font-bold text-[#e50914] hover:bg-[#fef2f2] dark:hover:bg-red-950/30 rounded-xl cursor-pointer transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Log Out</span>
-                </button>
+
+                <div className="py-1 space-y-0.5">
+                  <Link
+                    href="/profile"
+                    onClick={() => setShowProfileMenu(false)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold rounded-xl cursor-pointer transition-colors ${
+                      pathname === '/profile'
+                        ? 'bg-[#fee2e2]/70 dark:bg-red-950/50 text-[#e50914]'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-[#fef2f2] dark:hover:bg-red-950/30 hover:text-[#e50914]'
+                    }`}
+                  >
+                    <User className="w-4 h-4 text-[#e50914]" />
+                    <span>Studio Profile</span>
+                  </Link>
+
+                  <Link
+                    href="/social-links"
+                    onClick={() => setShowProfileMenu(false)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold rounded-xl cursor-pointer transition-colors ${
+                      pathname === '/social-links'
+                        ? 'bg-[#fee2e2]/70 dark:bg-red-950/50 text-[#e50914]'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-[#fef2f2] dark:hover:bg-red-950/30 hover:text-[#e50914]'
+                    }`}
+                  >
+                    <Share2 className="w-4 h-4 text-[#e50914]" />
+                    <span>Bio Link</span>
+                  </Link>
+                </div>
+
+                <div className="pt-1 mt-1 border-t border-gray-100 dark:border-gray-800">
+                  <button
+                    onClick={() => {
+                      logout();
+                      setShowProfileMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-bold text-red-600 dark:text-red-400 hover:bg-[#fef2f2] dark:hover:bg-red-950/30 rounded-xl cursor-pointer transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Log Out</span>
+                  </button>
+                </div>
               </div>
             </>
           )}

@@ -8,6 +8,8 @@ import Quotation from '@/lib/models/Quotation';
 import Booking from '@/lib/models/Booking';
 import Crew from '@/lib/models/Crew';
 import EventType from '@/lib/models/EventType';
+import Venue from '@/lib/models/Venue';
+import FinanceEntry from '@/lib/models/FinanceEntry';
 import Otp from '@/lib/models/Otp';
 import Notification from '@/lib/models/Notification';
 import BioProfile from '@/lib/models/BioProfile';
@@ -27,6 +29,21 @@ const PREDEFINED_EVENT_TYPES = [
   'Commercial & Fashion Session',
   'Maternity & Newborn Shoot',
   'Birthday & Anniversary Event',
+];
+
+const PREDEFINED_VENUES = [
+  { name: 'Mayfair Lagoon, Bhubaneswar', city: 'Bhubaneswar, Odisha', category: 'Luxury Resort' },
+  { name: 'Welcomhotel by ITC, Bhubaneswar', city: 'Bhubaneswar, Odisha', category: 'Luxury Hotel' },
+  { name: 'Swosti Chilika Resort', city: 'Chilika, Odisha', category: 'Destination Resort' },
+  { name: 'Puri Heritage Beachfront Resort', city: 'Puri, Odisha', category: 'Beach Destination' },
+  { name: 'Swosti Premium, Jaydev Vihar', city: 'Bhubaneswar, Odisha', category: '5-Star Hotel' },
+  { name: 'Vivanta by Taj, DN Square', city: 'Bhubaneswar, Odisha', category: '5-Star Hotel' },
+  { name: 'The Crown Hotel, Nayapalli', city: 'Bhubaneswar, Odisha', category: 'Hotel & Banquet' },
+  { name: 'Pal Heights / Mantra, Pahala', city: 'Bhubaneswar, Odisha', category: 'Resort & Lawn' },
+  { name: 'Cuttack Heritage & Riverfront (Barabati)', city: 'Cuttack, Odisha', category: 'Riverfront Venue' },
+  { name: 'Arjun Films Studio HQ (Hanspal)', city: 'Bhubaneswar, Odisha', category: 'Studio HQ' },
+  { name: 'Udaipur Heritage Palace & Fort', city: 'Udaipur, Rajasthan', category: 'Royal Destination' },
+  { name: 'Goa Beachfront Resort & Villa', city: 'Goa', category: 'Beach Destination' },
 ];
 
 export async function getEventTypes() {
@@ -62,6 +79,61 @@ export async function createEventType(name: string) {
     if (existing) return JSON.parse(JSON.stringify(existing));
     throw e;
   }
+}
+
+export async function deleteEventType(id: string) {
+  await connectToDatabase();
+  await EventType.findByIdAndDelete(id);
+  revalidatePath('/quotations', 'layout');
+  revalidatePath('/projects', 'layout');
+  return { success: true };
+}
+
+export async function getVenues() {
+  try {
+    await connectToDatabase();
+    let venues = await Venue.find({}).sort({ name: 1 }).lean();
+    if (!venues || venues.length === 0) {
+      await Venue.insertMany(PREDEFINED_VENUES);
+      venues = await Venue.find({}).sort({ name: 1 }).lean();
+    }
+    return JSON.parse(JSON.stringify(venues));
+  } catch (e) {
+    console.error('getVenues error:', e);
+    return PREDEFINED_VENUES.map((v) => ({ _id: v.name, ...v }));
+  }
+}
+
+export async function createVenue(data: { name: string; city?: string; category?: string; address?: string }) {
+  const trimmedName = (data.name || '').trim();
+  if (!trimmedName) throw new Error('Venue name is required');
+  await connectToDatabase();
+  try {
+    const existing = await Venue.findOne({ name: { $regex: new RegExp(`^${trimmedName}$`, 'i') } }).lean();
+    if (existing) return JSON.parse(JSON.stringify(existing));
+
+    const venue = await Venue.create({
+      name: trimmedName,
+      city: data.city?.trim() || '',
+      category: data.category?.trim() || 'Venue',
+      address: data.address?.trim() || ''
+    });
+    revalidatePath('/quotations', 'layout');
+    revalidatePath('/projects', 'layout');
+    return JSON.parse(JSON.stringify(venue));
+  } catch (e) {
+    const existing = await Venue.findOne({ name: trimmedName }).lean();
+    if (existing) return JSON.parse(JSON.stringify(existing));
+    throw e;
+  }
+}
+
+export async function deleteVenue(id: string) {
+  await connectToDatabase();
+  await Venue.findByIdAndDelete(id);
+  revalidatePath('/quotations', 'layout');
+  revalidatePath('/projects', 'layout');
+  return { success: true };
 }
 
 export async function getProjects() {
@@ -216,6 +288,87 @@ export async function addProjectExpense(projectId: string, expense: { date: stri
   return JSON.parse(JSON.stringify(project));
 }
 
+export async function updateProjectExpense(projectId: string, expenseIndex: number, expense: { date: string, description: string, amount: number }) {
+  await connectToDatabase();
+  const project = await Project.findById(projectId);
+  if (!project) throw new Error('Project not found');
+  if (!project.expenses || !project.expenses[expenseIndex]) throw new Error('Expense not found');
+  
+  project.expenses[expenseIndex] = {
+    date: new Date(expense.date),
+    description: expense.description,
+    amount: Number(expense.amount)
+  };
+  await project.save();
+  revalidatePath('/projects', 'layout');
+  return JSON.parse(JSON.stringify(project));
+}
+
+export async function deleteProjectExpense(projectId: string, expenseIndex: number) {
+  await connectToDatabase();
+  const project = await Project.findById(projectId);
+  if (!project) throw new Error('Project not found');
+  if (!project.expenses || !project.expenses[expenseIndex]) throw new Error('Expense not found');
+  
+  project.expenses.splice(expenseIndex, 1);
+  await project.save();
+  revalidatePath('/projects', 'layout');
+  return JSON.parse(JSON.stringify(project));
+}
+
+export async function addProjectPayment(projectId: string, data: { amount: number, paymentMethod: string, date: string, remarks?: string }) {
+  await connectToDatabase();
+  const project = await Project.findById(projectId);
+  if (!project) throw new Error('Project not found');
+
+  const payment = await Payment.create({
+    projectId,
+    customerName: project.name,
+    phone: project.phone,
+    amount: Number(data.amount),
+    paymentMethod: data.paymentMethod || 'UPI QR',
+    status: 'PAID',
+    date: data.date ? new Date(data.date) : new Date(),
+    remarks: data.remarks || 'Direct Client Payment'
+  });
+
+  await Project.findByIdAndUpdate(projectId, { $addToSet: { payments: payment._id } });
+
+  // Auto-create notification for payment
+  try {
+    await Notification.create({
+      title: 'Payment Logged for Project',
+      message: `Recorded ₹${Number(data.amount).toLocaleString('en-IN')} payment for ${project.name}`,
+      type: 'payment',
+      link: `/projects/${projectId}`,
+      amount: Number(data.amount),
+      read: false
+    });
+  } catch (e) {
+    // Ignore notification error
+  }
+
+  revalidatePath('/projects', 'layout');
+  revalidatePath('/payments', 'layout');
+  revalidatePath('/dashboard', 'layout');
+  return JSON.parse(JSON.stringify(payment));
+}
+
+export async function updateProjectPayment(paymentId: string, data: { amount?: number, paymentMethod?: string, date?: string, remarks?: string }) {
+  await connectToDatabase();
+  const updateData: any = {};
+  if (data.amount !== undefined) updateData.amount = Number(data.amount);
+  if (data.paymentMethod) updateData.paymentMethod = data.paymentMethod;
+  if (data.date) updateData.date = new Date(data.date);
+  if (data.remarks !== undefined) updateData.remarks = data.remarks;
+  
+  const payment = await Payment.findByIdAndUpdate(paymentId, updateData, { new: true });
+  revalidatePath('/projects', 'layout');
+  revalidatePath('/payments', 'layout');
+  revalidatePath('/dashboard', 'layout');
+  return JSON.parse(JSON.stringify(payment));
+}
+
 export async function addProjectCrew(projectId: string, crewData: { role: string, assignedCrewId?: string, charges: number }) {
   await connectToDatabase();
   const updateQuery: any = { $push: { crewBlueprint: crewData } };
@@ -239,7 +392,13 @@ export async function addProjectCrew(projectId: string, crewData: { role: string
 
 export async function deletePayment(id: string) {
   await connectToDatabase();
-  await Payment.findByIdAndDelete(id);
+  const payment = await Payment.findByIdAndDelete(id);
+  if (payment?.projectId) {
+    await Project.findByIdAndUpdate(payment.projectId, { $pull: { payments: id } });
+  }
+  revalidatePath('/projects', 'layout');
+  revalidatePath('/payments', 'layout');
+  revalidatePath('/dashboard', 'layout');
   return { success: true };
 }
 
@@ -455,7 +614,7 @@ export async function sendLoginOTP(username: string, email: string): Promise<{ s
   });
 
   // Always log OTP to server console (visible in local terminal & Vercel Dashboard -> Logs)
-  console.log(`\n🔑 [LOGIN OTP] OTP for ${email} is: ${otp}\n`);
+  console.log(`\n[LOGIN OTP] OTP for ${email} is: ${otp}\n`);
 
   try {
     const adminEmail = process.env.RESEND_TO_EMAIL || process.env.ADMIN_EMAIL || email;
@@ -1124,6 +1283,223 @@ export async function searchUniversalAction(rawQuery: string = '') {
   }
 }
 
+function getDefaultFinanceData() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const curMStr = pad(currentMonth);
 
+  const baseEntries = [
+    // May 2024 (Original Apple Numbers Sheet Data)
+    { type: 'income', category: 'Crypto', description: 'Crypto profit', amount: 3290, date: new Date('2024-05-03T10:00:00.000Z'), paymentMethod: 'Crypto Wallet' },
+    { type: 'income', category: 'Graphic & Design', description: 'Social media in dkl', amount: 1500, date: new Date('2024-05-04T12:00:00.000Z'), paymentMethod: 'UPI / QR' },
 
+    { type: 'expense', category: 'Things', description: 'Flipkart shopping', amount: 2665, date: new Date('2024-05-03T14:30:00.000Z'), paymentMethod: 'UPI / QR' },
+    { type: 'expense', category: 'Others', description: 'room rent in bbsr Khandagiri', amount: 300, date: new Date('2024-05-04T16:00:00.000Z'), paymentMethod: 'Cash' },
+    { type: 'expense', category: 'Travel', description: 'Train tickets or bus', amount: 65, date: new Date('2024-05-05T09:15:00.000Z'), paymentMethod: 'UPI / QR' },
+    { type: 'expense', category: 'Others', description: 'Ac were or Polytechnics', amount: 1405, date: new Date('2024-05-05T18:45:00.000Z'), paymentMethod: 'UPI / QR' },
+    { type: 'expense', category: 'Family', description: 'Egg or family', amount: 41, date: new Date('2024-05-06T11:20:00.000Z'), paymentMethod: 'Cash' },
 
+    // Standard Monthly Budgets
+    { type: 'budget', category: 'Family', description: 'Family Monthly Budget', amount: 0, budgetLimit: 2000 },
+    { type: 'budget', category: 'Fashion', description: 'Clothing & Styling', amount: 0, budgetLimit: 1000 },
+    { type: 'budget', category: 'Phone Electricity', description: 'Bills & Utilities', amount: 0, budgetLimit: 200 },
+    { type: 'budget', category: 'Medical', description: 'Health & Pharmacy', amount: 0, budgetLimit: 100 },
+    { type: 'budget', category: 'Travel', description: 'Local Transit & Commute', amount: 0, budgetLimit: 1000 },
+    { type: 'budget', category: 'Others', description: 'Rent & Miscellaneous', amount: 0, budgetLimit: 1100 },
+    { type: 'budget', category: 'Party & Feast', description: 'Dining & Outings', amount: 0, budgetLimit: 600 },
+    { type: 'budget', category: 'Sweets & Tifin', description: 'Snacks & Tiffin', amount: 0, budgetLimit: 500 },
+    { type: 'budget', category: 'Things', description: 'Gear & Shopping', amount: 0, budgetLimit: 1000 },
+    { type: 'budget', category: 'Investment', description: 'Monthly Wealth Allocation', amount: 0, budgetLimit: 2500 },
+  ];
+
+  // If current year/month is different from May 2024, also seed current month transactions so "This Month" filter is active immediately!
+  if (currentYear !== 2024 || currentMonth !== 5) {
+    baseEntries.push(
+      { type: 'income', category: 'Crypto', description: 'Crypto staking & trading profit', amount: 3290, date: new Date(`${currentYear}-${curMStr}-03T10:00:00.000Z`), paymentMethod: 'Crypto Wallet' },
+      { type: 'income', category: 'Graphic & Design', description: 'Client UI/UX Design project', amount: 1500, date: new Date(`${currentYear}-${curMStr}-04T12:00:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Things', description: 'Studio & gear purchases', amount: 2665, date: new Date(`${currentYear}-${curMStr}-03T14:30:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Others', description: 'Studio rent & utilities', amount: 300, date: new Date(`${currentYear}-${curMStr}-04T16:00:00.000Z`), paymentMethod: 'Cash' },
+      { type: 'expense', category: 'Travel', description: 'Travel & transit commute', amount: 65, date: new Date(`${currentYear}-${curMStr}-05T09:15:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Others', description: 'Software subscriptions & tools', amount: 1405, date: new Date(`${currentYear}-${curMStr}-05T18:45:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Family', description: 'Household provisions', amount: 41, date: new Date(`${currentYear}-${curMStr}-06T11:20:00.000Z`), paymentMethod: 'Cash' },
+      { type: 'investment', category: 'Crypto Portfolio', description: 'Monthly crypto allocation', amount: 2500, date: new Date(`${currentYear}-${curMStr}-10T10:00:00.000Z`), paymentMethod: 'Crypto Wallet' }
+    );
+  }
+
+  return baseEntries;
+}
+
+export async function getFinanceData() {
+  try {
+    await connectToDatabase();
+    let entries = await FinanceEntry.find({}).sort({ date: -1, createdAt: -1 }).lean();
+    if (!entries || entries.length === 0) {
+      const defaults = getDefaultFinanceData();
+      await FinanceEntry.insertMany(defaults);
+      entries = await FinanceEntry.find({}).sort({ date: -1, createdAt: -1 }).lean();
+    }
+    return JSON.parse(JSON.stringify(entries));
+  } catch (e) {
+    console.error('getFinanceData error:', e);
+    return JSON.parse(JSON.stringify(getDefaultFinanceData()));
+  }
+}
+
+export async function createFinanceEntry(data: {
+  type: 'income' | 'expense' | 'budget' | 'investment';
+  category: string;
+  description: string;
+  amount: number;
+  budgetLimit?: number;
+  date?: string | Date;
+  paymentMethod?: string;
+  notes?: string;
+}) {
+  await connectToDatabase();
+  try {
+    const entry = await FinanceEntry.create({
+      type: data.type,
+      category: data.category?.trim() || 'General',
+      description: data.description?.trim() || '',
+      amount: Number(data.amount) || 0,
+      budgetLimit: Number(data.budgetLimit) || 0,
+      date: data.date ? new Date(data.date) : new Date(),
+      paymentMethod: data.paymentMethod || 'UPI / QR',
+      notes: data.notes?.trim() || '',
+    });
+    revalidatePath('/finance', 'page');
+    return JSON.parse(JSON.stringify(entry));
+  } catch (error) {
+    console.error('createFinanceEntry error:', error);
+    throw error;
+  }
+}
+
+export async function updateFinanceEntry(id: string, data: any) {
+  await connectToDatabase();
+  try {
+    const updateData: any = {};
+    if (data.type !== undefined) updateData.type = data.type;
+    if (data.category !== undefined) updateData.category = data.category.trim();
+    if (data.description !== undefined) updateData.description = data.description.trim();
+    if (data.amount !== undefined) updateData.amount = Number(data.amount) || 0;
+    if (data.budgetLimit !== undefined) updateData.budgetLimit = Number(data.budgetLimit) || 0;
+    if (data.date !== undefined) updateData.date = new Date(data.date);
+    if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod;
+    if (data.notes !== undefined) updateData.notes = data.notes.trim();
+
+    const updated = await FinanceEntry.findByIdAndUpdate(id, updateData, { new: true }).lean();
+    revalidatePath('/finance', 'page');
+    return JSON.parse(JSON.stringify(updated));
+  } catch (error) {
+    console.error('updateFinanceEntry error:', error);
+    throw error;
+  }
+}
+
+export async function deleteFinanceEntry(id: string) {
+  await connectToDatabase();
+  try {
+    await FinanceEntry.findByIdAndDelete(id);
+    revalidatePath('/finance', 'page');
+    return { success: true };
+  } catch (error) {
+    console.error('deleteFinanceEntry error:', error);
+    throw error;
+  }
+}
+
+export async function updateBudgetCategory(category: string, budgetLimit: number) {
+  await connectToDatabase();
+  try {
+    const existing = await FinanceEntry.findOne({ type: 'budget', category: { $regex: new RegExp(`^${category.trim()}$`, 'i') } });
+    if (existing) {
+      existing.budgetLimit = Number(budgetLimit) || 0;
+      await existing.save();
+      return JSON.parse(JSON.stringify(existing));
+    } else {
+      const created = await FinanceEntry.create({
+        type: 'budget',
+        category: category.trim(),
+        description: `${category.trim()} Budget`,
+        amount: 0,
+        budgetLimit: Number(budgetLimit) || 0,
+      });
+      return JSON.parse(JSON.stringify(created));
+    }
+  } catch (error) {
+    console.error('updateBudgetCategory error:', error);
+    throw error;
+  }
+}
+
+export async function resetToDefaultFinanceData() {
+  await connectToDatabase();
+  try {
+    await FinanceEntry.deleteMany({});
+    const defaults = getDefaultFinanceData();
+    await FinanceEntry.insertMany(defaults);
+    revalidatePath('/finance', 'page');
+    return { success: true };
+  } catch (error) {
+    console.error('resetToDefaultFinanceData error:', error);
+    throw error;
+  }
+}
+
+export async function populateSampleMonthData(year: number, month: number) {
+  await connectToDatabase();
+  try {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const mStr = pad(month + 1); // 1-12
+    const sampleEntries = [
+      // Income
+      { type: 'income', category: 'Crypto', description: 'Crypto staking & trading profit', amount: 3290, date: new Date(`${year}-${mStr}-03T10:00:00.000Z`), paymentMethod: 'Crypto Wallet' },
+      { type: 'income', category: 'Graphic & Design', description: 'Client UI/UX Design project', amount: 1500, date: new Date(`${year}-${mStr}-04T12:00:00.000Z`), paymentMethod: 'UPI / QR' },
+      // Expenses
+      { type: 'expense', category: 'Things', description: 'Studio & gear purchases', amount: 2665, date: new Date(`${year}-${mStr}-03T14:30:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Others', description: 'Studio rent & utilities', amount: 300, date: new Date(`${year}-${mStr}-04T16:00:00.000Z`), paymentMethod: 'Cash' },
+      { type: 'expense', category: 'Travel', description: 'Travel & transit commute', amount: 65, date: new Date(`${year}-${mStr}-05T09:15:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Others', description: 'Software subscriptions & tools', amount: 1405, date: new Date(`${year}-${mStr}-05T18:45:00.000Z`), paymentMethod: 'UPI / QR' },
+      { type: 'expense', category: 'Family', description: 'Household provisions', amount: 41, date: new Date(`${year}-${mStr}-06T11:20:00.000Z`), paymentMethod: 'Cash' },
+      // Investment
+      { type: 'investment', category: 'Crypto Portfolio', description: 'Monthly crypto allocation', amount: 2500, date: new Date(`${year}-${mStr}-10T10:00:00.000Z`), paymentMethod: 'Crypto Wallet' }
+    ];
+
+    const inserted = await FinanceEntry.insertMany(sampleEntries);
+    revalidatePath('/finance', 'page');
+    return { success: true, count: inserted.length };
+  } catch (error) {
+    console.error('populateSampleMonthData error:', error);
+    throw error;
+  }
+}
+
+export async function importBatchFinanceEntries(entriesToImport: any[], mode: 'append' | 'replace' = 'append') {
+  await connectToDatabase();
+  try {
+    if (mode === 'replace') {
+      await FinanceEntry.deleteMany({});
+    }
+
+    const sanitized = entriesToImport.map((e) => ({
+      type: e.type || 'expense',
+      category: e.category?.trim() || 'General',
+      description: e.description?.trim() || '',
+      amount: Number(e.amount) || 0,
+      budgetLimit: Number(e.budgetLimit) || 0,
+      date: e.date ? new Date(e.date) : new Date(),
+      paymentMethod: e.paymentMethod || 'UPI / QR',
+      notes: e.notes || '',
+    }));
+
+    const inserted = await FinanceEntry.insertMany(sanitized);
+    revalidatePath('/finance', 'page');
+    return { success: true, count: inserted.length };
+  } catch (error) {
+    console.error('importBatchFinanceEntries error:', error);
+    throw error;
+  }
+}

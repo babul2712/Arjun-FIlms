@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Send, Calendar, User, Phone, MessageSquare, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, Send, Calendar, User, Phone, MessageSquare, Sparkles, CheckCircle2, MapPin, Camera } from 'lucide-react';
 import { toast } from 'sonner';
+import AutoSearchInput from '@/components/ui/AutoSearchInput';
 
 interface QuickInquiryModalProps {
   isOpen: boolean;
@@ -35,13 +36,13 @@ export default function QuickInquiryModal({
     }
 
     const cleanWaNumber = whatsappNumber.replace(/[^0-9]/g, '');
-    const message = `✨ *New Inquiry via Bio Links Page*\n\n` +
-      `👤 *Name:* ${name.trim()}\n` +
-      `📞 *Phone:* ${phone.trim()}\n` +
-      `💍 *Event Type:* ${eventType}\n` +
-      `📅 *Date:* ${eventDate || 'To be decided'}\n` +
-      `📍 *Location / City:* ${city || 'Not specified'}\n` +
-      `📝 *Notes:* ${notes || 'Interested in package options & date check.'}\n\n` +
+    const message = `*New Inquiry via Bio Links Page*\n\n` +
+      `*Name:* ${name.trim()}\n` +
+      `*Phone:* ${phone.trim()}\n` +
+      `*Event Type:* ${eventType}\n` +
+      `*Date:* ${eventDate || 'To be decided'}\n` +
+      `*Location / City:* ${city || 'Not specified'}\n` +
+      `*Notes:* ${notes || 'Interested in package options & date check.'}\n\n` +
       `_Sent from ${studioName} Bio Hub_`;
 
     const waUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(message)}`;
@@ -112,7 +113,7 @@ export default function QuickInquiryModal({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Priya Sharma"
-                    className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-xl py-2.5 pl-10 pr-3 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#e50914]"
+                    className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-2xl py-3 pl-10 pr-3 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#e50914]"
                   />
                 </div>
               </div>
@@ -129,7 +130,7 @@ export default function QuickInquiryModal({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-xl py-2.5 pl-10 pr-3 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#e50914]"
+                    className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-2xl py-3 pl-10 pr-3 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#e50914]"
                   />
                 </div>
               </div>
@@ -137,49 +138,60 @@ export default function QuickInquiryModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Event Type
-                </label>
-                <select
+                <AutoSearchInput
+                  label="Event Type"
                   value={eventType}
-                  onChange={(e) => setEventType(e.target.value)}
-                  className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
-                >
-                  <option value="Wedding Photography & Film">Wedding Photography & Film</option>
-                  <option value="Pre-Wedding Shoot">Pre-Wedding Shoot</option>
-                  <option value="Destination Wedding">Destination Wedding</option>
-                  <option value="Engagement / Reception">Engagement / Reception</option>
-                  <option value="Commercial / Fashion Shoot">Commercial / Fashion Shoot</option>
-                  <option value="Birthday / Anniversary Event">Birthday / Anniversary Event</option>
-                </select>
+                  onChange={(val) => setEventType(val)}
+                  icon={<Camera className="w-4 h-4" />}
+                  options={[
+                    { label: 'Wedding Photography & Film', value: 'Wedding Photography & Film', badge: 'Popular', badgeColor: 'red' },
+                    { label: 'Pre-Wedding Shoot & Story', value: 'Pre-Wedding Shoot & Story', badge: 'Creative', badgeColor: 'purple' },
+                    { label: 'Destination Wedding Masterpiece', value: 'Destination Wedding Masterpiece', badge: 'Luxury', badgeColor: 'amber' },
+                    { label: 'Engagement & Ring Ceremony', value: 'Engagement & Ring Ceremony', badge: 'Event', badgeColor: 'emerald' },
+                    { label: 'Reception & Sangeet Night', value: 'Reception & Sangeet Night', badge: 'Event', badgeColor: 'emerald' },
+                    { label: 'Commercial & Fashion Portfolio', value: 'Commercial & Fashion Portfolio', badge: 'Brand', badgeColor: 'blue' },
+                    { label: 'Birthday & Anniversary Event', value: 'Birthday & Anniversary Event', badge: 'Celebration', badgeColor: 'gray' },
+                  ]}
+                  placeholder="Search or select event..."
+                />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">
                   Event Date (Approx)
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   <input
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-xl py-2.5 pl-10 pr-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
+                    className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-2xl py-3 pl-10 pr-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#e50914]"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                Event City / Venue
-              </label>
-              <input
-                type="text"
+              <AutoSearchInput
+                label="Event City / Venue"
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="e.g. Mumbai, Udaipur, Bhubaneswar, Goa"
-                className="w-full bg-[#1e2229] border border-gray-700/70 focus:border-[#e50914] rounded-xl py-2.5 px-3 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#e50914]"
+                onChange={(val) => setCity(val)}
+                icon={<MapPin className="w-4 h-4" />}
+                options={[
+                  { label: 'Bhubaneswar, Odisha', value: 'Bhubaneswar, Odisha', badge: 'HQ', badgeColor: 'red' },
+                  { label: 'Cuttack, Odisha', value: 'Cuttack, Odisha', badge: 'Twin City', badgeColor: 'blue' },
+                  { label: 'Puri Beach / Heritage Venue', value: 'Puri Beach / Heritage Venue', badge: 'Destination', badgeColor: 'emerald' },
+                  { label: 'Rourkela, Odisha', value: 'Rourkela, Odisha', badge: 'Western', badgeColor: 'gray' },
+                  { label: 'Angul / Dhenkanal', value: 'Angul / Dhenkanal', badge: 'Central', badgeColor: 'gray' },
+                  { label: 'Sambalpur / Jharsuguda', value: 'Sambalpur / Jharsuguda', badge: 'Western', badgeColor: 'gray' },
+                  { label: 'Udaipur Palace, Rajasthan', value: 'Udaipur Palace, Rajasthan', badge: 'Destination', badgeColor: 'amber' },
+                  { label: 'Goa Beach Resort', value: 'Goa Beach Resort', badge: 'Destination', badgeColor: 'emerald' },
+                  { label: 'Kolkata, West Bengal', value: 'Kolkata, West Bengal', badge: 'Metro', badgeColor: 'purple' },
+                  { label: 'Hyderabad, Telangana', value: 'Hyderabad, Telangana', badge: 'Metro', badgeColor: 'purple' },
+                  { label: 'Mumbai / Pune', value: 'Mumbai / Pune', badge: 'Metro', badgeColor: 'purple' },
+                ]}
+                placeholder="Search or type city/venue..."
               />
             </div>
 

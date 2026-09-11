@@ -175,22 +175,60 @@ export default function DashboardSkeleton() {
         {/* Counter Badge */}
         <div className="h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
 
-        {/* Case Cards Grid listing skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-[#16181c] border border-gray-100 dark:border-gray-850 rounded-[32px] p-6 h-[340px] flex flex-col justify-between animate-pulse">
-              <div className="flex justify-between items-start">
-                <div className="space-y-1.5">
-                  <div className="h-5 w-32 bg-gray-200 dark:bg-gray-800 rounded-md" />
-                  <div className="h-3.5 w-24 bg-gray-200 dark:bg-gray-800 rounded-md" />
+        {/* Case Cards Grid listing skeleton (4 cards per row) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="glass-card rounded-[32px] p-5 h-[375px] bg-white dark:bg-[#16181c] border border-gray-100/50 dark:border-gray-800/40 flex flex-col justify-between overflow-hidden relative animate-pulse">
+              {/* Top notch button placeholder */}
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gray-100/70 dark:bg-gray-850/70 rounded-bl-[24px] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-800" />
+              </div>
+
+              {/* Profile details */}
+              <div className="flex items-start justify-between pr-16">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-gray-200 dark:bg-gray-800 shrink-0" />
+                  <div className="space-y-1.5">
+                    <div className="h-4 w-28 bg-gray-200 dark:bg-gray-800 rounded-md" />
+                    <div className="h-3 w-20 bg-gray-100 dark:bg-gray-800/60 rounded-md" />
+                  </div>
                 </div>
-                <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-800" />
               </div>
-              <div className="space-y-2 border-t border-gray-100 dark:border-gray-800/40 pt-4">
-                <div className="h-3 w-full bg-gray-200 dark:bg-gray-800 rounded" />
-                <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-800 rounded" />
+
+              {/* 2x2 grid (Location, Contact, Date, Contract) */}
+              <div className="grid grid-cols-2 gap-3 py-3 border-y border-gray-100 dark:border-gray-800/60 my-1">
+                <div className="space-y-1">
+                  <div className="h-2.5 w-12 bg-gray-100 dark:bg-gray-800/60 rounded" />
+                  <div className="h-3.5 w-20 bg-gray-200 dark:bg-gray-800 rounded" />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-2.5 w-12 bg-gray-100 dark:bg-gray-800/60 rounded" />
+                  <div className="h-3.5 w-20 bg-gray-200 dark:bg-gray-800 rounded" />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-2.5 w-14 bg-gray-100 dark:bg-gray-800/60 rounded" />
+                  <div className="h-3.5 w-18 bg-gray-200 dark:bg-gray-800 rounded" />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-2.5 w-14 bg-gray-100 dark:bg-gray-800/60 rounded" />
+                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-800 rounded" />
+                </div>
               </div>
-              <div className="h-11 w-full bg-gray-200 dark:bg-gray-800 rounded-xl mt-4" />
+
+              {/* Deliverables section */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="h-2.5 w-20 bg-gray-100 dark:bg-gray-800/60 rounded" />
+                  <div className="h-2.5 w-12 bg-gray-100 dark:bg-gray-800/60 rounded" />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="h-6 w-full bg-gray-100 dark:bg-gray-800/40 rounded-xl" />
+                  <div className="h-6 w-full bg-gray-100 dark:bg-gray-800/40 rounded-xl" />
+                </div>
+              </div>
+
+              {/* Bottom CTA Button */}
+              <div className="h-10 w-full bg-gray-100 dark:bg-gray-800/70 rounded-2xl mt-1" />
             </div>
           ))}
         </div>

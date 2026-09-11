@@ -33,7 +33,7 @@ export default function ProjectCard({ project, onSelect, onMilestoneHover, onSta
     try {
       const res = await toggleProjectStar(projId);
       if (res.success) {
-        toast.success(nextStarred ? `⭐ Bookmarked ${project.name}` : `Removed bookmark for ${project.name}`);
+        toast.success(nextStarred ? `Bookmarked ${project.name}` : `Removed bookmark for ${project.name}`);
         if (onStarToggle) {
           onStarToggle(projId, nextStarred);
         }

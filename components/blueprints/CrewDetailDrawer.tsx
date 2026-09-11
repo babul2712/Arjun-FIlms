@@ -22,7 +22,13 @@ import {
   Clock,
   Layers,
   ChevronRight,
-  UserCheck
+  UserCheck,
+  Compass,
+  Radio,
+  Zap,
+  Heart,
+  Scissors,
+  Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -277,37 +283,45 @@ export default function CrewDetailDrawer({
                 </span>
                 {isVideo && (
                   <>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      🎥 Sony FX3 / A7SIII 4K
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Video className="w-3.5 h-3.5 text-blue-500" />
+                      Sony FX3 / A7SIII 4K
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      🕹️ DJI RS3 Pro Gimbal
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Compass className="w-3.5 h-3.5 text-indigo-500" />
+                      DJI RS3 Pro Gimbal
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      🚁 4K Drone Certified
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-sky-500" />
+                      4K Drone Certified
                     </span>
                   </>
                 )}
                 {isPhoto && (
                   <>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      📸 Sony A7IV + GM Lenses
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-amber-500" />
+                      Sony A7IV + GM Lenses
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      ⚡ Profoto / Godox Lighting
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      Profoto / Godox Lighting
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      💍 Candid Wedding Specialist
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Heart className="w-3.5 h-3.5 text-rose-500" />
+                      Candid Wedding Specialist
                     </span>
                   </>
                 )}
                 {isEditor && (
                   <>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      ✂️ DaVinci Resolve Studio
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Scissors className="w-3.5 h-3.5 text-purple-500" />
+                      DaVinci Resolve Studio
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
-                      🎨 Film Emulation & Grading
+                    <span className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-[11px] flex items-center gap-1.5">
+                      <Palette className="w-3.5 h-3.5 text-pink-500" />
+                      Film Emulation & Grading
                     </span>
                   </>
                 )}

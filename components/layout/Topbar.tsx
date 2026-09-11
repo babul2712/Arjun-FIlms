@@ -18,6 +18,7 @@ export default function Topbar() {
     '/payments': 'Payments Verified',
     '/projects': 'Client Cases',
     '/blueprints': 'Crew Blueprint Database',
+    '/finance': 'Financial Hub & Analytics',
     '/social-links': 'Bio & Social Links Manager',
     '/profile': 'Studio Profile & Settings',
   };
@@ -26,7 +27,7 @@ export default function Topbar() {
     (pathname.startsWith('/projects/') ? 'Project Details' : 'Arjun Photography CRM');
 
   return (
-    <header className="flex justify-between items-center px-6 md:px-8 h-20 w-full bg-transparent sticky top-0 z-40 gap-4">
+    <header className="flex justify-between items-center px-6 md:px-10 h-20 w-full bg-transparent sticky top-0 z-40 gap-4">
       {/* Title */}
       <div className="shrink-0">
         <h2 className="text-[18px] md:text-[20px] font-extrabold text-gray-800 dark:text-white tracking-tight">{currentTitle}</h2>

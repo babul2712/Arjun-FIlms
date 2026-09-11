@@ -31,7 +31,11 @@ import {
   Award,
   CheckCircle2,
   Share2,
-  Type
+  Type,
+  Wallet,
+  Flame,
+  CheckCheck,
+  BarChart3
 } from 'lucide-react';
 import { getBioProfileAdmin, updateBioProfile, getStudioStatsAction } from '@/app/actions';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
@@ -39,7 +43,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useUIStore, SITE_FONTS, SiteFontId, THEME_COLORS, ThemeColorId } from '@/store/uiStore';
 import { toast } from 'sonner';
 
-type TabType = 'identity' | 'contact' | 'billing' | 'security' | 'appearance';
+type TabType = 'identity' | 'billing' | 'appearance';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<TabType>('identity');
@@ -50,7 +54,8 @@ export default function ProfilePage() {
 
   // Auth & UI Store
   const user = useAuthStore((state) => state.user);
-  const { theme, toggleTheme, siteFont, setSiteFont, themeColor, setThemeColor } = useUIStore();
+  const updateUser = useAuthStore((state) => state.updateUser);
+  const { theme, toggleTheme, siteFont, setSiteFont, themeColor, setThemeColor, setUserAvatar } = useUIStore();
 
   // Studio Profile Form State
   const [formData, setFormData] = useState({
@@ -139,6 +144,10 @@ export default function ProfilePage() {
           themeColor: loadedThemeColor,
         });
 
+        if (profileRes.avatar) {
+          setUserAvatar(profileRes.avatar);
+          updateUser({ avatar: profileRes.avatar, name: profileRes.ownerName || profileRes.studioName });
+        }
         if (profileRes.fontFamily) {
           setSiteFont(loadedFont);
         }
@@ -165,6 +174,10 @@ export default function ProfilePage() {
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'avatar' && value) {
+      setUserAvatar(value);
+      updateUser({ avatar: value });
+    }
     setIsDirty(true);
   };
 
@@ -174,6 +187,10 @@ export default function ProfilePage() {
     try {
       const res = await updateBioProfile(formData, 'arjunfilms');
       if (res.success) {
+        if (formData.avatar) {
+          setUserAvatar(formData.avatar);
+          updateUser({ avatar: formData.avatar, name: formData.ownerName || formData.studioName });
+        }
         if (formData.fontFamily) {
           setSiteFont(formData.fontFamily as SiteFontId);
         }
@@ -203,15 +220,13 @@ export default function ProfilePage() {
   };
 
   const tabs: { id: TabType; label: string; icon: any; badge?: string }[] = [
-    { id: 'identity', label: 'Studio Identity', icon: Building2 },
-    { id: 'contact', label: 'Contact & Location', icon: MapPin },
-    { id: 'billing', label: 'Billing & Invoicing', icon: CreditCard },
-    { id: 'security', label: 'Security & Access', icon: ShieldCheck },
+    { id: 'identity', label: 'Studio Identity & Contact', icon: Building2 },
+    { id: 'billing', label: 'Billing, Invoicing & Security', icon: CreditCard },
     { id: 'appearance', label: 'Theme & Defaults', icon: Palette },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-28 animate-fade-in text-gray-800 dark:text-gray-100">
+    <div className="w-full space-y-8 pb-28 animate-fade-in text-gray-800 dark:text-gray-100">
       {/* Hero Studio Banner & Profile Header */}
       <div className="relative rounded-[40px] overflow-hidden bg-white dark:bg-[#15181e] border border-[#fee2e2]/70 dark:border-gray-800 shadow-xl shadow-red-500/5 transition-all">
         {/* Cover Image */}
@@ -269,9 +284,9 @@ export default function ProfilePage() {
               </div>
 
               {/* Title & Tagline */}
-              <div className="space-y-1.5 pt-2">
+              <div className="-space-y-2 pt-2">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                  <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight ">
                     {formData.studioName}
                   </h1>
                   {formData.verified && (
@@ -284,7 +299,7 @@ export default function ProfilePage() {
                     Owner: {formData.ownerName}
                   </span>
                 </div>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium max-w-2xl line-clamp-2">
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium max-w-2xl line-clamp-2 mt-1">
                   {formData.tagline}
                 </p>
               </div>
@@ -314,57 +329,169 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 mt-8 pt-6 border-t border-gray-150 dark:border-gray-800/80 text-[13px]">
-            <div className="bg-[#fef2f2]/60 dark:bg-red-950/20 border border-[#fee2e2] dark:border-red-950/40 rounded-2xl p-3.5">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Briefcase className="w-3.5 h-3.5 text-[#e50914]" />
-                Total Cases
-              </span>
-              <div className="text-[20px] font-black text-gray-900 dark:text-white mt-1">
-                {stats.totalProjects}
+          {/* Quick Metrics Bar - 5-Card Bento Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 md:gap-4 mt-8 pt-6 border-t border-gray-150 dark:border-gray-800/80">
+            
+            {/* Box 1: Total Cases */}
+            <div className="group relative overflow-hidden rounded-[24px] bg-gradient-to-br from-red-500/[0.07] via-white to-red-500/[0.02] dark:from-[#201418] dark:via-[#15181e] dark:to-[#101216] border border-red-500/20 dark:border-red-900/35 hover:border-[#e50914]/60 p-4 shadow-xs hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+              <div className="absolute -top-8 -right-8 w-20 h-20 bg-red-500/15 dark:bg-red-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-red-500/30 transition-all" />
+              
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#e50914] animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Total Cases
+                    </span>
+                  </div>
+                  <div className="text-[26px] font-black text-gray-900 dark:text-white leading-none tracking-tight mt-2">
+                    {stats.totalProjects}
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#e50914] to-red-600 text-white flex items-center justify-center shadow-md shadow-red-500/25 group-hover:scale-105 transition-transform">
+                  <Briefcase className="w-4.5 h-4.5 stroke-[2.2]" />
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-3 pt-2.5 border-t border-red-100/60 dark:border-red-950/60 flex items-center justify-between text-[10.5px]">
+                <span className="text-gray-500 dark:text-gray-400 font-bold">
+                  Portfolio
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9.5px] font-black text-[#e50914] bg-red-50 dark:bg-red-950/60 px-2 py-0.5 rounded-full border border-red-200/60 dark:border-red-900/50">
+                  <Flame className="w-2.5 h-2.5" />
+                  Live Cases
+                </span>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800/50 border border-gray-200/60 dark:border-gray-800 rounded-2xl p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-blue-500" />
-                Crew Blueprints
-              </span>
-              <div className="text-[20px] font-black text-gray-900 dark:text-white mt-1">
-                {stats.totalCrew}
+            {/* Box 2: Crew Blueprints */}
+            <div className="group relative overflow-hidden rounded-[24px] bg-gradient-to-br from-blue-500/[0.07] via-white to-blue-500/[0.02] dark:from-[#141b24] dark:via-[#15181e] dark:to-[#101216] border border-blue-500/20 dark:border-blue-900/35 hover:border-blue-500/60 p-4 shadow-xs hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+              <div className="absolute -top-8 -right-8 w-20 h-20 bg-blue-500/15 dark:bg-blue-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-blue-500/30 transition-all" />
+              
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Crew Blueprints
+                    </span>
+                  </div>
+                  <div className="text-[26px] font-black text-blue-600 dark:text-blue-400 leading-none tracking-tight mt-2">
+                    {stats.totalCrew}
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
+                  <Users className="w-4.5 h-4.5 stroke-[2.2]" />
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-3 pt-2.5 border-t border-blue-100/60 dark:border-blue-950/60 flex items-center justify-between text-[10.5px]">
+                <span className="text-gray-500 dark:text-gray-400 font-bold">
+                  Roster
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9.5px] font-black text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200/60 dark:border-blue-900/50">
+                  <CheckCheck className="w-2.5 h-2.5" />
+                  Active Crew
+                </span>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800/50 border border-gray-200/60 dark:border-gray-800 rounded-2xl p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-purple-500" />
-                Quotations
-              </span>
-              <div className="text-[20px] font-black text-gray-900 dark:text-white mt-1">
-                {stats.totalQuotations}
+            {/* Box 3: Quotations */}
+            <div className="group relative overflow-hidden rounded-[24px] bg-gradient-to-br from-purple-500/[0.07] via-white to-purple-500/[0.02] dark:from-[#1d1424] dark:via-[#15181e] dark:to-[#101216] border border-purple-500/20 dark:border-purple-900/35 hover:border-purple-500/60 p-4 shadow-xs hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+              <div className="absolute -top-8 -right-8 w-20 h-20 bg-purple-500/15 dark:bg-purple-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/30 transition-all" />
+              
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Quotations
+                    </span>
+                  </div>
+                  <div className="text-[26px] font-black text-purple-600 dark:text-purple-400 leading-none tracking-tight mt-2">
+                    {stats.totalQuotations}
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 to-violet-600 text-white flex items-center justify-center shadow-md shadow-purple-500/25 group-hover:scale-105 transition-transform">
+                  <FileText className="w-4.5 h-4.5 stroke-[2.2]" />
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-3 pt-2.5 border-t border-purple-100/60 dark:border-purple-950/60 flex items-center justify-between text-[10.5px]">
+                <span className="text-gray-500 dark:text-gray-400 font-bold">
+                  Pipeline
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9.5px] font-black text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-900/50">
+                  <BarChart3 className="w-2.5 h-2.5" />
+                  Proposals
+                </span>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800/50 border border-gray-200/60 dark:border-gray-800 rounded-2xl p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                Revenue Collections
-              </span>
-              <div className="text-[20px] font-black text-gray-900 dark:text-white mt-1 truncate">
-                ₹{stats.totalCollected.toLocaleString('en-IN')}
+            {/* Box 4: Revenue Collections */}
+            <div className="group relative overflow-hidden rounded-[24px] bg-gradient-to-br from-emerald-500/[0.07] via-white to-emerald-500/[0.02] dark:from-[#132018] dark:via-[#15181e] dark:to-[#101216] border border-emerald-500/20 dark:border-emerald-900/35 hover:border-emerald-500/60 p-4 shadow-xs hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+              <div className="absolute -top-8 -right-8 w-20 h-20 bg-emerald-500/15 dark:bg-emerald-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-500/30 transition-all" />
+              
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Revenue Collections
+                    </span>
+                  </div>
+                  <div className="text-[26px] font-black text-emerald-600 dark:text-emerald-400 leading-none tracking-tight mt-2 truncate">
+                    ₹{stats.totalCollected.toLocaleString('en-IN')}
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:scale-105 transition-transform">
+                  <Wallet className="w-4.5 h-4.5 stroke-[2.2]" />
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-3 pt-2.5 border-t border-emerald-100/60 dark:border-emerald-950/60 flex items-center justify-between text-[10.5px]">
+                <span className="text-gray-500 dark:text-gray-400 font-bold">
+                  Inflow
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9.5px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-900/50">
+                  <TrendingUp className="w-2.5 h-2.5" />
+                  Verified
+                </span>
               </div>
             </div>
 
-            <div className="col-span-2 sm:col-span-1 bg-white dark:bg-gray-800/50 border border-gray-200/60 dark:border-gray-800 rounded-2xl p-3.5 shadow-xs">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5 text-amber-500" />
-                Bio Page Views
-              </span>
-              <div className="text-[20px] font-black text-gray-900 dark:text-white mt-1">
-                {stats.bioViews}
+            {/* Box 5: Bio Page Views */}
+            <div className="group relative overflow-hidden rounded-[24px] bg-gradient-to-br from-amber-500/[0.07] via-white to-amber-500/[0.02] dark:from-[#201b12] dark:via-[#15181e] dark:to-[#101216] border border-amber-500/20 dark:border-amber-900/35 hover:border-amber-500/60 p-4 shadow-xs hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between col-span-1 sm:col-span-2 lg:col-span-1">
+              <div className="absolute -top-8 -right-8 w-20 h-20 bg-amber-500/15 dark:bg-amber-500/20 rounded-full blur-xl pointer-events-none group-hover:bg-amber-500/30 transition-all" />
+              
+              <div className="relative z-10 flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Bio Page Views
+                    </span>
+                  </div>
+                  <div className="text-[26px] font-black text-amber-600 dark:text-amber-400 leading-none tracking-tight mt-2">
+                    {stats.bioViews.toLocaleString('en-IN')}
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-105 transition-transform">
+                  <Eye className="w-4.5 h-4.5 stroke-[2.2]" />
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-3 pt-2.5 border-t border-amber-100/60 dark:border-amber-950/60 flex items-center justify-between text-[10.5px]">
+                <span className="text-gray-500 dark:text-gray-400 font-bold">
+                  Reach
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9.5px] font-black text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/50">
+                  <Share2 className="w-2.5 h-2.5" />
+                  Public Bio
+                </span>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -394,468 +521,484 @@ export default function ProfilePage() {
 
       {/* Main Tab Content Card */}
       <form onSubmit={handleSave} className="space-y-6">
-        {/* TAB 1: STUDIO IDENTITY & BRANDING */}
+        {/* TAB 1: STUDIO IDENTITY & CONTACT & LOCATION (SIDE BY SIDE) */}
         {activeTab === 'identity' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
-              <div className="border-b border-gray-150 dark:border-gray-800 pb-4 flex items-center justify-between">
-                <div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in items-start">
+            {/* LEFT COLUMN: STUDIO IDENTITY & BRANDING (7 Cols on LG) */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
+                <div className="border-b border-gray-150 dark:border-gray-800 pb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-[#e50914]" />
+                      Studio Visual Branding
+                    </h3>
+                    <p className="text-[12px] text-gray-400 font-medium mt-0.5">
+                      Upload official logos, cover photography, and configure public studio identifiers.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Uploads Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Logo / Avatar */}
+                  <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-4 flex flex-col items-center justify-between text-center min-h-[210px]">
+                    <div>
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                        Studio Logo / Icon
+                      </span>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium mb-2">
+                        Avatar & branding
+                      </p>
+                    </div>
+                    <div className="w-full flex justify-center py-1">
+                      <CloudinaryUpload
+                        value={formData.avatar}
+                        onChange={(url) => handleChange('avatar', url)}
+                        variant="avatar"
+                        folder="branding"
+                      />
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-semibold mt-2">
+                      Square 1:1 image
+                    </p>
+                  </div>
+
+                  {/* Banner / Cover */}
+                  <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-4 flex flex-col items-center justify-between text-center min-h-[210px]">
+                    <div>
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                        Hero Banner Photo
+                      </span>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium mb-2">
+                        Public bio & portals
+                      </p>
+                    </div>
+                    <div className="w-full flex justify-center py-1">
+                      <CloudinaryUpload
+                        value={formData.coverImage}
+                        onChange={(url) => handleChange('coverImage', url)}
+                        variant="banner"
+                        folder="branding"
+                      />
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-semibold mt-2">
+                      Wide 16:9 landscape banner
+                    </p>
+                  </div>
+
+                  {/* Watermark */}
+                  <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-4 flex flex-col items-center justify-between text-center min-h-[210px]">
+                    <div>
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                        Invoice Watermark
+                      </span>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium mb-2">
+                        Stamped on PDFs
+                      </p>
+                    </div>
+                    <div className="w-full flex justify-center py-1">
+                      <CloudinaryUpload
+                        value={formData.watermarkUrl}
+                        onChange={(url) => handleChange('watermarkUrl', url)}
+                        variant="watermark"
+                        folder="quotations"
+                      />
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-semibold mt-2">
+                      Transparent PNG watermark
+                    </p>
+                  </div>
+                </div>
+
+                {/* Text Fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                      Official Studio Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.studioName}
+                      onChange={(e) => handleChange('studioName', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
+                      placeholder="e.g. Arjun Films & Photography"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                      Studio Owner / Founder Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.ownerName}
+                      onChange={(e) => handleChange('ownerName', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
+                      placeholder="e.g. Arjun Samal"
+                    />
+                  </div>
+
+                  <div className="col-span-1 sm:col-span-2 space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                      Studio Tagline & Specialties
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.tagline}
+                      onChange={(e) => handleChange('tagline', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
+                      placeholder="e.g. Cinematic Weddings • Luxury Portfolios • Commercials"
+                    />
+                  </div>
+
+                  <div className="col-span-1 sm:col-span-2 space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                      Studio Biography & Story
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.bio}
+                      onChange={(e) => handleChange('bio', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-[13px] font-medium text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
+                      placeholder="Introduce your visual storytelling philosophy, gear, awards, and experience..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: CONTACT & OFFICIAL LOCATION (5 Cols on LG) */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
+                <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
                   <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-[#e50914]" />
-                    Studio Visual Branding
+                    <MapPin className="w-5 h-5 text-[#e50914]" />
+                    Direct Contact & Studio HQ
                   </h3>
                   <p className="text-[12px] text-gray-400 font-medium mt-0.5">
-                    Upload official logos, cover photography, and configure public studio identifiers.
-                  </p>
-                </div>
-              </div>
-
-              {/* Uploads Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Logo / Avatar */}
-                <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-5 flex flex-col items-center justify-center text-center">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4">
-                    Studio Logo / Icon
-                  </span>
-                  <CloudinaryUpload
-                    value={formData.avatar}
-                    onChange={(url) => handleChange('avatar', url)}
-                    variant="avatar"
-                    folder="branding"
-                    label="Studio Logo"
-                  />
-                  <p className="text-[11px] text-gray-400 font-semibold mt-4">
-                    Square 1:1 image recommended (PNG or JPG).
+                    These details populate invoices, receipts, and public client inquiry triggers.
                   </p>
                 </div>
 
-                {/* Banner / Cover */}
-                <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-5 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                      Hero Banner Photo
-                    </span>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-3">
-                      Displayed on public bio link `/links` and client portals.
-                    </p>
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-gray-400" />
+                      Primary Studio Hotline
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                      placeholder="+91 77889 92712"
+                    />
                   </div>
-                  <CloudinaryUpload
-                    value={formData.coverImage}
-                    onChange={(url) => handleChange('coverImage', url)}
-                    variant="compact"
-                    folder="branding"
-                    label="Header Banner"
-                  />
-                </div>
 
-                {/* Watermark */}
-                <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-5 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                      Quotation Watermark / Stamp
-                    </span>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-3">
-                      Transparent PNG logo stamped across generated PDF invoices.
-                    </p>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
+                      WhatsApp Business Number
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.whatsapp}
+                      onChange={(e) => handleChange('whatsapp', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                      placeholder="917788992712"
+                    />
                   </div>
-                  <CloudinaryUpload
-                    value={formData.watermarkUrl}
-                    onChange={(url) => handleChange('watermarkUrl', url)}
-                    variant="compact"
-                    folder="quotations"
-                    label="Watermark PNG"
-                  />
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-gray-400" />
+                      Official Client Inquiries Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => handleChange('email', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                      placeholder="arjunphotographyyy@gmail.com"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-gray-400" />
+                      Official Website URL
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => handleChange('website', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                      placeholder="https://arjunfilms.com"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                      Studio Physical Address & City
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => handleChange('location', e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                      placeholder="Bhubaneswar, Odisha, India"
+                    />
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
 
-              {/* Text Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                    Official Studio Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.studioName}
-                    onChange={(e) => handleChange('studioName', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
-                    placeholder="e.g. Arjun Films & Photography"
-                  />
+        {/* TAB 2: BILLING, INVOICING & SECURITY (SIDE BY SIDE) */}
+        {activeTab === 'billing' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in items-start">
+            {/* LEFT COLUMN: INVOICING, BANKING & UPI SETUP (7 Cols on LG) */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
+                <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
+                  <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-[#e50914]" />
+                    Invoicing, Banking & UPI Checkout Setup
+                  </h3>
+                  <p className="text-[12px] text-gray-400 font-medium mt-0.5">
+                    Configure default payment collection channels, bank account details, and quotation payment clauses.
+                  </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                    Studio Owner / Founder Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.ownerName}
-                    onChange={(e) => handleChange('ownerName', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
-                    placeholder="e.g. Arjun Samal"
-                  />
+                {/* UPI QR & ID Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-5 flex flex-col justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+                        <QrCode className="w-4 h-4 text-[#e50914]" />
+                        Payment QR Code Image
+                      </span>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-3">
+                        Shown to clients on `/payment` page for instant UPI scanning.
+                      </p>
+                    </div>
+                    <CloudinaryUpload
+                      value={formData.upiQrCode}
+                      onChange={(url) => handleChange('upiQrCode', url)}
+                      variant="compact"
+                      folder="payments"
+                      label="Payment QR Code"
+                    />
+                  </div>
+
+                  <div className="col-span-1 md:col-span-2 space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                        Primary UPI VPA ID
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.upiId}
+                        onChange={(e) => handleChange('upiId', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                        placeholder="e.g. 7788992712@upi or arjunphotography@okaxis"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                          GSTIN Number (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.gstin}
+                          onChange={(e) => handleChange('gstin', e.target.value)}
+                          className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                          placeholder="21AAAAA0000A1Z5"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                          PAN Number (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.panNumber}
+                          onChange={(e) => handleChange('panNumber', e.target.value)}
+                          className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                          placeholder="ABCDE1234F"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="col-span-1 md:col-span-2 space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                    Studio Tagline & Specialties
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.tagline}
-                    onChange={(e) => handleChange('tagline', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
-                    placeholder="e.g. Cinematic Weddings • Luxury Portfolios • Commercials"
-                  />
+                {/* Bank Account Details */}
+                <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-4">
+                  <h4 className="text-[14px] font-extrabold text-gray-800 dark:text-white">
+                    Studio Bank Account for NEFT / RTGS / IMPS
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                        Beneficiary Name
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.bankAccountName}
+                        onChange={(e) => handleChange('bankAccountName', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                        placeholder="Arjun Photography"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                        Bank Name
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.bankName}
+                        onChange={(e) => handleChange('bankName', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                        placeholder="State Bank of India"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                        Account Number
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.bankAccountNumber}
+                        onChange={(e) => handleChange('bankAccountNumber', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                        placeholder="9876543210123"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                        IFSC Code
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.bankIfsc}
+                        onChange={(e) => handleChange('bankIfsc', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                        placeholder="SBIN0001234"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="col-span-1 md:col-span-2 space-y-1.5">
+                {/* Quotation Default Terms */}
+                <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-2">
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                    Studio Biography & Story
+                    Default Invoicing & Quotation Payment Terms
                   </label>
                   <textarea
                     rows={3}
-                    value={formData.bio}
-                    onChange={(e) => handleChange('bio', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-[13px] font-medium text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-[#e50914]"
-                    placeholder="Introduce your visual storytelling philosophy, gear, awards, and experience..."
+                    value={formData.defaultPaymentTerms}
+                    onChange={(e) => handleChange('defaultPaymentTerms', e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-[13px] font-medium text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
+                    placeholder="Enter payment stages, advance % requirement, and delivery policies..."
                   />
                 </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* TAB 2: CONTACT & OFFICIAL LOCATION */}
-        {activeTab === 'contact' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
-              <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
-                <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-[#e50914]" />
-                  Direct Contact & Studio HQ Location
-                </h3>
-                <p className="text-[12px] text-gray-400 font-medium mt-0.5">
-                  These details populate PDF quotation headers, customer payment receipts, and public inquiry triggers.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-gray-400" />
-                    Primary Studio Hotline
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                    placeholder="+91 77889 92712"
-                  />
+            {/* RIGHT COLUMN: SECURITY & ACCESS CREDENTIALS (5 Cols on LG) */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
+                <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
+                  <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-[#e50914]" />
+                    Administrator Security & Login Access
+                  </h3>
+                  <p className="text-[12px] text-gray-400 font-medium mt-0.5">
+                    Two-factor authentication with Resend Email OTP verification is active on this system.
+                  </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    WhatsApp Business Number (without + or dashes)
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.whatsapp}
-                    onChange={(e) => handleChange('whatsapp', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                    placeholder="917788992712"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-gray-400" />
-                    Official Client Inquiries Email
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                    placeholder="arjunphotographyyy@gmail.com"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-gray-400" />
-                    Official Website URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => handleChange('website', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                    placeholder="https://arjunfilms.com"
-                  />
-                </div>
-
-                <div className="col-span-1 md:col-span-2 space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                    Studio Physical Address & Base City
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => handleChange('location', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                    placeholder="Bhubaneswar, Odisha, India"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: BILLING, INVOICING & BANKING */}
-        {activeTab === 'billing' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
-              <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
-                <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-[#e50914]" />
-                  Invoicing, Banking & UPI Checkout Setup
-                </h3>
-                <p className="text-[12px] text-gray-400 font-medium mt-0.5">
-                  Configure default payment collection channels, bank account details, and quotation payment clauses.
-                </p>
-              </div>
-
-              {/* UPI QR & ID Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#fdf6f6]/60 dark:bg-gray-900/40 border border-[#fee2e2] dark:border-gray-800 rounded-3xl p-5 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
-                      <QrCode className="w-4 h-4 text-[#e50914]" />
-                      Payment QR Code Image
-                    </span>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-3">
-                      Shown to clients on `/payment` page for instant UPI scanning.
-                    </p>
+                {/* Security Status Box */}
+                <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-3xl p-5 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md shrink-0">
+                      <ShieldCheck className="w-6 h-6 stroke-[2.5]" />
+                    </div>
+                    <div>
+                      <h4 className="text-[14px] font-extrabold text-emerald-950 dark:text-emerald-200">
+                        Two-Factor Email OTP Active
+                      </h4>
+                      <p className="text-[12px] text-emerald-700 dark:text-emerald-400 font-medium">
+                        One-time login codes are sent to <span className="font-bold">{formData.email}</span>.
+                      </p>
+                    </div>
                   </div>
-                  <CloudinaryUpload
-                    value={formData.upiQrCode}
-                    onChange={(url) => handleChange('upiQrCode', url)}
-                    variant="compact"
-                    folder="payments"
-                    label="Payment QR Code"
-                  />
+                  <span className="px-3 py-1 bg-emerald-500 text-white text-[11px] font-extrabold rounded-full uppercase tracking-wider">
+                    Protected
+                  </span>
                 </div>
 
-                <div className="col-span-1 md:col-span-2 space-y-4">
+                {/* Admin Username & Notification Email */}
+                <div className="space-y-4 pt-2">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                      Primary UPI VPA ID
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-gray-400" />
+                      Admin Login Identifier
                     </label>
                     <input
                       type="text"
-                      value={formData.upiId}
-                      onChange={(e) => handleChange('upiId', e.target.value)}
+                      disabled
+                      value={securityForm.username}
+                      className="w-full bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-bold text-gray-600 dark:text-gray-300 cursor-not-allowed"
+                    />
+                    <span className="text-[10px] text-gray-400 block">Configured via environment security profile.</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-gray-400" />
+                      OTP Delivery Inbox
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleChange('email', e.target.value)}
                       className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                      placeholder="e.g. 7788992712@upi or arjunphotography@okaxis"
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                        GSTIN Number (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.gstin}
-                        onChange={(e) => handleChange('gstin', e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                        placeholder="21AAAAA0000A1Z5"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                        PAN Number (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.panNumber}
-                        onChange={(e) => handleChange('panNumber', e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                        placeholder="ABCDE1234F"
-                      />
-                    </div>
+                    <span className="text-[10px] text-gray-400 block">OTPs and security alerts are dispatched to this inbox.</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Bank Account Details */}
-              <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-4">
-                <h4 className="text-[14px] font-extrabold text-gray-800 dark:text-white">
-                  Studio Bank Account for NEFT / RTGS / IMPS
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                      Beneficiary Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.bankAccountName}
-                      onChange={(e) => handleChange('bankAccountName', e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                      placeholder="Arjun Photography"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                      Bank Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.bankName}
-                      onChange={(e) => handleChange('bankName', e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                      placeholder="State Bank of India"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                      Account Number
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.bankAccountNumber}
-                      onChange={(e) => handleChange('bankAccountNumber', e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                      placeholder="9876543210123"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                      IFSC Code
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.bankIfsc}
-                      onChange={(e) => handleChange('bankIfsc', e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                      placeholder="SBIN0001234"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Quotation Default Terms */}
-              <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-2">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                  Default Invoicing & Quotation Payment Terms
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.defaultPaymentTerms}
-                  onChange={(e) => handleChange('defaultPaymentTerms', e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-[13px] font-medium text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                  placeholder="Enter payment stages, advance % requirement, and delivery policies..."
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: SECURITY & ACCESS CREDENTIALS */}
-        {activeTab === 'security' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
-              <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
-                <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-[#e50914]" />
-                  Administrator Security & Login Access
-                </h3>
-                <p className="text-[12px] text-gray-400 font-medium mt-0.5">
-                  Two-factor authentication with Resend Email OTP verification is active on this system.
-                </p>
-              </div>
-
-              {/* Security Status Box */}
-              <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-3xl p-5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-md shrink-0">
-                    <ShieldCheck className="w-6 h-6 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h4 className="text-[14px] font-extrabold text-emerald-950 dark:text-emerald-200">
-                      Two-Factor Email OTP Authentication Active
-                    </h4>
-                    <p className="text-[12px] text-emerald-700 dark:text-emerald-400 font-medium">
-                      One-time login codes are automatically sent to <span className="font-bold">{formData.email}</span>.
-                    </p>
-                  </div>
-                </div>
-                <span className="px-3 py-1 bg-emerald-500 text-white text-[11px] font-extrabold rounded-full uppercase tracking-wider">
-                  Protected
-                </span>
-              </div>
-
-              {/* Admin Username & Notification Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-gray-400" />
-                    Admin Login Identifier
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={securityForm.username}
-                    className="w-full bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-bold text-gray-600 dark:text-gray-300 cursor-not-allowed"
-                  />
-                  <span className="text-[10px] text-gray-400 block">Configured via environment security profile.</span>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-gray-400" />
-                    OTP Delivery Inbox
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    className="w-full bg-gray-50 dark:bg-[#1c1f26] border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-[13px] font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#e50914]"
-                  />
-                  <span className="text-[10px] text-gray-400 block">OTPs and booking alerts are dispatched here.</span>
-                </div>
-              </div>
-
-              {/* Security Audit Information */}
-              <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-3 text-[12px]">
-                <h4 className="font-extrabold text-gray-800 dark:text-white text-[13px]">
-                  Recent Security Activity
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-150 dark:border-gray-800">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <div>
-                        <span className="font-bold text-gray-800 dark:text-gray-200 block">Current Active Session (Admin)</span>
-                        <span className="text-gray-400 text-[11px]">Next.js Turbopack Session • Mac OS</span>
+                {/* Security Audit Information */}
+                <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-3 text-[12px]">
+                  <h4 className="font-extrabold text-gray-800 dark:text-white text-[13px]">
+                    Recent Security Activity
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-150 dark:border-gray-800">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <div>
+                          <span className="font-bold text-gray-800 dark:text-gray-200 block">Current Active Session (Admin)</span>
+                          <span className="text-gray-400 text-[11px]">Next.js Turbopack Session • Mac OS</span>
+                        </div>
                       </div>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">Active Now</span>
                     </div>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">Active Now</span>
                   </div>
                 </div>
               </div>

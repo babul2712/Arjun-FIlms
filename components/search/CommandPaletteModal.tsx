@@ -34,9 +34,9 @@ export default function CommandPaletteModal() {
       />
 
       {/* Main Omnibar Window */}
-      <div className="relative w-full max-w-2xl bg-white dark:bg-[#15181e] border border-[#fee2e2]/80 dark:border-gray-800 rounded-[32px] shadow-2xl shadow-red-500/10 overflow-hidden z-10 flex flex-col animate-slide-in">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-[#15181e] border border-[#fee2e2]/80 dark:border-gray-800 rounded-[32px] shadow-2xl shadow-red-500/10 overflow-hidden z-10 flex flex-col max-h-[85vh] h-[580px] animate-slide-in">
         {/* Modal Top Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-2 border-b border-gray-150 dark:border-gray-800/80">
+        <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-150 dark:border-gray-800/80 shrink-0">
           <div className="flex items-center gap-2 text-[12px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             <Command className="w-4 h-4 text-[#e50914]" />
             <span>Studio Omnibar • Universal Auto Search</span>
@@ -52,7 +52,7 @@ export default function CommandPaletteModal() {
         </div>
 
         {/* Search Bar Input Container */}
-        <div className="p-4">
+        <div className="p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
           <UniversalSearchBar
             variant="hero"
             autoFocus
