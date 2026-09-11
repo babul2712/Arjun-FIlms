@@ -19,6 +19,7 @@ import { createQuotation, updateQuotation, getEventTypes, createEventType, getPr
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { AVAILABLE_TEMPLATES, generateQuotationHTML } from '@/lib/quotationTemplates';
+import EventTypeSelect from '@/components/ui/EventTypeSelect';
 
 export default function QuotationForm({ initialData, quotationId, projectId }: { initialData?: any, quotationId?: string, projectId?: string }) {
   const router = useRouter();
@@ -373,16 +374,10 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Event Type</label>
-              <select 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px] cursor-pointer"
+              <EventTypeSelect 
                 value={formData.eventType}
-                onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-              >
-                <option value="Wedding Ceremony">Wedding Ceremony</option>
-                <option value="Corporate Shoot">Corporate Shoot</option>
-                <option value="Commercial Session">Commercial Session</option>
-                <option value="Pre-wedding Session">Pre-wedding Session</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, eventType: val })}
+              />
             </div>
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Event Date</label>

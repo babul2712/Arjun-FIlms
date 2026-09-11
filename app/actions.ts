@@ -18,24 +18,47 @@ import { generateOTPEmailHtml } from '@/lib/emailTemplates';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'default_key');
 
+const PREDEFINED_EVENT_TYPES = [
+  'Wedding Ceremony',
+  'Pre-wedding Shoot',
+  'Destination Wedding',
+  'Engagement / Reception',
+  'Corporate Shoot',
+  'Commercial & Fashion Session',
+  'Maternity & Newborn Shoot',
+  'Birthday & Anniversary Event',
+];
+
 export async function getEventTypes() {
   try {
     await connectToDatabase();
-    const types = await EventType.find({}).sort({ name: 1 }).lean();
+    let types = await EventType.find({}).sort({ name: 1 }).lean();
+    if (!types || types.length === 0) {
+      // Seed predefined standard event types
+      await EventType.insertMany(PREDEFINED_EVENT_TYPES.map((name) => ({ name })));
+      types = await EventType.find({}).sort({ name: 1 }).lean();
+    }
     return JSON.parse(JSON.stringify(types));
   } catch (e) {
     console.error('getEventTypes error:', e);
-    return [];
+    return PREDEFINED_EVENT_TYPES.map((name) => ({ _id: name, name }));
   }
 }
 
 export async function createEventType(name: string) {
+  const trimmed = (name || '').trim();
+  if (!trimmed) throw new Error('Event type name is required');
   await connectToDatabase();
   try {
-    const type = await EventType.create({ name });
+    const existing = await EventType.findOne({ name: { $regex: new RegExp(`^${trimmed}$`, 'i') } }).lean();
+    if (existing) return JSON.parse(JSON.stringify(existing));
+
+    const type = await EventType.create({ name: trimmed });
+    revalidatePath('/quotations', 'layout');
+    revalidatePath('/projects', 'layout');
     return JSON.parse(JSON.stringify(type));
   } catch (e) {
-    const existing = await EventType.findOne({ name }).lean();
+    const existing = await EventType.findOne({ name: trimmed }).lean();
     if (existing) return JSON.parse(JSON.stringify(existing));
     throw e;
   }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { createProject, getEventTypes, createEventType } from '@/app/actions';
+import EventTypeSelect from '@/components/ui/EventTypeSelect';
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -131,58 +132,11 @@ export default function CreateProjectPage() {
           </div>
           <div className="flex flex-col">
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Event Type *</label>
-            <div className="flex items-center gap-2">
-              {!isCustomEvent ? (
-                <select 
-                  value={formData.eventType} 
-                  onChange={(e) => {
-                    if (e.target.value === 'CUSTOM') {
-                      setIsCustomEvent(true);
-                      setFormData(prev => ({ ...prev, eventType: '' }));
-                    } else {
-                      handleChange(e);
-                    }
-                  }}
-                  name="eventType"
-                  className="w-full bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[16px] cursor-pointer"
-                >
-                  <option value="">Select event type...</option>
-                  {eventTypes.map((t: any) => (
-                    <option key={t._id} value={t.name}>{t.name}</option>
-                  ))}
-                  {eventTypes.length === 0 && (
-                    <>
-                      <option value="Wedding Shoot">Wedding Shoot</option>
-                      <option value="Corporate Shoot">Corporate Shoot</option>
-                      <option value="Commercial Session">Commercial Session</option>
-                      <option value="Pre-wedding Session">Pre-wedding Session</option>
-                    </>
-                  )}
-                  <option value="CUSTOM">+ Add New Event Type</option>
-                </select>
-              ) : (
-                <div className="w-full flex items-center gap-2 border-b border-gray-300 py-1 focus-within:border-[#e50914]">
-                  <input 
-                    type="text"
-                    name="eventType"
-                    value={formData.eventType}
-                    onChange={handleChange}
-                    className="w-full bg-transparent focus:outline-none py-1 text-[16px]"
-                    placeholder="Type new event type..."
-                    autoFocus
-                  />
-                  <button 
-                    onClick={() => {
-                      setIsCustomEvent(false);
-                      setFormData(prev => ({ ...prev, eventType: '' }));
-                    }}
-                    className="text-xs text-gray-500 hover:text-[#e50914]"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
+            <EventTypeSelect 
+              value={formData.eventType}
+              onChange={(val) => setFormData(prev => ({ ...prev, eventType: val }))}
+              required
+            />
           </div>
           <div className="flex flex-col">
             <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Event Date</label>

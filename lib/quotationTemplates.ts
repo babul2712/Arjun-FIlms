@@ -171,7 +171,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
       font-size: 46px;
       font-weight: 900;
       letter-spacing: -0.5px;
-      color: #1a253c;
+      color: #e50914;
       line-height: 1;
       font-family: -apple-system, BlinkMacSystemFont, "Arial Black", sans-serif;
     }
@@ -326,7 +326,8 @@ export function generateInvoice1HTML(data: QuotationData): string {
           <div class="studio-meta">
             <div class="studio-name">${studioName}</div>
             <div>${studioAddress}</div>
-            <div>Ph: ${studioPhone} • ${studioEmail}</div>
+            <div>Ph: ${studioPhone}</div>
+            <div>${studioEmail}</div>
           </div>
         </td>
         <td style="vertical-align: top; text-align: right; width: 120px;">
