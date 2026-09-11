@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { Search, Bell, Settings, Filter } from 'lucide-react';
+import { Bell, Filter } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
+import UniversalSearchBar from '@/components/search/UniversalSearchBar';
 
 export default function Topbar() {
   const pathname = usePathname();
@@ -25,29 +26,24 @@ export default function Topbar() {
     (pathname.startsWith('/projects/') ? 'Project Details' : 'Arjun Photography CRM');
 
   return (
-    <header className="flex justify-between items-center px-8 h-20 w-full bg-transparent sticky top-0 z-40">
+    <header className="flex justify-between items-center px-6 md:px-8 h-20 w-full bg-transparent sticky top-0 z-40 gap-4">
       {/* Title */}
-      <div>
-        <h2 className="text-[20px] font-extrabold text-gray-800 dark:text-white tracking-tight">{currentTitle}</h2>
+      <div className="shrink-0">
+        <h2 className="text-[18px] md:text-[20px] font-extrabold text-gray-800 dark:text-white tracking-tight">{currentTitle}</h2>
       </div>
 
       {/* Right controls */}
-      <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="hidden sm:flex items-center px-4 py-2 bg-[#fee2e2]/30 dark:bg-gray-800/40 rounded-full border border-gray-200/20 dark:border-gray-700/50 w-64 focus-within:ring-1 focus-within:ring-[#e50914]/50">
-          <Search className="text-gray-400 w-[18px] h-[18px] mr-2" />
-          <input 
-            className="bg-transparent border-none focus:outline-none focus:ring-0 text-[13px] font-medium w-full placeholder:text-gray-400 text-gray-800 dark:text-gray-200" 
-            placeholder="Search studio records..." 
-            type="text"
-          />
+      <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end max-w-xl">
+        {/* Universal Search Bar */}
+        <div className="w-full max-w-xs md:max-w-md">
+          <UniversalSearchBar placeholder="Search cases, crew, quotes, payments..." />
         </div>
 
         {/* Filter Toggle (for dashboard) */}
         {pathname === '/dashboard' && (
           <button 
             onClick={toggleFilterPanel}
-            className="p-2.5 bg-gray-100 hover:bg-[#e50914]/10 text-gray-600 hover:text-[#e50914] rounded-xl transition-all cursor-pointer"
+            className="p-2.5 bg-gray-100 hover:bg-[#e50914]/10 text-gray-600 hover:text-[#e50914] rounded-xl transition-all cursor-pointer shrink-0"
             title="Toggle Filters Panel"
           >
             <Filter className="w-5 h-5" />
@@ -57,7 +53,7 @@ export default function Topbar() {
         {/* Notifications */}
         <button 
           onClick={toggleNotificationDrawer}
-          className="p-2.5 bg-gray-100 dark:bg-gray-800/60 hover:bg-[#fee2e2]/50 dark:hover:bg-red-950/40 text-gray-600 dark:text-gray-300 hover:text-[#e50914] rounded-xl transition-all cursor-pointer relative active:scale-95"
+          className="p-2.5 bg-gray-100 dark:bg-gray-800/60 hover:bg-[#fee2e2]/50 dark:hover:bg-red-950/40 text-gray-600 dark:text-gray-300 hover:text-[#e50914] rounded-xl transition-all cursor-pointer relative active:scale-95 shrink-0"
           title="Open Notifications"
         >
           <Bell className="w-5 h-5" />

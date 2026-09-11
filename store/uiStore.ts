@@ -81,6 +81,7 @@ interface UIState {
   sidebarOpen: boolean;
   filterPanelOpen: boolean; // right filters panel in Images 1 & 3
   notificationDrawerOpen: boolean; // Notification Drawer
+  commandPaletteOpen: boolean; // Universal Omnibar / ⌘K Command Palette
   theme: 'light' | 'dark';
   siteFont: SiteFontId;
   toggleSidebar: () => void;
@@ -89,6 +90,9 @@ interface UIState {
   setFilterPanelOpen: (open: boolean) => void;
   toggleNotificationDrawer: () => void;
   setNotificationDrawerOpen: (open: boolean) => void;
+  openCommandPalette: () => void;
+  closeCommandPalette: () => void;
+  toggleCommandPalette: () => void;
   toggleTheme: () => void;
   setSiteFont: (font: SiteFontId) => void;
 }
@@ -99,6 +103,7 @@ export const useUIStore = create<UIState>()(
       sidebarOpen: false,
       filterPanelOpen: false,
       notificationDrawerOpen: false,
+      commandPaletteOpen: false,
       theme: 'light',
       siteFont: 'montserrat',
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
@@ -107,6 +112,9 @@ export const useUIStore = create<UIState>()(
       setFilterPanelOpen: (open: boolean) => set({ filterPanelOpen: open }),
       toggleNotificationDrawer: () => set((state) => ({ notificationDrawerOpen: !state.notificationDrawerOpen })),
       setNotificationDrawerOpen: (open: boolean) => set({ notificationDrawerOpen: open }),
+      openCommandPalette: () => set({ commandPaletteOpen: true }),
+      closeCommandPalette: () => set({ commandPaletteOpen: false }),
+      toggleCommandPalette: () => set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
       toggleTheme: () => set((state) => {
         const nextTheme = state.theme === 'light' ? 'dark' : 'light';
         return { theme: nextTheme };

@@ -828,5 +828,302 @@ export async function getStudioStatsAction() {
   }
 }
 
+export async function searchUniversalAction(rawQuery: string = '') {
+  try {
+    await connectToDatabase();
+    const query = (rawQuery || '').trim();
+    const safeRegexStr = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = query ? new RegExp(safeRegexStr, 'i') : null;
+
+    // Quick System Navigation Items
+    const STATIC_ACTIONS = [
+      {
+        id: 'act_new_project',
+        category: 'actions' as const,
+        title: 'Create New Case / Client Project',
+        subtitle: 'Start a new client file with custom deliverables & milestones',
+        badge: 'Action',
+        badgeColor: 'bg-red-500/10 text-[#e50914] border-red-500/20',
+        icon: 'folder-plus',
+        url: '/projects/create',
+        keywords: ['new', 'create', 'case', 'project', 'client', 'booking', 'shoot'],
+      },
+      {
+        id: 'act_new_quote',
+        category: 'actions' as const,
+        title: 'Generate Client Quotation',
+        subtitle: 'Create a customized PDF quotation package with pricing items',
+        badge: 'Action',
+        badgeColor: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+        icon: 'file-text',
+        url: '/quotations/create',
+        keywords: ['quote', 'quotation', 'invoice', 'proposal', 'estimate', 'pricing', 'bill'],
+      },
+      {
+        id: 'act_crew_blueprints',
+        category: 'actions' as const,
+        title: 'Crew Blueprint Database',
+        subtitle: 'Manage cinematographers, photographers, drone pilots & daily rates',
+        badge: 'Blueprint',
+        badgeColor: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+        icon: 'users',
+        url: '/blueprints',
+        keywords: ['crew', 'photographer', 'cinematographer', 'editor', 'drone', 'team', 'blueprint', 'staff'],
+      },
+      {
+        id: 'act_calendar',
+        category: 'actions' as const,
+        title: 'Event Calendar & Shoot Schedule',
+        subtitle: 'View upcoming wedding shoot dates, milestones & schedules',
+        badge: 'Schedule',
+        badgeColor: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+        icon: 'calendar',
+        url: '/calendar',
+        keywords: ['calendar', 'date', 'schedule', 'shoot', 'upcoming', 'event', 'month'],
+      },
+      {
+        id: 'act_payments',
+        category: 'actions' as const,
+        title: 'Payments & Collections Ledger',
+        subtitle: 'Verify UPI payments, QR receipts, advances & bank transactions',
+        badge: 'Finance',
+        badgeColor: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+        icon: 'credit-card',
+        url: '/payments',
+        keywords: ['payment', 'upi', 'received', 'advance', 'transaction', 'utr', 'money', 'revenue'],
+      },
+      {
+        id: 'act_social_links',
+        category: 'actions' as const,
+        title: 'Bio & Social Links Manager',
+        subtitle: 'Manage showreel buttons, portfolio links & track bio clicks',
+        badge: 'Bio Link',
+        badgeColor: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+        icon: 'share-2',
+        url: '/social-links',
+        keywords: ['bio', 'links', 'social', 'instagram', 'youtube', 'tree', 'profile', 'public'],
+      },
+      {
+        id: 'act_profile_settings',
+        category: 'actions' as const,
+        title: 'Studio Profile & Typography Settings',
+        subtitle: 'Customize branding logo, watermark, theme mode & full-site font',
+        badge: 'Settings',
+        badgeColor: 'bg-gray-500/10 text-gray-700 dark:text-gray-300 border-gray-500/20',
+        icon: 'settings',
+        url: '/profile',
+        keywords: ['profile', 'settings', 'font', 'theme', 'typography', 'logo', 'watermark', 'branding'],
+      },
+    ];
+
+    let matchedActions = STATIC_ACTIONS;
+    if (query) {
+      const qLower = query.toLowerCase();
+      matchedActions = STATIC_ACTIONS.filter(
+        (a) =>
+          a.title.toLowerCase().includes(qLower) ||
+          a.subtitle.toLowerCase().includes(qLower) ||
+          a.keywords.some((k) => k.includes(qLower) || qLower.includes(k))
+      );
+    }
+
+    // Database Queries
+    let projectResults: any[] = [];
+    let crewResults: any[] = [];
+    let quotationResults: any[] = [];
+    let paymentResults: any[] = [];
+
+    if (regex) {
+      const [pRes, cRes, qRes, payRes] = await Promise.all([
+        Project.find({
+          $or: [
+            { name: regex },
+            { company: regex },
+            { phone: regex },
+            { email: regex },
+            { location: regex },
+            { eventType: regex },
+            { status: regex },
+            { projectNumber: regex },
+            { notes: regex },
+          ],
+        })
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .lean(),
+        Crew.find({
+          $or: [
+            { name: regex },
+            { role: regex },
+            { location: regex },
+            { phone: regex },
+            { address: regex },
+          ],
+        })
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .lean(),
+        Quotation.find({
+          $or: [
+            { customerName: regex },
+            { phone: regex },
+            { email: regex },
+            { location: regex },
+            { eventType: regex },
+          ],
+        })
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .lean(),
+        Payment.find({
+          $or: [
+            { customerName: regex },
+            { phone: regex },
+            { paymentMethod: regex },
+            { status: regex },
+            { remarks: regex },
+          ],
+        })
+          .sort({ date: -1 })
+          .limit(8)
+          .lean(),
+      ]);
+
+      projectResults = pRes || [];
+      crewResults = cRes || [];
+      quotationResults = qRes || [];
+      paymentResults = payRes || [];
+    } else {
+      // Return recent top items if query is empty
+      const [pRes, cRes, qRes] = await Promise.all([
+        Project.find({}).sort({ createdAt: -1 }).limit(3).lean(),
+        Crew.find({}).sort({ createdAt: -1 }).limit(3).lean(),
+        Quotation.find({}).sort({ createdAt: -1 }).limit(2).lean(),
+      ]);
+      projectResults = pRes || [];
+      crewResults = cRes || [];
+      quotationResults = qRes || [];
+    }
+
+    // Transform into standard UniversalSearchResultItem
+    const formattedCases = projectResults.map((p: any) => ({
+      id: p._id?.toString() || p.id,
+      category: 'cases' as const,
+      title: p.name || 'Untitled Case',
+      subtitle: `${p.eventType || 'Shoot'} • ${p.location || 'Studio HQ'}${p.eventDate ? ` • ${new Date(p.eventDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}`,
+      badge: p.status || 'Active',
+      badgeColor:
+        p.status === 'Booked'
+          ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+          : p.status === 'Lead'
+          ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+          : p.status === 'Completed'
+          ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+          : 'bg-gray-500/10 text-gray-600 border-gray-500/20',
+      icon: 'briefcase',
+      url: `/projects/${p._id?.toString() || p.id}`,
+      amount: p.totalValue || 0,
+      meta: {
+        coverImage: p.coverImage,
+        phone: p.phone,
+        email: p.email,
+        isStarred: p.isStarred,
+        projectNumber: p.projectNumber,
+      },
+    }));
+
+    const formattedCrew = crewResults.map((c: any) => ({
+      id: c._id?.toString() || c.id,
+      category: 'crew' as const,
+      title: c.name || 'Crew Member',
+      subtitle: `${c.role || 'Operator'} • ${c.location || 'Base City'}${c.phone ? ` • ${c.phone}` : ''}`,
+      badge: c.charges ? `₹${c.charges.toLocaleString('en-IN')}/day` : 'Crew',
+      badgeColor: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+      icon: 'camera',
+      url: `/blueprints?crewId=${c._id?.toString() || c.id}`,
+      amount: c.charges || 0,
+      meta: {
+        avatarUrl: c.avatarUrl,
+        phone: c.phone,
+        role: c.role,
+        address: c.address,
+      },
+    }));
+
+    const formattedQuotes = quotationResults.map((q: any) => ({
+      id: q._id?.toString() || q.id,
+      category: 'quotations' as const,
+      title: `${q.customerName || 'Client'} - ${q.eventType || 'Package'}`,
+      subtitle: `${q.location || 'Location'}${q.email ? ` • ${q.email}` : ''}${q.services ? ` • ${q.services.length} services` : ''}`,
+      badge: q.grandTotal ? `₹${q.grandTotal.toLocaleString('en-IN')}` : 'Quote',
+      badgeColor: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+      icon: 'file-text',
+      url: `/quotations/edit/${q._id?.toString() || q.id}`,
+      amount: q.grandTotal || 0,
+      meta: {
+        phone: q.phone,
+        email: q.email,
+        subTotal: q.subTotal,
+        discount: q.discount,
+      },
+    }));
+
+    const formattedPayments = paymentResults.map((pay: any) => ({
+      id: pay._id?.toString() || pay.id,
+      category: 'payments' as const,
+      title: `Payment: ${pay.customerName || 'Client'}`,
+      subtitle: `${pay.paymentMethod || 'UPI'} • ${pay.remarks || 'Advance deposit'}${pay.date ? ` • ${new Date(pay.date).toLocaleDateString('en-IN')}` : ''}`,
+      badge: pay.amount ? `₹${pay.amount.toLocaleString('en-IN')}` : 'Payment',
+      badgeColor:
+        pay.status === 'PAID' || pay.status === 'Verified'
+          ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+          : 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      icon: 'credit-card',
+      url: '/payments',
+      amount: pay.amount || 0,
+      meta: {
+        status: pay.status,
+        phone: pay.phone,
+        method: pay.paymentMethod,
+        screenshotUrl: pay.screenshotUrl,
+      },
+    }));
+
+    const allResults = [
+      ...matchedActions,
+      ...formattedCases,
+      ...formattedCrew,
+      ...formattedQuotes,
+      ...formattedPayments,
+    ];
+
+    return {
+      success: true,
+      query,
+      totalCount: allResults.length,
+      results: JSON.parse(JSON.stringify(allResults)),
+      categoriesCount: {
+        all: allResults.length,
+        actions: matchedActions.length,
+        cases: formattedCases.length,
+        crew: formattedCrew.length,
+        quotations: formattedQuotes.length,
+        payments: formattedPayments.length,
+      },
+    };
+  } catch (error: any) {
+    console.error('searchUniversalAction error:', error);
+    return {
+      success: false,
+      query: rawQuery,
+      totalCount: 0,
+      results: [],
+      categoriesCount: { all: 0, actions: 0, cases: 0, crew: 0, quotations: 0, payments: 0 },
+      error: error?.message || 'Search execution failed',
+    };
+  }
+}
+
+
 
 

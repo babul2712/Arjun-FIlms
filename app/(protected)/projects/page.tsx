@@ -68,13 +68,18 @@ export default function ProjectsListPage() {
       filtered = filtered.filter(p => p.isStarred);
     }
 
-    // Search query filter
+    // Search query filter with full multi-field matching
     if (search.trim() !== '') {
       const query = search.toLowerCase();
       filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(query) || 
-        p.eventType.toLowerCase().includes(query) ||
-        p.location.toLowerCase().includes(query)
+        (p.name && p.name.toLowerCase().includes(query)) || 
+        (p.eventType && p.eventType.toLowerCase().includes(query)) ||
+        (p.location && p.location.toLowerCase().includes(query)) ||
+        (p.phone && p.phone.toLowerCase().includes(query)) ||
+        (p.email && p.email.toLowerCase().includes(query)) ||
+        (p.company && p.company.toLowerCase().includes(query)) ||
+        (p.status && p.status.toLowerCase().includes(query)) ||
+        (p.notes && p.notes.toLowerCase().includes(query))
       );
     }
 
@@ -226,15 +231,28 @@ export default function ProjectsListPage() {
           </button>
 
           {/* Search Field */}
-          <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#fee2e2]/40 rounded-2xl border border-[#fecaca]/40 w-64 focus-within:bg-white focus-within:border-gray-300 transition-all">
-            <Search className="text-gray-400 w-[18px] h-[18px] mr-2.5 shrink-0" />
+          <div className="flex-1 md:flex-none flex items-center px-4 py-2.5 bg-[#fee2e2]/40 dark:bg-gray-800/40 rounded-2xl border border-[#fecaca]/40 dark:border-gray-700/50 w-64 md:w-72 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-700 transition-all shadow-xs">
+            <Search className="text-gray-400 w-4 h-4 mr-2.5 shrink-0" />
             <input 
               value={searchQuery}
               onChange={handleSearchChange}
-              className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400/80" 
-              placeholder="Search for client" 
+              className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400 text-gray-800 dark:text-white" 
+              placeholder="Filter cases, events, city..." 
               type="text"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  applyFiltering(projects, activeTab, '');
+                }}
+                className="p-1 hover:bg-gray-200/60 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0 cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Filter Toggle */}

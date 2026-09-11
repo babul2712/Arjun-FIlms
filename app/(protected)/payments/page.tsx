@@ -1,26 +1,32 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getPayments } from '@/services/api';
 import { Payment } from '@/lib/types';
 import { 
+  TrendingUp, 
+  ArrowUp, 
+  CheckCircle2, 
+  Clock, 
   Search, 
-  ChevronDown,
-  TrendingUp,
-  CheckCircle2,
-  ArrowUp,
-  Eye,
+  Filter, 
+  Download, 
+  ExternalLink, 
+  Trash2, 
+  Check, 
+  Eye, 
   X,
-  Trash2
+  CreditCard 
 } from 'lucide-react';
 import dayjs from 'dayjs';
-import { verifyPayment, deletePayment, getProjects } from '@/app/actions';
+import { verifyPayment, deletePayment, getProjects, getPayments } from '@/app/actions';
 import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'pending'>('all');
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
   const [paymentToDelete, setPaymentToDelete] = useState<string | null>(null);
 
@@ -81,26 +87,43 @@ export default function PaymentsPage() {
     .filter(p => isPaid(p) && p?.date && dayjs(p.date).isValid() && dayjs(p.date).isSame(dayjs(), 'day'))
     .reduce((sum, p) => sum + (p?.amount || 0), 0) : 0;
 
+  // Filtered Payments list
+  const filteredPayments = (Array.isArray(payments) ? payments : []).filter((p) => {
+    if (!p) return false;
+    if (statusFilter === 'verified' && !isPaid(p)) return false;
+    if (statusFilter === 'pending' && isPaid(p)) return false;
+    if (!searchQuery.trim()) return true;
+    const s = searchQuery.toLowerCase();
+    return (
+      (p.customerName && p.customerName.toLowerCase().includes(s)) ||
+      (p.phone && p.phone.toLowerCase().includes(s)) ||
+      (p.paymentMethod && p.paymentMethod.toLowerCase().includes(s)) ||
+      (p.status && p.status.toLowerCase().includes(s)) ||
+      (p.remarks && p.remarks.toLowerCase().includes(s)) ||
+      (p.amount && p.amount.toString().includes(s))
+    );
+  });
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-gray-800">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-gray-800 dark:text-gray-100">
       {/* Bento Grid Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Received */}
-        <div className="glass-card p-6 rounded-2xl flex flex-col justify-between h-36 bg-white border border-gray-200/50 shadow-sm">
+        <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5">
               Total Received
               <TrendingUp className="text-[#e50914] w-4 h-4" />
             </span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 tracking-tight">₹{totalReceived.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{totalReceived.toLocaleString()}</div>
           </div>
         </div>
 
         {/* Pending */}
-        <div className="glass-card p-6 rounded-2xl flex flex-col justify-between h-36 bg-white border border-gray-200/50 shadow-sm">
+        <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider block">Pending Collections</span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 tracking-tight">₹{pendingAmount.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{pendingAmount.toLocaleString()}</div>
           </div>
           <div className="text-[11px] text-gray-400 font-semibold">
             {Array.isArray(payments) ? payments.filter(p => p && (p.status === 'PENDING' || p.status === 'Pending Verification')).length : 0} awaiting verification
@@ -108,10 +131,10 @@ export default function PaymentsPage() {
         </div>
 
         {/* Today */}
-        <div className="glass-card p-6 rounded-2xl flex flex-col justify-between h-36 bg-white border border-gray-200/50 shadow-sm">
+        <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider">Today's Collection</span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 tracking-tight">₹{todayCollections.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{todayCollections.toLocaleString()}</div>
           </div>
           <div className="text-[11px] text-gray-400 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
@@ -120,10 +143,10 @@ export default function PaymentsPage() {
         </div>
 
         {/* Month */}
-        <div className="glass-card p-6 rounded-2xl flex flex-col justify-between h-36 bg-white border border-gray-200/50 shadow-sm">
+        <div className="glass-card p-6 rounded-3xl flex flex-col justify-between h-36 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
           <div>
             <span className="text-gray-400 text-[12px] font-bold uppercase tracking-wider">This Month</span>
-            <div className="mt-2 text-[26px] font-extrabold text-gray-900 tracking-tight">₹{totalReceived.toLocaleString()}</div>
+            <div className="mt-2 text-[26px] font-extrabold text-gray-900 dark:text-white tracking-tight">₹{totalReceived.toLocaleString()}</div>
           </div>
           <div className="flex items-center gap-1 text-green-600 text-[11px] font-bold uppercase">
             <ArrowUp className="w-3.5 h-3.5" />
@@ -132,14 +155,64 @@ export default function PaymentsPage() {
         </div>
       </div>
 
+      {/* Search & Status Filter Controls Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 dark:bg-[#15181e] p-4 rounded-3xl border border-gray-200/60 dark:border-gray-800 shadow-xs">
+        {/* Search Field */}
+        <div className="flex-1 w-full sm:max-w-md flex items-center px-4 py-2.5 bg-[#fdf6f6] dark:bg-gray-800/50 rounded-2xl border border-[#fee2e2] dark:border-gray-700/60 focus-within:bg-white dark:focus-within:bg-[#15181e] focus-within:border-[#e50914]/50 transition-all shadow-xs">
+          <Search className="text-gray-400 w-4 h-4 mr-2.5 shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search payments by client, method, UTR, amount..."
+            className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400 text-gray-800 dark:text-white"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="p-1 hover:bg-gray-200/60 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0 cursor-pointer"
+              title="Clear Search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Status Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar w-full sm:w-auto">
+          {[
+            { id: 'all', label: 'All Transactions' },
+            { id: 'verified', label: 'Verified Paid' },
+            { id: 'pending', label: 'Awaiting Verification' },
+          ].map((s) => {
+            const isActive = statusFilter === s.id;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setStatusFilter(s.id as any)}
+                className={`px-3.5 py-2 rounded-xl text-[12px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? 'bg-[#e50914] text-white shadow-xs'
+                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Table Card */}
-      <div className="glass-card rounded-[24px] overflow-hidden bg-white border border-gray-200/50">
+      <div className="glass-card rounded-[28px] overflow-hidden bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
         {loading ? (
           <div className="p-8 flex justify-center text-[#e50914] font-bold">Loading transactions...</div>
         ) : (
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse text-[13px]">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50/70 dark:bg-gray-900/50 border-b border-gray-150 dark:border-gray-800">
                 <tr className="text-gray-400 font-bold uppercase tracking-wider text-[11px]">
                   <th className="px-6 py-4">Customer Details</th>
                   <th className="px-6 py-4">Method</th>
@@ -149,66 +222,67 @@ export default function PaymentsPage() {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {Array.isArray(payments) && payments.map((payment, pIdx) => {
-                  const paymentId = payment.id || (payment as any)._id || `pmt-${pIdx}`;
-                  return (
-                    <tr key={paymentId} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="font-bold text-gray-800">{payment.customerName || 'Anonymous Client'}</p>
-                          <p className="text-[11px] text-gray-400 font-semibold">{payment.phone || ''}</p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 font-semibold text-gray-600">{payment.paymentMethod || 'UPI QR'}</td>
-                      <td className="px-6 py-4 font-extrabold text-gray-900 text-right">₹{(payment.amount || 0).toLocaleString()}</td>
-                      <td className="px-6 py-4 font-semibold text-gray-500">
-                        {payment.date && dayjs(payment.date).isValid() ? dayjs(payment.date).format('DD MMM YYYY, hh:mm A') : 'Recently'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${isPaid(payment) ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
-                          {payment.status || 'Pending'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {payment.screenshotUrl && (
-                            <button 
-                              onClick={() => setSelectedScreenshot(payment.screenshotUrl)}
-                              className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-                              title="View Screenshot Proof"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          )}
-                          
-                          {!isPaid(payment) && (
-                            <button 
-                              onClick={() => setPaymentToVerify(paymentId)}
-                              className="px-3 py-1 bg-[#e50914] hover:bg-red-700 text-white text-[11px] font-bold rounded-lg shadow-sm cursor-pointer"
-                            >
-                              Verify
-                            </button>
-                          )}
-
-                          <button 
-                            onClick={() => setPaymentToDelete(paymentId)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Delete Payment"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {payments.length === 0 && (
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800/80">
+                {filteredPayments.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-gray-400 font-semibold">
-                      No payment records found.
+                      {searchQuery ? `No transactions match "${searchQuery}"` : 'No payment records found.'}
                     </td>
                   </tr>
+                ) : (
+                  filteredPayments.map((payment, pIdx) => {
+                    const paymentId = payment.id || (payment as any)._id || `pmt-${pIdx}`;
+                    return (
+                      <tr key={paymentId} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <div>
+                            <p className="font-bold text-gray-800 dark:text-white">{payment.customerName || 'Anonymous Client'}</p>
+                            <p className="text-[11px] text-gray-400 font-semibold">{payment.phone || ''}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-gray-600 dark:text-gray-300">{payment.paymentMethod || 'UPI QR'}</td>
+                        <td className="px-6 py-4 font-extrabold text-gray-900 dark:text-white text-right">₹{(payment.amount || 0).toLocaleString()}</td>
+                        <td className="px-6 py-4 font-semibold text-gray-500 dark:text-gray-400">
+                          {payment.date && dayjs(payment.date).isValid() ? dayjs(payment.date).format('DD MMM YYYY, hh:mm A') : 'Recently'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${isPaid(payment) ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/60' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800/60'}`}>
+                            {payment.status || 'Pending'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {payment.screenshotUrl && (
+                              <button 
+                                onClick={() => setSelectedScreenshot(payment.screenshotUrl)}
+                                className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                                title="View Screenshot Proof"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            )}
+                            
+                            {!isPaid(payment) && (
+                              <button 
+                                onClick={() => setPaymentToVerify(paymentId)}
+                                className="px-3 py-1 bg-[#e50914] hover:bg-red-700 text-white text-[11px] font-bold rounded-lg shadow-sm cursor-pointer"
+                              >
+                                Verify
+                              </button>
+                            )}
+
+                            <button 
+                              onClick={() => setPaymentToDelete(paymentId)}
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                              title="Delete Payment"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

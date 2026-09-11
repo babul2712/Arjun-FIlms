@@ -319,15 +319,25 @@ export default function CalendarPage() {
         {/* Filter Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Box */}
-          <div className="relative flex-1 sm:w-60">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <div className="relative flex-1 sm:w-60 flex items-center">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <input
               type="text"
               placeholder="Search client or venue..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 rounded-xl text-[12.5px] font-medium focus:outline-none focus:border-[#e50914] dark:text-white"
+              className="w-full pl-9 pr-8 py-2 bg-gray-50 dark:bg-[#1c1f24] border border-gray-250/60 dark:border-gray-800 rounded-xl text-[12.5px] font-medium focus:outline-none focus:border-[#e50914] dark:text-white"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Event Type Filter */}

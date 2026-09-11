@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getCrew, createCrew, updateCrew, deleteCrew } from '@/app/actions';
-import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles, ChevronRight, Eye } from 'lucide-react';
+import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles, ChevronRight, Eye, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 import CrewDetailDrawer from '@/components/blueprints/CrewDetailDrawer';
@@ -10,6 +10,8 @@ import CrewDetailDrawer from '@/components/blueprints/CrewDetailDrawer';
 export default function BlueprintPage() {
   const [crewData, setCrewData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
   
   // Right sidebar details drawer state
   const [selectedCrewForDetail, setSelectedCrewForDetail] = useState<any | null>(null);
@@ -97,12 +99,27 @@ export default function BlueprintPage() {
     }
   };
 
+  // Filtered Crew records
+  const filteredCrew = crewData.filter((c) => {
+    const matchesRole = roleFilter === 'all' || (c.role && c.role.toLowerCase().includes(roleFilter.toLowerCase()));
+    if (!matchesRole) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.role && c.role.toLowerCase().includes(q)) ||
+      (c.location && c.location.toLowerCase().includes(q)) ||
+      (c.phone && c.phone.toLowerCase().includes(q)) ||
+      (c.address && c.address.toLowerCase().includes(q))
+    );
+  });
+
   return (
-    <div className="space-y-8 max-w-[1600px] mx-auto pb-16 animate-fade-in text-gray-800">
+    <div className="space-y-8 max-w-[1600px] mx-auto pb-16 animate-fade-in text-gray-800 dark:text-gray-100">
       {/* Header bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#fee2e2]/40 p-5 rounded-[32px] border border-[#fecaca]/40 backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#fee2e2]/40 dark:bg-gray-800/40 p-5 rounded-[32px] border border-[#fecaca]/40 dark:border-gray-700/50 backdrop-blur-md">
         <div>
-          <h2 className="text-[20px] font-extrabold text-gray-800 flex items-center gap-2.5">
+          <h2 className="text-[20px] font-extrabold text-gray-800 dark:text-white flex items-center gap-2.5">
             <Briefcase className="w-5.5 h-5.5 text-[#e50914]" />
             Crew Blueprint Database
           </h2>
@@ -110,29 +127,85 @@ export default function BlueprintPage() {
         </div>
         <button 
           onClick={openAddModal}
-          className="flex items-center gap-1.5 px-6 py-3 bg-[#0a0b0d] hover:bg-gray-900 text-white rounded-xl text-[13px] font-bold shadow-lg shadow-black/10 transition-all cursor-pointer active:scale-95"
+          className="flex items-center gap-1.5 px-6 py-3 bg-[#0a0b0d] hover:bg-black dark:bg-[#e50914] dark:hover:bg-red-700 text-white rounded-2xl text-[13px] font-bold shadow-lg shadow-black/10 transition-all cursor-pointer active:scale-95 shrink-0"
         >
           <Plus className="w-4.5 h-4.5" />
           Add Crew Member
         </button>
       </div>
 
+      {/* Search & Filter Controls Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Search Bar */}
+        <div className="flex-1 w-full sm:max-w-md flex items-center px-4 py-2.5 bg-white dark:bg-[#15181e] rounded-2xl border border-gray-200/80 dark:border-gray-800 focus-within:border-[#e50914]/60 focus-within:ring-2 focus-within:ring-[#e50914]/10 transition-all shadow-xs">
+          <Search className="text-gray-400 w-4 h-4 mr-2.5 shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search crew by name, role, city, phone..."
+            className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400 text-gray-800 dark:text-white"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0 cursor-pointer"
+              title="Clear Search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Role Quick Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar w-full sm:w-auto pb-1 sm:pb-0">
+          {[
+            { id: 'all', label: 'All Roles' },
+            { id: 'cinematographer', label: 'Cinematographers' },
+            { id: 'photographer', label: 'Photographers' },
+            { id: 'drone', label: 'Drone' },
+            { id: 'editor', label: 'Editors' },
+          ].map((r) => {
+            const isActive = roleFilter === r.id;
+            return (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setRoleFilter(r.id)}
+                className={`px-3.5 py-2 rounded-xl text-[12px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? 'bg-[#e50914] text-white shadow-md shadow-red-500/10'
+                    : 'bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                {r.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Grid View */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="glass-card rounded-[45px] h-[220px] bg-white/50" />
+            <div key={i} className="glass-card rounded-[45px] h-[220px] bg-white/50 dark:bg-gray-800/40" />
           ))}
         </div>
-      ) : crewData.length === 0 ? (
-        <div className="glass-card rounded-[45px] p-16 text-center max-w-md mx-auto space-y-6 bg-white border border-gray-200/50">
-          <Briefcase className="w-16 h-16 mx-auto text-gray-300 stroke-1" />
-          <h3 className="text-[17px] font-extrabold text-gray-700">No crew records found</h3>
-          <p className="text-[13px] text-gray-400 font-medium">Add crew members to register them inside the studio blueprints.</p>
+      ) : filteredCrew.length === 0 ? (
+        <div className="glass-card rounded-[45px] p-16 text-center max-w-md mx-auto space-y-4 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800">
+          <Briefcase className="w-14 h-14 mx-auto text-gray-300 dark:text-gray-600 stroke-1" />
+          <h3 className="text-[17px] font-extrabold text-gray-700 dark:text-gray-200">
+            {searchQuery ? `No crew members found for "${searchQuery}"` : 'No crew records found'}
+          </h3>
+          <p className="text-[13px] text-gray-400 font-medium">
+            {searchQuery ? 'Try clearing the search or changing the role filter.' : 'Add crew members to register them inside the studio blueprints.'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {crewData.map((crew) => {
+          {filteredCrew.map((crew) => {
             const avatarUrl = crew.avatarUrl || (
               crew.name.includes('Davidson') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80' :
               crew.name.includes('Veronica') ? 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&h=150&q=80' :

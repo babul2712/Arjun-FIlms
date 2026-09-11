@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useUIStore, applySiteFont } from '@/store/uiStore';
+import CommandPaletteModal from '@/components/search/CommandPaletteModal';
 
 export default function FontThemeProvider({
   children,
@@ -25,5 +26,10 @@ export default function FontThemeProvider({
     }
   }, [theme]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <CommandPaletteModal />
+    </>
+  );
 }

@@ -27,6 +27,7 @@ import ProjectCard from '@/components/dashboard/ProjectCard';
 import FiltersPanel from '@/components/dashboard/FiltersPanel';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import CalendarView from './components/CalendarView';
+import UniversalSearchBar from '@/components/search/UniversalSearchBar';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from '@/store/uiStore';
@@ -114,13 +115,18 @@ export default function DashboardPage() {
       filtered = filtered.filter(p => p.isStarred);
     }
 
-    // Search query filter
+    // Search query filter with multi-field matching
     if (search.trim() !== '') {
       const query = search.toLowerCase();
       filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(query) || 
-        p.eventType.toLowerCase().includes(query) ||
-        p.location.toLowerCase().includes(query)
+        (p.name && p.name.toLowerCase().includes(query)) || 
+        (p.eventType && p.eventType.toLowerCase().includes(query)) ||
+        (p.location && p.location.toLowerCase().includes(query)) ||
+        (p.phone && p.phone.toLowerCase().includes(query)) ||
+        (p.email && p.email.toLowerCase().includes(query)) ||
+        (p.company && p.company.toLowerCase().includes(query)) ||
+        (p.status && p.status.toLowerCase().includes(query)) ||
+        (p.notes && p.notes.toLowerCase().includes(query))
       );
     }
 
@@ -153,8 +159,10 @@ export default function DashboardPage() {
   const handleFilterChange = (filters: any) => {
     let list = [...projects];
     if (filters.nationality) {
-      list = list.filter(p => p.name.toLowerCase().includes(filters.nationality.toLowerCase()) || 
-                              p.location.toLowerCase().includes(filters.nationality.toLowerCase()));
+      list = list.filter(p => 
+        (p.name && p.name.toLowerCase().includes(filters.nationality.toLowerCase())) || 
+        (p.location && p.location.toLowerCase().includes(filters.nationality.toLowerCase()))
+      );
     }
     applyFiltering(list, activeTab, searchQuery);
   };
@@ -222,16 +230,8 @@ export default function DashboardPage() {
               </p>
             </div>
             
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              {/* Search Bar */}
-              <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#fee2e2]/40 border border-[#fecaca]/40 dark:bg-[#16181c] dark:border-gray-800/40 rounded-2xl w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-700 transition-colors shadow-sm">
-                <Search className="text-gray-505 w-4.5 h-4.5 mr-3 shrink-0" />
-                <input 
-                  type="text" 
-                  className="bg-transparent border-none focus:outline-none text-[12.5px] font-semibold text-gray-700 dark:text-white placeholder:text-gray-400 w-full"
-                  placeholder="Search project"
-                />
-              </div>
+            <div className="w-full md:w-80">
+              <UniversalSearchBar placeholder="Search cases, crew, quotes..." />
             </div>
           </div>
 
@@ -604,15 +604,28 @@ export default function DashboardPage() {
             </button>
 
             {/* Search clients */}
-            <div className="flex-1 md:flex-none flex items-center px-4 py-3 bg-[#fee2e2]/40 dark:bg-[#16181c] rounded-2xl border border-[#fecaca]/40 dark:border-gray-800/40 w-64 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-750 transition-all shadow-sm">
-              <Search className="text-gray-455 w-[18px] h-[18px] mr-2.5 shrink-0" />
+            <div className="flex-1 md:flex-none flex items-center px-4 py-2.5 bg-[#fee2e2]/40 dark:bg-[#16181c] rounded-2xl border border-[#fecaca]/40 dark:border-gray-800/40 w-64 md:w-72 focus-within:bg-white dark:focus-within:bg-[#16181c] focus-within:border-gray-300 dark:focus-within:border-gray-700 transition-all shadow-xs">
+              <Search className="text-gray-400 w-4 h-4 mr-2.5 shrink-0" />
               <input 
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400 dark:text-white" 
-                placeholder="Search for client" 
+                className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400 text-gray-800 dark:text-white" 
+                placeholder="Filter clients & events..." 
                 type="text"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    applyFiltering(projects, activeTab, '');
+                  }}
+                  className="p-1 hover:bg-gray-200/60 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0 cursor-pointer"
+                  title="Clear Filter"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Filter drawer toggle */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, FileText, Edit2, Trash2, Calendar, MapPin, Sparkles } from 'lucide-react';
+import { Plus, Search, FileText, Edit2, Trash2, Calendar, MapPin, Sparkles, X } from 'lucide-react';
 import { getQuotations, deleteQuotation } from '@/app/actions';
 import { Quotation } from '@/lib/types';
 import dayjs from 'dayjs';
@@ -15,6 +15,7 @@ export default function QuotationsDashboardPage() {
   const router = useRouter();
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [quotationToDelete, setQuotationToDelete] = useState<string | null>(null);
   const [showTemplateDrawer, setShowTemplateDrawer] = useState(false);
 
@@ -46,31 +47,68 @@ export default function QuotationsDashboardPage() {
     }
   };
 
+  // Filtered quotations
+  const filteredQuotations = quotations.filter((q) => {
+    if (!searchQuery.trim()) return true;
+    const s = searchQuery.toLowerCase();
+    return (
+      (q.customerName && q.customerName.toLowerCase().includes(s)) ||
+      (q.email && q.email.toLowerCase().includes(s)) ||
+      (q.phone && q.phone.toLowerCase().includes(s)) ||
+      (q.location && q.location.toLowerCase().includes(s)) ||
+      (q.eventType && q.eventType.toLowerCase().includes(s))
+    );
+  });
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-gray-800">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-gray-800 dark:text-gray-100">
       {/* Header section */}
-      <div className="flex justify-between items-center bg-white/40 p-4 rounded-3xl border border-white/40 backdrop-blur-md">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/60 dark:bg-[#15181e] p-5 rounded-[32px] border border-gray-200/60 dark:border-gray-800 backdrop-blur-md shadow-xs">
         <div>
-          <h2 className="text-[18px] font-bold text-gray-800 flex items-center gap-2">
+          <h2 className="text-[19px] font-extrabold text-gray-800 dark:text-white flex items-center gap-2">
             <FileText className="w-5 h-5 text-[#e50914]" />
-            Quotations
+            Quotations & Estimates
           </h2>
           <p className="text-[12px] text-gray-400 font-semibold mt-0.5">Manage and view all your generated client proposals and packages.</p>
         </div>
-        <div className="flex items-center gap-3">
+
+        {/* Search & Actions */}
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          {/* Search Bar */}
+          <div className="flex-1 md:flex-none flex items-center px-4 py-2.5 bg-[#fdf6f6] dark:bg-gray-800/50 rounded-2xl border border-[#fee2e2] dark:border-gray-700/60 w-full sm:w-64 focus-within:bg-white dark:focus-within:bg-[#15181e] focus-within:border-[#e50914]/50 transition-all shadow-xs">
+            <Search className="text-gray-400 w-4 h-4 mr-2.5 shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search quotes, clients..."
+              className="bg-transparent border-none focus:outline-none text-[13px] font-semibold w-full placeholder:text-gray-400 text-gray-800 dark:text-white"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="p-1 hover:bg-gray-200/60 dark:hover:bg-gray-700 rounded-lg text-gray-400 hover:text-gray-600 transition-colors shrink-0 cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
           <button 
             onClick={() => setShowTemplateDrawer(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-[#16181c] text-gray-700 dark:text-gray-200 border border-gray-250/60 dark:border-gray-800 rounded-xl text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all cursor-pointer shadow-sm active:scale-98"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-xl text-[13px] font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all cursor-pointer shadow-xs active:scale-98"
           >
             <Sparkles className="w-4 h-4 text-[#e50914]" />
-            Customize Template
+            Templates
           </button>
           <button 
             onClick={() => router.push('/quotations/create')}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#e50914] text-white rounded-xl text-[13px] font-bold hover:bg-red-700 shadow-lg shadow-red-500/20 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#e50914] text-white rounded-xl text-[13px] font-bold hover:bg-red-700 shadow-lg shadow-red-500/20 transition-all cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4" />
-            Add New Quotation
+            Add Quotation
           </button>
         </div>
       </div>
@@ -79,18 +117,22 @@ export default function QuotationsDashboardPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="glass-card rounded-[24px] h-[200px] bg-white/50" />
+            <div key={i} className="glass-card rounded-[24px] h-[200px] bg-white/50 dark:bg-gray-800/40" />
           ))}
         </div>
-      ) : quotations.length === 0 ? (
-        <div className="glass-card rounded-[24px] p-12 text-center max-w-md mx-auto space-y-4">
-          <FileText className="w-12 h-12 mx-auto text-gray-300 stroke-1" />
-          <h3 className="text-[16px] font-bold text-gray-700">No quotations found</h3>
-          <p className="text-[13px] text-gray-400 font-medium">Create client proposals to record and track project quotes.</p>
+      ) : filteredQuotations.length === 0 ? (
+        <div className="glass-card rounded-[28px] p-12 text-center max-w-md mx-auto space-y-4 bg-white dark:bg-[#15181e] border border-gray-200/50 dark:border-gray-800 shadow-sm">
+          <FileText className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 stroke-1" />
+          <h3 className="text-[16px] font-bold text-gray-700 dark:text-gray-200">
+            {searchQuery ? `No quotations found for "${searchQuery}"` : 'No quotations found'}
+          </h3>
+          <p className="text-[13px] text-gray-400 font-medium">
+            {searchQuery ? 'Try searching by a different name, event type or email.' : 'Create client proposals to record and track project quotes.'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quotations.map((quotation) => (
+          {filteredQuotations.map((quotation) => (
             <div key={quotation._id || quotation.id} className="glass-card rounded-[24px] p-6 bg-white border border-gray-200/50 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-shadow">
               <div>
                 <div className="flex justify-between items-start">
