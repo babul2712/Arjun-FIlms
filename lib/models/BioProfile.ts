@@ -59,6 +59,7 @@ export interface IBioProfile extends Document {
   buttonShape: string;
   showShareButton: boolean;
   showInquiryButton: boolean;
+  fontFamily?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -144,6 +145,7 @@ const BioProfileSchema: Schema = new Schema(
     buttonShape: { type: String, default: 'rounded-2xl' },
     showShareButton: { type: Boolean, default: true },
     showInquiryButton: { type: Boolean, default: true },
+    fontFamily: { type: String, default: 'montserrat' },
   },
   { timestamps: true }
 );

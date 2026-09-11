@@ -348,4 +348,5 @@ export const DEFAULT_BIO_DATA = {
   buttonShape: 'rounded-2xl',
   showShareButton: true,
   showInquiryButton: true,
+  fontFamily: 'montserrat',
 };

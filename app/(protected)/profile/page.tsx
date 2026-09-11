@@ -30,12 +30,13 @@ import {
   MessageCircle,
   Award,
   CheckCircle2,
-  Share2
+  Share2,
+  Type
 } from 'lucide-react';
 import { getBioProfileAdmin, updateBioProfile, getStudioStatsAction } from '@/app/actions';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
 import { useAuthStore } from '@/store/authStore';
-import { useUIStore } from '@/store/uiStore';
+import { useUIStore, SITE_FONTS, SiteFontId } from '@/store/uiStore';
 import { toast } from 'sonner';
 
 type TabType = 'identity' | 'contact' | 'billing' | 'security' | 'appearance';
@@ -49,7 +50,7 @@ export default function ProfilePage() {
 
   // Auth & UI Store
   const user = useAuthStore((state) => state.user);
-  const { theme, toggleTheme } = useUIStore();
+  const { theme, toggleTheme, siteFont, setSiteFont } = useUIStore();
 
   // Studio Profile Form State
   const [formData, setFormData] = useState({
@@ -76,6 +77,7 @@ export default function ProfilePage() {
     defaultPaymentTerms: '1. 50% advance payment required for date reservation.\n2. 30% payment on the event shoot date.\n3. 20% final balance upon raw previews delivery.',
     slug: 'arjunfilms',
     verified: true,
+    fontFamily: 'montserrat',
   });
 
   // Security Form State
@@ -106,6 +108,7 @@ export default function ProfilePage() {
       ]);
 
       if (profileRes) {
+        const loadedFont = (profileRes.fontFamily || 'montserrat') as SiteFontId;
         setFormData({
           studioName: profileRes.studioName || 'Arjun Films & Photography',
           ownerName: profileRes.ownerName || 'Arjun Samal',
@@ -130,7 +133,12 @@ export default function ProfilePage() {
           defaultPaymentTerms: profileRes.defaultPaymentTerms || '1. 50% advance payment required for date reservation.\n2. 30% payment on the event shoot date.\n3. 20% final balance upon raw previews delivery.',
           slug: profileRes.slug || 'arjunfilms',
           verified: profileRes.verified !== false,
+          fontFamily: loadedFont,
         });
+
+        if (profileRes.fontFamily) {
+          setSiteFont(loadedFont);
+        }
       }
 
       if (statsRes?.success && statsRes.stats) {
@@ -846,19 +854,97 @@ export default function ProfilePage() {
         {/* TAB 5: APPEARANCE, THEME & SYSTEM DEFAULTS */}
         {activeTab === 'appearance' && (
           <div className="space-y-6 animate-fade-in">
-            <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-6 shadow-sm">
+            <div className="glass-card bg-white dark:bg-[#15181e] border border-gray-200/70 dark:border-gray-800 rounded-[32px] p-6 md:p-8 space-y-8 shadow-sm">
               <div className="border-b border-gray-150 dark:border-gray-800 pb-4">
                 <h3 className="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                   <Palette className="w-5 h-5 text-[#e50914]" />
-                  Theme, Visual Interface & System Defaults
+                  Theme, Typography & System Defaults
                 </h3>
                 <p className="text-[12px] text-gray-400 font-medium mt-0.5">
-                  Customize the CRM UI appearance and quotation generator templates.
+                  Customize the CRM color mode, full-site font family, and quotation generator templates.
                 </p>
               </div>
 
-              {/* Theme Mode Selector */}
-              <div className="space-y-3">
+              {/* Section 1: Website Global Typography & Font Family (6 Options) */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <h4 className="font-extrabold text-gray-900 dark:text-white text-[15px] flex items-center gap-2">
+                      <Type className="w-4 h-4 text-[#e50914]" />
+                      Full Website Font Family (6 Presets)
+                    </h4>
+                    <p className="text-[12px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                      Select any font below to instantly update typography across the full website, dashboard, and public pages.
+                    </p>
+                  </div>
+                  <span className="self-start sm:self-auto px-3 py-1 bg-red-500/10 border border-red-500/20 text-[#e50914] text-[11px] font-extrabold rounded-full uppercase tracking-wider">
+                    Instant Live Switch
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+                  {SITE_FONTS.map((font) => {
+                    const isSelected = (siteFont || 'montserrat') === font.id;
+                    return (
+                      <div
+                        key={font.id}
+                        onClick={() => {
+                          setSiteFont(font.id as SiteFontId);
+                          handleChange('fontFamily', font.id);
+                          toast.success(`Website font switched to ${font.name}!`);
+                        }}
+                        className={`relative p-5 rounded-3xl border transition-all duration-200 cursor-pointer text-left flex flex-col justify-between group ${
+                          isSelected
+                            ? 'border-[#e50914] bg-[#fef2f2]/80 dark:bg-red-950/20 shadow-lg shadow-red-500/10 ring-2 ring-red-500/30'
+                            : 'border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/30 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span
+                              className="text-[17px] font-black tracking-tight text-gray-900 dark:text-white"
+                              style={{ fontFamily: font.family }}
+                            >
+                              {font.name}
+                            </span>
+                            {isSelected ? (
+                              <div className="w-5 h-5 rounded-full bg-[#e50914] text-white flex items-center justify-center shadow-xs">
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full border border-gray-300 dark:border-gray-700 group-hover:border-gray-400" />
+                            )}
+                          </div>
+
+                          <span className="inline-block px-2.5 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                            {font.badge}
+                          </span>
+
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                            {font.description}
+                          </p>
+                        </div>
+
+                        {/* Live Font Sample Preview Card */}
+                        <div
+                          className="mt-4 pt-3 border-t border-gray-150 dark:border-gray-800/80 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 p-3"
+                          style={{ fontFamily: font.family }}
+                        >
+                          <div className="text-[14px] font-bold text-gray-900 dark:text-white truncate">
+                            {font.sampleText}
+                          </div>
+                          <div className="text-[11px] text-gray-400 font-medium tracking-wider mt-0.5">
+                            Aa Bb Gg 123 • Cinema & Case HQ
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Section 2: Theme Mode Selector */}
+              <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-3">
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">
                   CRM Theme Mode
                 </label>
@@ -895,7 +981,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Quotation Template Info */}
+              {/* Section 3: Quotation Template Info */}
               <div className="border-t border-gray-150 dark:border-gray-800 pt-6 space-y-4">
                 <div>
                   <h4 className="font-extrabold text-gray-800 dark:text-white text-[14px]">
