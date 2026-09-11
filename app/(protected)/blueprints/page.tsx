@@ -1,15 +1,18 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { getCrew, createCrew, updateCrew, deleteCrew } from '@/app/actions';
-import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles } from 'lucide-react';
+import { Plus, MapPin, Phone, Briefcase, Edit2, Trash2, X, Sparkles, ChevronRight, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
+import CrewDetailDrawer from '@/components/blueprints/CrewDetailDrawer';
 
 export default function BlueprintPage() {
   const [crewData, setCrewData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Right sidebar details drawer state
+  const [selectedCrewForDetail, setSelectedCrewForDetail] = useState<any | null>(null);
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -138,16 +141,23 @@ export default function BlueprintPage() {
             return (
               <div 
                 key={crew._id} 
-                className="glass-card rounded-[45px] p-8 bg-white border border-gray-100/50 shadow-sm flex flex-col justify-between h-full relative overflow-hidden transition-all hover:shadow-md"
+                onClick={() => {
+                  setSelectedCrewForDetail(crew);
+                  setIsDetailDrawerOpen(true);
+                }}
+                className="glass-card rounded-[45px] p-8 bg-white border border-gray-100/50 shadow-sm flex flex-col justify-between h-full relative overflow-hidden transition-all hover:shadow-xl hover:border-red-200/60 cursor-pointer group"
               >
                 {/* Scoop Notch Corner (Top-Right) matching ProjectCard */}
-                <div className="absolute top-0 right-0 w-[112px] h-[112px] bg-[#fdf6f6] rounded-bl-[45px] z-10">
+                <div className="absolute top-0 right-0 w-[112px] h-[112px] bg-[#fdf6f6] rounded-bl-[45px] z-10 pointer-events-auto">
                   <div className="inverted-radius-top"></div>
                   <div className="inverted-radius-right"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <button 
-                      onClick={() => openEditModal(crew)}
-                      className="w-[85px] h-[85px] bg-[#ededed] hover:bg-gray-200 text-[#e50914] rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-95"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditModal(crew);
+                      }}
+                      className="w-[85px] h-[85px] bg-[#ededed] hover:bg-[#e50914] hover:text-white text-[#e50914] rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer border border-gray-200/20 active:scale-95"
                       title="Edit Record"
                     >
                       <Edit2 className="w-[22px] h-[22px] stroke-[2.5]" />
@@ -159,7 +169,7 @@ export default function BlueprintPage() {
                 <div>
                   <div className="flex items-start justify-between pr-[116px]">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0 bg-gray-100">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 shadow-sm shrink-0 bg-gray-100 group-hover:scale-105 transition-transform">
                         <img 
                           src={avatarUrl} 
                           alt={crew.name} 
@@ -167,7 +177,9 @@ export default function BlueprintPage() {
                         />
                       </div>
                       <div>
-                        <h4 className="text-[16px] font-extrabold text-[#1a1c22] leading-tight">{crew.name}</h4>
+                        <h4 className="text-[16px] font-extrabold text-[#1a1c22] leading-tight group-hover:text-[#e50914] transition-colors">
+                          {crew.name}
+                        </h4>
                         <span className="inline-block bg-[#fef2f2] text-[#e50914] border border-[#fee2e2] text-[9.5px] font-extrabold uppercase px-2.5 py-1 rounded-[10px] mt-2.5 leading-none">
                           {crew.role}
                         </span>
@@ -202,9 +214,15 @@ export default function BlueprintPage() {
 
                 {/* Bottom Actions section */}
                 <div className="flex justify-between items-center mt-5 pt-1">
-                  <span className="text-[11px] text-gray-400 font-extrabold uppercase tracking-widest">Active Blueprint</span>
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#e50914] font-extrabold uppercase tracking-wider">
+                    <span>View Rate Card & Details</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
                   <button 
-                    onClick={() => handleDelete(crew._id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(crew._id);
+                    }}
                     className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-100"
                     title="Remove Record"
                   >
@@ -328,6 +346,15 @@ export default function BlueprintPage() {
           </form>
         </div>
       )}
+
+      {/* Crew Details Right Sidebar Slide-Over Drawer */}
+      <CrewDetailDrawer
+        isOpen={isDetailDrawerOpen}
+        onClose={() => setIsDetailDrawerOpen(false)}
+        crew={selectedCrewForDetail}
+        onEdit={(crew) => openEditModal(crew)}
+        onDelete={(id) => handleDelete(id)}
+      />
     </div>
   );
 }

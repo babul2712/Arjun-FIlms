@@ -18,6 +18,7 @@ export default function Topbar() {
     '/projects': 'Client Cases',
     '/blueprints': 'Crew Blueprint Database',
     '/social-links': 'Bio & Social Links Manager',
+    '/profile': 'Studio Profile & Settings',
   };
 
   const currentTitle = titleMap[pathname] || 

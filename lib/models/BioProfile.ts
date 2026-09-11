@@ -30,16 +30,27 @@ export interface ICustomLink {
 export interface IBioProfile extends Document {
   slug: string;
   studioName: string;
+  ownerName?: string;
   tagline: string;
   bio: string;
   avatar: string;
   coverImage?: string;
+  watermarkUrl?: string;
   verified: boolean;
   phone: string;
   whatsapp: string;
   email: string;
   location: string;
   website: string;
+  gstin?: string;
+  panNumber?: string;
+  upiId?: string;
+  upiQrCode?: string;
+  bankName?: string;
+  bankAccountNumber?: string;
+  bankIfsc?: string;
+  bankAccountName?: string;
+  defaultPaymentTerms?: string;
   socialLinks: ISocialLink[];
   customLinks: ICustomLink[];
   viewsCount: number;
@@ -89,6 +100,7 @@ const BioProfileSchema: Schema = new Schema(
   {
     slug: { type: String, default: 'arjunfilms', unique: true },
     studioName: { type: String, default: 'Arjun Films & Photography' },
+    ownerName: { type: String, default: 'Arjun Samal' },
     tagline: { type: String, default: 'Cinematic Weddings • Luxury Portfolios • Commercials' },
     bio: {
       type: String,
@@ -104,12 +116,26 @@ const BioProfileSchema: Schema = new Schema(
       default:
         'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80',
     },
+    watermarkUrl: { type: String, default: '' },
     verified: { type: Boolean, default: true },
-    phone: { type: String, default: '+91 98765 43210' },
-    whatsapp: { type: String, default: '919876543210' },
-    email: { type: String, default: 'contact@arjunfilms.com' },
-    location: { type: String, default: 'Bhubaneswar & Mumbai, India' },
+    phone: { type: String, default: '+91 77889 92712' },
+    whatsapp: { type: String, default: '917788992712' },
+    email: { type: String, default: 'arjunphotographyyy@gmail.com' },
+    location: { type: String, default: 'Bhubaneswar, Odisha, India' },
     website: { type: String, default: 'https://arjunfilms.com' },
+    gstin: { type: String, default: '' },
+    panNumber: { type: String, default: '' },
+    upiId: { type: String, default: '7788992712@upi' },
+    upiQrCode: { type: String, default: '' },
+    bankName: { type: String, default: 'State Bank of India' },
+    bankAccountNumber: { type: String, default: '' },
+    bankIfsc: { type: String, default: '' },
+    bankAccountName: { type: String, default: 'Arjun Photography' },
+    defaultPaymentTerms: {
+      type: String,
+      default:
+        '1. 50% advance payment required for date reservation.\n2. 30% payment on the event shoot date.\n3. 20% final balance upon raw previews delivery.',
+    },
     socialLinks: { type: [SocialLinkSchema], default: [] },
     customLinks: { type: [CustomLinkSchema], default: [] },
     viewsCount: { type: Number, default: 0 },

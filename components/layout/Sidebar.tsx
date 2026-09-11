@@ -15,7 +15,8 @@ import {
   Calendar,
   Sun,
   Moon,
-  Share2
+  Share2,
+  User
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
@@ -28,6 +29,7 @@ const navItems = [
   { name: 'Projects', href: '/projects', icon: Briefcase },
   { name: 'Blueprint', href: '/blueprints', icon: Users },
   { name: 'Bio Links', href: '/social-links', icon: Share2 },
+  { name: 'Profile', href: '/profile', icon: User },
 ];
 
 export default function Sidebar() {
@@ -150,12 +152,20 @@ export default function Sidebar() {
                   <p className="text-[12px] font-bold text-gray-800 dark:text-gray-200">{user?.name || 'Arjun Owner'}</p>
                   <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{user?.username || 'admin@arjunfilms.com'}</p>
                 </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 mt-1 text-[12px] font-bold text-gray-700 dark:text-gray-200 hover:bg-[#fef2f2] dark:hover:bg-red-950/30 rounded-xl cursor-pointer transition-colors"
+                >
+                  <User className="w-4 h-4 text-[#e50914]" />
+                  <span>Studio Profile</span>
+                </Link>
                 <button
                   onClick={() => {
                     logout();
                     setShowProfileMenu(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 mt-1.5 text-[12px] font-bold text-[#e50914] hover:bg-[#fef2f2] dark:hover:bg-red-950/30 rounded-xl cursor-pointer transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 mt-1 text-[12px] font-bold text-[#e50914] hover:bg-[#fef2f2] dark:hover:bg-red-950/30 rounded-xl cursor-pointer transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Log Out</span>

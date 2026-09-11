@@ -736,4 +736,51 @@ export async function uploadImageToCloudinaryAction(
   }
 }
 
+export async function getStudioStatsAction() {
+  try {
+    await connectToDatabase();
+    const [
+      totalProjects,
+      totalQuotations,
+      totalCrew,
+      totalPayments,
+      bioProfile,
+    ] = await Promise.all([
+      Project.countDocuments(),
+      Quotation.countDocuments(),
+      Crew.countDocuments(),
+      Payment.find({ status: { $in: ['PAID', 'Verified'] } }).select('amount').lean(),
+      BioProfile.findOne({ slug: 'arjunfilms' }).select('viewsCount totalClicks').lean(),
+    ]);
+
+    const totalCollected = (totalPayments || []).reduce((acc: number, curr: any) => acc + (curr?.amount || 0), 0);
+
+    return {
+      success: true,
+      stats: {
+        totalProjects: totalProjects || 0,
+        totalQuotations: totalQuotations || 0,
+        totalCrew: totalCrew || 0,
+        totalCollected: totalCollected || 0,
+        bioViews: bioProfile?.viewsCount || 0,
+        bioClicks: bioProfile?.totalClicks || 0,
+      },
+    };
+  } catch (error) {
+    console.error('getStudioStatsAction error:', error);
+    return {
+      success: false,
+      stats: {
+        totalProjects: 0,
+        totalQuotations: 0,
+        totalCrew: 0,
+        totalCollected: 0,
+        bioViews: 0,
+        bioClicks: 0,
+      },
+    };
+  }
+}
+
+
 
