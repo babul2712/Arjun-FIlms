@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
@@ -29,14 +29,14 @@
   --color-surface: var(--surface);
   --color-surface-variant: var(--surface-variant);
   --color-outline-variant: var(--outline-variant);
-  --font-sans: 'Poppins', sans-serif;
+  --font-sans: 'Montserrat', var(--font-montserrat, sans-serif);
 }
 
 body {
   background: radial-gradient(circle at 10% 10%, rgba(229, 9, 20, 0.04) 0%, transparent 45%), radial-gradient(circle at 90% 85%, rgba(229, 9, 20, 0.03) 0%, transparent 40%), linear-gradient(135deg, #fdf6f6 0%, #f9f0f0 50%, #fdf8f8 100%);
   background-attachment: fixed;
   color: var(--foreground);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', var(--font-montserrat, sans-serif);
   overflow-x: hidden;
   min-height: 100vh;
 }
