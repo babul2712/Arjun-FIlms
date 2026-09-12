@@ -9,8 +9,10 @@ export interface User {
 }
 
 export interface ServiceItem {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
+  description?: string;
   quantity: number;
   price: number;
 }

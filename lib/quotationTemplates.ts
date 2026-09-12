@@ -107,8 +107,12 @@ export function generateInvoice1HTML(data: QuotationData): string {
     const amount = qty * unitPrice;
     const descriptionSubLines = (item.description || '')
       .split(/\r\n|\n|\r/)
-      .filter(l => l.trim())
-      .map(l => `<div style="font-size: 11.5px; color: #666; font-weight: normal; margin-top: 2px;">${l.trim()}</div>`)
+      .map(l => l.trim())
+      .filter(Boolean)
+      .map(l => {
+        const clean = l.replace(/^[•\-\*]\s*/, '');
+        return `<div style="font-size: 11.5px; color: #555; font-weight: normal; margin-top: 3px; line-height: 1.45;">• ${clean}</div>`;
+      })
       .join('');
 
     return `
@@ -464,8 +468,12 @@ export function generateClassicHTML(data: QuotationData): string {
   const servicesHtml = data.services.map((s: any) => {
     const details = (s.description || '')
       .split(/\r\n|\n|\r/)
-      .filter((line: string) => line.trim())
-      .map((line: string) => `<div style="font-size:11px; color:#555; margin-top:2px;">${line.trim()}</div>`)
+      .map((line: string) => line.trim())
+      .filter(Boolean)
+      .map((line: string) => {
+        const clean = line.replace(/^[•\-\*]\s*/, '');
+        return `<div style="font-size:11.5px; color:#555; margin-top:3px; line-height: 1.45;">• ${clean}</div>`;
+      })
       .join('');
     return `
     <tr>

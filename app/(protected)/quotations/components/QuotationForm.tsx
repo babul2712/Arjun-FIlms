@@ -624,14 +624,21 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                   </div>
                 </div>
 
-                <div className="flex flex-col">
-                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Scope of Work / Deliverables Details</label>
-                  <input 
-                    className="w-full bg-transparent border-b border-gray-300 py-1.5 focus:outline-none focus:border-[#e50914] text-[12px] text-gray-600" 
-                    placeholder="e.g. Includes color grading, audio cleanup, full 4K delivery on cloud drive" 
-                    value={service.description}
+                <div className="flex flex-col mt-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest block">
+                      Scope of Work / Deliverables Details
+                    </label>
+                    <span className="text-[10px] text-gray-400 font-medium">
+                      Supports multiple lines & bullet lists (Press Enter for new line)
+                    </span>
+                  </div>
+                  <textarea 
+                    className="w-full bg-white dark:bg-[#16181c] border border-gray-200/90 dark:border-gray-700/80 rounded-xl p-3 focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-red-500/20 text-[12.5px] text-gray-700 dark:text-gray-200 transition-all resize-y min-h-[72px] font-normal leading-relaxed placeholder:text-gray-400/70 shadow-2xs" 
+                    placeholder="e.g.&#10;• 1 Traditional Video 4K Ultra HD&#10;• 1 Cinematic Highlight Teaser (3-5 mins)&#10;• Full Raw Footage delivered on Cloud Drive&#10;• 2 Candid Photographers + 2 Cinematographers" 
+                    value={service.description || ''}
                     onChange={e => handleServiceChange(service.id, 'description', e.target.value)}
-                    type="text"
+                    rows={3}
                   />
                 </div>
               </div>
