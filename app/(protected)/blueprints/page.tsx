@@ -625,51 +625,6 @@ export default function BlueprintPage() {
           </div>
         </div>
 
-        {/* Database Stored Role Filter Pills (Dynamic from MongoDB) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 pt-1 border-t border-gray-150/70 dark:border-gray-800/60 custom-scrollbar">
-          {/* All Roles Pill */}
-          <button
-            type="button"
-            onClick={() => setRoleFilter('all')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-              roleFilter === 'all'
-                ? 'bg-[#e50914] text-white border-[#e50914] shadow-xs font-black'
-                : 'bg-gray-100/70 dark:bg-gray-800/60 hover:bg-gray-200/80 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200/60 dark:border-gray-700/60'
-            }`}
-          >
-            <span>All Roles</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-              roleFilter === 'all' ? 'bg-white/20 text-white' : 'bg-gray-200/80 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-            }`}>
-              {stats.total}
-            </span>
-          </button>
-
-          {/* Dynamic DB Role Pills */}
-          {distinctDbRoles.map((d) => {
-            const isActive = roleFilter.toLowerCase() === d.role.toLowerCase();
-            return (
-              <button
-                key={d.role}
-                type="button"
-                onClick={() => setRoleFilter(d.role)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                  isActive
-                    ? 'bg-[#e50914] text-white border-[#e50914] shadow-xs font-black'
-                    : 'bg-gray-100/70 dark:bg-gray-800/60 hover:bg-gray-200/80 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200/60 dark:border-gray-700/60'
-                }`}
-              >
-                <span>{d.role}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-gray-200/80 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                }`}>
-                  {d.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
         {/* Active Filters & Match Count Bar */}
         {(searchQuery || roleFilter !== 'all' || cityFilter !== 'all' || rateRange !== 'all' || sortBy !== 'default') && (
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-150/70 dark:border-gray-800/60 text-[11.5px]">
