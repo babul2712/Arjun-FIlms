@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CrewDetailDrawer from '@/components/blueprints/CrewDetailDrawer';
+import AutoSearchInput, { AutoSearchOption } from '@/components/ui/AutoSearchInput';
 
 type SortOption = 'default' | 'name-asc' | 'name-desc' | 'rate-asc' | 'rate-desc' | 'role' | 'location';
 type RateRange = 'all' | 'under-3k' | '3k-6k' | 'above-6k';
@@ -121,6 +122,25 @@ export default function BlueprintPage() {
     }
   };
 
+  // 1. Extract ALL unique, distinct roles stored in the Database with real-time member counts
+  const distinctDbRoles = useMemo(() => {
+    const roleCountMap: Record<string, number> = {};
+    crewData.forEach(c => {
+      const r = (c.role || '').trim();
+      if (r) {
+        roleCountMap[r] = (roleCountMap[r] || 0) + 1;
+      }
+    });
+    return Object.entries(roleCountMap)
+      .map(([role, count]) => ({ role, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [crewData]);
+
+  // Distinct list of role names
+  const availableRolesList = useMemo(() => {
+    return distinctDbRoles.map(d => d.role);
+  }, [distinctDbRoles]);
+
   // Distinct cities list for filter dropdown
   const distinctCities = useMemo(() => {
     const set = new Set<string>();
@@ -132,6 +152,28 @@ export default function BlueprintPage() {
     return Array.from(set).sort();
   }, [crewData]);
 
+  // Auto-Search Options for the search dropdown component
+  const crewSearchOptions: AutoSearchOption[] = useMemo(() => {
+    return crewData.map(c => {
+      const lower = (c.role || '').toLowerCase();
+      let badgeColor: 'red' | 'blue' | 'emerald' | 'amber' | 'purple' | 'gray' = 'gray';
+      if (lower.includes('photo')) badgeColor = 'red';
+      else if (lower.includes('video') || lower.includes('cinema')) badgeColor = 'blue';
+      else if (lower.includes('drone')) badgeColor = 'blue';
+      else if (lower.includes('edit') || lower.includes('album')) badgeColor = 'purple';
+
+      return {
+        value: c.name,
+        label: c.name,
+        sublabel: `${c.role} • ${c.location} • ₹${(Number(c.charges) || 0).toLocaleString('en-IN')}/day`,
+        badge: c.role,
+        badgeColor,
+        avatar: c.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name || 'Crew')}&background=e50914&color=fff&bold=true&size=64`,
+        data: c
+      };
+    });
+  }, [crewData]);
+
   // Quick statistics
   const stats = useMemo(() => {
     const total = crewData.length;
@@ -139,15 +181,11 @@ export default function BlueprintPage() {
     const videoCount = crewData.filter(c => (c.role || '').toLowerCase().includes('video') || (c.role || '').toLowerCase().includes('cinema')).length;
     const droneCount = crewData.filter(c => (c.role || '').toLowerCase().includes('drone')).length;
     const editorCount = crewData.filter(c => (c.role || '').toLowerCase().includes('edit') || (c.role || '').toLowerCase().includes('album')).length;
-    const otherCount = crewData.filter(c => {
-      const r = (c.role || '').toLowerCase();
-      return !r.includes('photo') && !r.includes('video') && !r.includes('cinema') && !r.includes('drone') && !r.includes('edit') && !r.includes('album');
-    }).length;
     
     const validCharges = crewData.map(c => Number(c.charges) || 0).filter(c => c > 0);
     const avgRate = validCharges.length > 0 ? Math.round(validCharges.reduce((a, b) => a + b, 0) / validCharges.length) : 0;
 
-    return { total, photoCount, videoCount, droneCount, editorCount, otherCount, avgRate };
+    return { total, photoCount, videoCount, droneCount, editorCount, avgRate };
   }, [crewData]);
 
   // Active filters count
@@ -171,26 +209,18 @@ export default function BlueprintPage() {
   const filteredAndSortedCrew = useMemo(() => {
     // 1. Filter
     const filtered = crewData.filter((c) => {
-      const r = (c.role || '').toLowerCase();
+      const r = (c.role || '').trim();
+      const rLower = r.toLowerCase();
       const loc = (c.location || '').toLowerCase();
       const charges = Number(c.charges) || 0;
 
-      // Role check
-      let matchesRole = true;
-      if (roleFilter === 'photo') {
-        matchesRole = r.includes('photo');
-      } else if (roleFilter === 'video') {
-        matchesRole = r.includes('video') || r.includes('cinema');
-      } else if (roleFilter === 'drone') {
-        matchesRole = r.includes('drone');
-      } else if (roleFilter === 'edit') {
-        matchesRole = r.includes('edit') || r.includes('album');
-      } else if (roleFilter === 'other') {
-        matchesRole = !r.includes('photo') && !r.includes('video') && !r.includes('cinema') && !r.includes('drone') && !r.includes('edit') && !r.includes('album');
-      } else if (roleFilter !== 'all') {
-        matchesRole = r.includes(roleFilter.toLowerCase());
+      // Exact or Category Role check
+      if (roleFilter !== 'all') {
+        // Match exact role from database or case-insensitive match
+        if (r.toLowerCase() !== roleFilter.toLowerCase()) {
+          return false;
+        }
       }
-      if (!matchesRole) return false;
 
       // City check
       if (cityFilter !== 'all' && loc !== cityFilter.toLowerCase()) {
@@ -275,15 +305,6 @@ export default function BlueprintPage() {
       glowClass: 'from-amber-500/20 to-transparent'
     };
   };
-
-  const filterTabs = [
-    { id: 'all', label: 'All Roles', count: stats.total },
-    { id: 'photo', label: 'Photographers', count: stats.photoCount },
-    { id: 'video', label: 'Cinematography', count: stats.videoCount },
-    { id: 'drone', label: 'Drone', count: stats.droneCount },
-    { id: 'edit', label: 'Editors & Album', count: stats.editorCount },
-    { id: 'other', label: 'Other', count: stats.otherCount },
-  ];
 
   const sortLabels: Record<SortOption, string> = {
     default: 'Default Order',
@@ -390,26 +411,22 @@ export default function BlueprintPage() {
         {/* Top Control Strip */}
         <div className="flex flex-col lg:flex-row gap-3.5 items-stretch lg:items-center justify-between">
           
-          {/* Auto Search Bar */}
+          {/* Auto Search Dropdown Input Component */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
+            <AutoSearchInput
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Auto-search by name, role, city, phone, rate (e.g. Rahul, Editor, Cuttack)..."
-              className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 rounded-2xl text-[13px] font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#e50914] focus:ring-2 focus:ring-red-500/10 transition-all"
+              onChange={(val, selected) => {
+                setSearchQuery(val);
+                if (selected?.data) {
+                  openViewDrawer(selected.data);
+                }
+              }}
+              options={crewSearchOptions}
+              placeholder="Auto-search by name, role, city, phone (e.g. Chinmay, Editor, Bhubaneswar)..."
+              icon={<Search className="w-4 h-4 text-gray-400" />}
+              allowCustom={true}
+              inputClassName="py-2.5 bg-gray-50 dark:bg-gray-800/60 text-[13px]"
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 cursor-pointer"
-                title="Clear Search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
 
           {/* Action Buttons: Filter, Sort, View Toggle */}
@@ -458,10 +475,10 @@ export default function BlueprintPage() {
                     )}
                   </div>
 
-                  {/* Role Category Selection */}
+                  {/* Role Category Selection from stored DB Roles */}
                   <div className="space-y-1.5">
                     <label className="text-[10.5px] font-extrabold text-gray-400 uppercase tracking-wider block">
-                      Specialist Role
+                      Database Stored Roles ({distinctDbRoles.length})
                     </label>
                     <select
                       value={roleFilter}
@@ -469,25 +486,25 @@ export default function BlueprintPage() {
                       className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700 rounded-xl text-[12px] font-bold text-gray-800 dark:text-white focus:outline-none focus:border-[#e50914]"
                     >
                       <option value="all">All Roles ({stats.total})</option>
-                      <option value="photo">Photographers ({stats.photoCount})</option>
-                      <option value="video">Cinematographers ({stats.videoCount})</option>
-                      <option value="drone">Drone Pilots ({stats.droneCount})</option>
-                      <option value="edit">Video Editors & Album ({stats.editorCount})</option>
-                      <option value="other">Other Specialists ({stats.otherCount})</option>
+                      {distinctDbRoles.map((d) => (
+                        <option key={d.role} value={d.role}>
+                          {d.role} ({d.count})
+                        </option>
+                      ))}
                     </select>
                   </div>
 
-                  {/* City / Base Location */}
+                  {/* City / Base Location from DB */}
                   <div className="space-y-1.5">
                     <label className="text-[10.5px] font-extrabold text-gray-400 uppercase tracking-wider block">
-                      Operating Base City
+                      Operating Base City ({distinctCities.length})
                     </label>
                     <select
                       value={cityFilter}
                       onChange={(e) => setCityFilter(e.target.value)}
                       className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700 rounded-xl text-[12px] font-bold text-gray-800 dark:text-white focus:outline-none focus:border-[#e50914]"
                     >
-                      <option value="all">All Locations</option>
+                      <option value="all">All Locations ({distinctCities.length})</option>
                       {distinctCities.map((city) => (
                         <option key={city} value={city}>{city}</option>
                       ))}
@@ -608,26 +625,45 @@ export default function BlueprintPage() {
           </div>
         </div>
 
-        {/* Role Quick Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 border-t border-gray-150/70 dark:border-gray-800/60">
-          {filterTabs.map((r) => {
-            const isActive = roleFilter === r.id;
+        {/* Database Stored Role Filter Pills (Dynamic from MongoDB) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 pt-1 border-t border-gray-150/70 dark:border-gray-800/60 custom-scrollbar">
+          {/* All Roles Pill */}
+          <button
+            type="button"
+            onClick={() => setRoleFilter('all')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
+              roleFilter === 'all'
+                ? 'bg-[#e50914] text-white border-[#e50914] shadow-xs font-black'
+                : 'bg-gray-100/70 dark:bg-gray-800/60 hover:bg-gray-200/80 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200/60 dark:border-gray-700/60'
+            }`}
+          >
+            <span>All Roles</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+              roleFilter === 'all' ? 'bg-white/20 text-white' : 'bg-gray-200/80 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+            }`}>
+              {stats.total}
+            </span>
+          </button>
+
+          {/* Dynamic DB Role Pills */}
+          {distinctDbRoles.map((d) => {
+            const isActive = roleFilter.toLowerCase() === d.role.toLowerCase();
             return (
               <button
-                key={r.id}
+                key={d.role}
                 type="button"
-                onClick={() => setRoleFilter(r.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer whitespace-nowrap border ${
+                onClick={() => setRoleFilter(d.role)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
                   isActive
                     ? 'bg-[#e50914] text-white border-[#e50914] shadow-xs font-black'
                     : 'bg-gray-100/70 dark:bg-gray-800/60 hover:bg-gray-200/80 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200/60 dark:border-gray-700/60'
                 }`}
               >
-                <span>{r.label}</span>
+                <span>{d.role}</span>
                 <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
                   isActive ? 'bg-white/20 text-white' : 'bg-gray-200/80 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}>
-                  {r.count}
+                  {d.count}
                 </span>
               </button>
             );
@@ -649,7 +685,7 @@ export default function BlueprintPage() {
 
               {roleFilter !== 'all' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 dark:bg-red-950/40 text-[#e50914] rounded-lg font-bold">
-                  Role: {filterTabs.find(t => t.id === roleFilter)?.label}
+                  Role: {roleFilter}
                   <button onClick={() => setRoleFilter('all')} className="hover:text-red-700 cursor-pointer"><X className="w-3 h-3" /></button>
                 </span>
               )}
@@ -980,6 +1016,8 @@ export default function BlueprintPage() {
         onClose={() => setIsDetailDrawerOpen(false)}
         crew={selectedCrewForDetail}
         initialMode={drawerMode}
+        availableRoles={availableRolesList}
+        availableCities={distinctCities}
         onDelete={(id) => handleDelete(id)}
         onSuccess={fetchData}
       />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   X, 
@@ -37,28 +37,7 @@ import {
 import { toast } from 'sonner';
 import { createCrew, updateCrew } from '@/app/actions';
 import CloudinaryUpload from '@/components/ui/CloudinaryUpload';
-
-const QUICK_ROLES = [
-  'Lead Photographer',
-  'Cinematographer',
-  'Candid Photographer',
-  'Traditional Videographer',
-  'Drone Pilot',
-  'Video Editor',
-  'Album Designer',
-  'Photography',
-  'Videography'
-];
-
-const QUICK_CITIES = [
-  'Bhubaneswar',
-  'Cuttack',
-  'Puri',
-  'Kolkata',
-  'West Bengal',
-  'Dhenkanal',
-  'Berhampur'
-];
+import AutoSearchInput, { AutoSearchOption } from '@/components/ui/AutoSearchInput';
 
 interface CrewDetailDrawerProps {
   isOpen: boolean;
@@ -67,6 +46,8 @@ interface CrewDetailDrawerProps {
   onDelete: (id: string) => void;
   onSuccess?: () => void;
   initialMode?: 'view' | 'edit' | 'create';
+  availableRoles?: string[];
+  availableCities?: string[];
 }
 
 export default function CrewDetailDrawer({
@@ -75,7 +56,9 @@ export default function CrewDetailDrawer({
   crew,
   onDelete,
   onSuccess,
-  initialMode = 'view'
+  initialMode = 'view',
+  availableRoles = [],
+  availableCities = []
 }: CrewDetailDrawerProps) {
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>(initialMode);
   const [copiedPhone, setCopiedPhone] = useState(false);
@@ -102,8 +85,8 @@ export default function CrewDetailDrawer({
       setMode('create');
       setFormData({
         name: '',
-        role: 'Lead Photographer',
-        location: 'Bhubaneswar',
+        role: availableRoles[0] || 'Lead Photographer',
+        location: availableCities[0] || 'Bhubaneswar',
         phone: '',
         address: '',
         charges: '5000',
@@ -113,15 +96,15 @@ export default function CrewDetailDrawer({
       setMode(initialMode || 'view');
       setFormData({
         name: crew.name || '',
-        role: crew.role || 'Lead Photographer',
-        location: crew.location || 'Bhubaneswar',
+        role: crew.role || availableRoles[0] || 'Lead Photographer',
+        location: crew.location || availableCities[0] || 'Bhubaneswar',
         phone: crew.phone || '',
         address: crew.address || '',
         charges: crew.charges ? crew.charges.toString() : '5000',
         avatarUrl: crew.avatarUrl || ''
       });
     }
-  }, [crew, initialMode, isOpen]);
+  }, [crew, initialMode, isOpen, availableRoles, availableCities]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -136,6 +119,51 @@ export default function CrewDetailDrawer({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
+
+  // Convert available roles and cities into AutoSearchOptions
+  const roleSearchOptions: AutoSearchOption[] = useMemo(() => {
+    const defaultRoles = [
+      'Videography',
+      'Photography',
+      'Video Editor',
+      'Album Designer',
+      'Drone PIlot',
+      'Album Print Store',
+      'Lead Photographer',
+      'Cinematographer',
+      'Candid Photographer',
+      'Traditional Videographer'
+    ];
+    const combined = Array.from(new Set([...availableRoles, ...defaultRoles])).filter(Boolean);
+    return combined.map(r => {
+      const lower = r.toLowerCase();
+      let badgeColor: 'red' | 'blue' | 'emerald' | 'amber' | 'purple' | 'gray' = 'gray';
+      if (lower.includes('photo')) badgeColor = 'red';
+      else if (lower.includes('video') || lower.includes('cinema')) badgeColor = 'blue';
+      else if (lower.includes('drone')) badgeColor = 'blue';
+      else if (lower.includes('edit') || lower.includes('album')) badgeColor = 'purple';
+      
+      return {
+        value: r,
+        label: r,
+        sublabel: 'Database Specialty Role',
+        badge: r,
+        badgeColor
+      };
+    });
+  }, [availableRoles]);
+
+  const citySearchOptions: AutoSearchOption[] = useMemo(() => {
+    const defaultCities = ['Bhubaneswar', 'Cuttack', 'Puri', 'Kolkata', 'West Bengal', 'Berhampur', 'Sambalpur', 'Rourkela'];
+    const combined = Array.from(new Set([...availableCities, ...defaultCities])).filter(Boolean);
+    return combined.map(c => ({
+      value: c,
+      label: c,
+      sublabel: 'Operating City',
+      badge: 'Base',
+      badgeColor: 'emerald' as const
+    }));
+  }, [availableCities]);
 
   if (!mounted || !isOpen) return null;
 
@@ -168,7 +196,8 @@ export default function CrewDetailDrawer({
   const isPhoto = ((mode === 'view' ? crew?.role : formData.role) || '').toLowerCase().includes('photo') || 
                   ((mode === 'view' ? crew?.role : formData.role) || '').toLowerCase().includes('candid') || 
                   ((mode === 'view' ? crew?.role : formData.role) || '').toLowerCase().includes('lead');
-  const isEditor = ((mode === 'view' ? crew?.role : formData.role) || '').toLowerCase().includes('edit');
+  const isEditor = ((mode === 'view' ? crew?.role : formData.role) || '').toLowerCase().includes('edit') ||
+                   ((mode === 'view' ? crew?.role : formData.role) || '').toLowerCase().includes('album');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,11 +209,17 @@ export default function CrewDetailDrawer({
       toast.error('Please enter the contact phone number');
       return;
     }
+    if (!formData.role.trim()) {
+      toast.error('Please enter or select a role');
+      return;
+    }
 
     setSubmitting(true);
     const payload = {
       ...formData,
       name: formData.name.trim(),
+      role: formData.role.trim(),
+      location: formData.location.trim() || 'Bhubaneswar',
       charges: parseInt(formData.charges, 10) || 0
     };
 
@@ -544,25 +579,23 @@ export default function CrewDetailDrawer({
                   </div>
                 </div>
 
-                {/* Role & Specialization */}
+                {/* Role & Specialization using AutoSearchInput */}
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
-                    Role & Specialization *
-                  </label>
-                  <div className="flex items-center px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200/80 dark:border-gray-700/80 focus-within:border-[#e50914] focus-within:ring-2 focus-within:ring-red-500/15 transition-all">
-                    <Briefcase className="w-4 h-4 text-gray-400 mr-2.5 shrink-0" />
-                    <input 
-                      type="text" 
-                      required 
-                      value={formData.role}
-                      onChange={e => setFormData({...formData, role: e.target.value})}
-                      className="bg-transparent border-none focus:outline-none text-[13.5px] font-bold w-full text-gray-900 dark:text-white placeholder:text-gray-400" 
-                      placeholder="Type or select a role below..." 
-                    />
-                  </div>
-                  {/* Quick Role Selector Chips */}
+                  <AutoSearchInput
+                    label="Role & Specialization"
+                    required
+                    value={formData.role}
+                    onChange={(val) => setFormData(prev => ({ ...prev, role: val }))}
+                    options={roleSearchOptions}
+                    placeholder="Search or select database role (or type new)..."
+                    allowCustom={true}
+                    createOptionLabel="Add custom role"
+                    icon={<Briefcase className="w-4 h-4 text-gray-400" />}
+                  />
+                  
+                  {/* Quick Role Selector Chips from actual database roles */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {QUICK_ROLES.map((roleOption) => (
+                    {availableRoles.slice(0, 6).map((roleOption) => (
                       <button
                         key={roleOption}
                         type="button"
@@ -606,35 +639,19 @@ export default function CrewDetailDrawer({
                     )}
                   </div>
 
-                  {/* Base City / Location */}
+                  {/* Base City / Location using AutoSearchInput */}
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
-                      Base City / Location *
-                    </label>
-                    <div className="flex items-center px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200/80 dark:border-gray-700/80 focus-within:border-[#e50914] focus-within:ring-2 focus-within:ring-red-500/15 transition-all">
-                      <MapPin className="w-4 h-4 text-gray-400 mr-2.5 shrink-0" />
-                      <input 
-                        type="text" 
-                        required 
-                        value={formData.location}
-                        onChange={e => setFormData({...formData, location: e.target.value})}
-                        className="bg-transparent border-none focus:outline-none text-[13.5px] font-bold w-full text-gray-900 dark:text-white placeholder:text-gray-400" 
-                        placeholder="e.g. Bhubaneswar" 
-                      />
-                    </div>
-                    {/* Quick City Chips */}
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {QUICK_CITIES.slice(0, 4).map(city => (
-                        <button
-                          key={city}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, location: city })}
-                          className="text-[9.5px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-white cursor-pointer"
-                        >
-                          {city}
-                        </button>
-                      ))}
-                    </div>
+                    <AutoSearchInput
+                      label="Base City / Location"
+                      required
+                      value={formData.location}
+                      onChange={(val) => setFormData(prev => ({ ...prev, location: val }))}
+                      options={citySearchOptions}
+                      placeholder="Search or select city..."
+                      allowCustom={true}
+                      createOptionLabel="Add custom city"
+                      icon={<MapPin className="w-4 h-4 text-gray-400" />}
+                    />
                   </div>
 
                 </div>
