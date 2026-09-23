@@ -276,13 +276,13 @@ export default function MonthlyCalendar({
         </div>
 
         {/* Month High-Level KPIs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5">
           {/* Total P&L */}
-          <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
               Monthly Net P&L
             </span>
-            <span className={`text-base font-black truncate block ${
+            <span className={`text-sm sm:text-base font-black truncate block ${
               monthStats.totalPnL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
             }`}>
               {monthStats.totalPnL >= 0 ? '+' : ''}{currencySymbol}{monthStats.totalPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -290,61 +290,61 @@ export default function MonthlyCalendar({
           </div>
 
           {/* Win Rate */}
-          <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
               Win Rate %
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="text-base font-black text-gray-900 dark:text-white">
+              <span className="text-sm sm:text-base font-black text-gray-900 dark:text-white">
                 {monthStats.winRate.toFixed(1)}%
               </span>
               <span className="text-[10px] font-bold text-gray-400">
-                ({monthStats.winCount}W / {monthStats.lossCount}L)
+                ({monthStats.winCount}W/{monthStats.lossCount}L)
               </span>
             </div>
           </div>
 
           {/* Profit Factor */}
-          <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
               Profit Factor
             </span>
-            <span className="text-base font-black text-gray-900 dark:text-white">
+            <span className="text-sm sm:text-base font-black text-gray-900 dark:text-white">
               {monthStats.profitFactor.toFixed(2)}x
             </span>
           </div>
 
           {/* Green vs Red Days */}
-          <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
               Green / Red Days
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-emerald-600">
-                {monthStats.greenDays} Green
+                {monthStats.greenDays}G
               </span>
               <span className="text-xs font-black text-red-600">
-                {monthStats.redDays} Red
+                {monthStats.redDays}R
               </span>
             </div>
           </div>
 
           {/* Best Day */}
-          <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
               Best Day
             </span>
-            <span className="text-base font-black text-emerald-600 truncate block">
+            <span className="text-sm sm:text-base font-black text-emerald-600 truncate block">
               +{currencySymbol}{monthStats.bestDayPnL.toLocaleString('en-US', { maximumFractionDigits: 2 })}
             </span>
           </div>
 
           {/* Total Trades Logged */}
-          <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
               Trades Taken
             </span>
-            <span className="text-base font-black text-gray-900 dark:text-white">
+            <span className="text-sm sm:text-base font-black text-gray-900 dark:text-white">
               {monthStats.totalTradesCount} Trades
             </span>
           </div>
@@ -352,24 +352,24 @@ export default function MonthlyCalendar({
 
         {/* Heatmap Grid with Responsive Scroll Container */}
         <div className="w-full overflow-x-auto custom-scrollbar pb-1">
-          <div className="w-full min-w-[560px] sm:min-w-0">
+          <div className="w-full min-w-[500px] sm:min-w-0">
             {/* Weekday Header */}
-            <div className="grid grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mb-2 text-center text-xs font-black uppercase tracking-wider text-gray-400">
+            <div className="grid grid-cols-7 gap-1.5 sm:gap-2 md:gap-2.5 mb-2 text-center text-xs font-black uppercase tracking-wider text-gray-400">
               {WEEK_DAYS.map((w, idx) => (
-                <div key={w} className={`py-1.5 ${idx === 0 || idx === 6 ? 'text-gray-300 dark:text-gray-600' : ''}`}>
+                <div key={w} className={`py-1 ${idx === 0 || idx === 6 ? 'text-gray-300 dark:text-gray-600' : ''}`}>
                   {w}
                 </div>
               ))}
             </div>
 
             {/* Calendar Cells Grid */}
-            <div className="grid grid-cols-7 gap-2 sm:gap-2.5 md:gap-3">
+            <div className="grid grid-cols-7 gap-1.5 sm:gap-2 md:gap-2.5">
               {calendarCells.map((cell) => {
                 if (!cell.dayNumber) {
                   return (
                     <div
                       key={cell.dateKey}
-                      className="min-h-[85px] sm:min-h-[100px] md:min-h-[115px] rounded-2xl bg-gray-50/30 dark:bg-gray-900/20 border border-dashed border-gray-200/40 dark:border-gray-800/40 opacity-40 pointer-events-none"
+                      className="min-h-[80px] sm:min-h-[95px] md:min-h-[105px] rounded-2xl bg-gray-50/30 dark:bg-gray-900/20 border border-dashed border-gray-200/40 dark:border-gray-800/40 opacity-40 pointer-events-none"
                     />
                   );
                 }

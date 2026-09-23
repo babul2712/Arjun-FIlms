@@ -201,35 +201,35 @@ export default function EquityCurveChart({
   };
 
   return (
-    <div className="p-5 md:p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-6">
+    <div className="p-4 sm:p-5 md:p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-4 md:space-y-5 h-full flex flex-col justify-between">
       
       {/* Header & Timeframe Switcher */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center border shadow-xs ${
+      <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-start sm:items-center lg:items-start xl:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border shadow-xs shrink-0 ${
             isPositiveEquity
               ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
               : 'bg-red-500/10 text-red-600 border-red-500/20'
           }`}>
-            <Activity className="w-5 h-5 stroke-[2.2]" />
+            <Activity className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
           </div>
           <div>
-            <h2 className="text-lg md:text-xl font-black text-gray-900 dark:text-white tracking-tight">
-              Cumulative Equity Curve
+            <h2 className="text-base sm:text-lg font-black text-gray-900 dark:text-white tracking-tight">
+              Equity Curve
             </h2>
-            <p className="text-xs text-gray-400 font-bold">
-              Account balance growth, peak equity, and drawdown trajectory
+            <p className="text-[10px] sm:text-xs text-gray-400 font-bold">
+              Balance & Drawdown
             </p>
           </div>
         </div>
 
         {/* Timeframe Buttons */}
-        <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800/80 rounded-2xl border border-gray-200 dark:border-gray-700/60">
+        <div className="flex items-center p-0.5 sm:p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700/60 self-stretch sm:self-auto justify-between">
           {TIMEFRAMES.map((tf) => (
             <button
               key={tf.label}
               onClick={() => setTimeframe(tf.label)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-black transition-all cursor-pointer ${
                 timeframe === tf.label
                   ? 'bg-white dark:bg-[#15171c] text-gray-900 dark:text-white shadow-xs'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
@@ -241,14 +241,14 @@ export default function EquityCurveChart({
         </div>
       </div>
 
-      {/* High-Level Metric Badges */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* High-Level Metric Badges (2x2 Grid for compact 1/4 fit) */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
         {/* Current Net Equity */}
-        <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
-          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
-            Period Net P&L
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70 flex flex-col justify-between">
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-0.5 truncate">
+            Period P&L
           </span>
-          <span className={`text-base sm:text-lg font-black truncate block ${
+          <span className={`text-sm sm:text-base font-black truncate block ${
             isPositiveEquity ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
           }`}>
             {isPositiveEquity ? '+' : ''}{currencySymbol}{metrics.currentEquity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -256,51 +256,46 @@ export default function EquityCurveChart({
         </div>
 
         {/* Peak Equity */}
-        <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
-          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70 flex flex-col justify-between">
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-0.5 truncate">
             Peak Balance
           </span>
-          <span className="text-base sm:text-lg font-black text-gray-900 dark:text-white truncate block">
+          <span className="text-sm sm:text-base font-black text-gray-900 dark:text-white truncate block">
             +{currencySymbol}{metrics.peakEquity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
 
         {/* Maximum Drawdown */}
-        <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
-          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70 flex flex-col justify-between">
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-0.5 truncate">
             Max Drawdown
           </span>
-          <span className="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400 truncate block">
+          <span className="text-sm sm:text-base font-black text-rose-600 dark:text-rose-400 truncate block">
             -{currencySymbol}{metrics.maxDrawdown.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            {metrics.maxDrawdownPct > 0 && (
-              <span className="text-xs font-bold ml-1 text-rose-500">
-                ({metrics.maxDrawdownPct.toFixed(1)}%)
-              </span>
-            )}
           </span>
         </div>
 
         {/* Trades in period */}
-        <div className="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70">
-          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">
-            Trades Executed
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-gray-50/80 dark:bg-[#121418]/80 border border-gray-200/70 dark:border-gray-800/70 flex flex-col justify-between">
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-0.5 truncate">
+            Trades
           </span>
-          <span className="text-base sm:text-lg font-black text-gray-900 dark:text-white truncate block">
+          <span className="text-sm sm:text-base font-black text-gray-900 dark:text-white truncate block">
             {metrics.totalTrades} Trades
           </span>
         </div>
       </div>
 
       {/* Chart Canvas */}
-      <div className="h-[280px] sm:h-[320px] w-full pt-2">
+      <div className="h-[220px] sm:h-[250px] lg:h-[280px] w-full pt-1 flex-1 min-h-[200px]">
         {chartData.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 space-y-2">
-            <Activity className="w-8 h-8 opacity-40" />
-            <p className="text-xs font-bold">No trades recorded in selected timeframe</p>
+            <Activity className="w-7 h-7 opacity-40" />
+            <p className="text-[11px] font-bold">No trades in timeframe</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="equityPositiveGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
@@ -316,13 +311,13 @@ export default function EquityCurveChart({
               
               <XAxis 
                 dataKey="date" 
-                tick={{ fontSize: 11, fill: '#888' }} 
+                tick={{ fontSize: 10, fill: '#888' }} 
                 tickLine={false} 
                 axisLine={false}
               />
               
               <YAxis 
-                tick={{ fontSize: 11, fill: '#888' }} 
+                tick={{ fontSize: 10, fill: '#888' }} 
                 tickLine={false} 
                 axisLine={false}
                 tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
@@ -336,9 +331,9 @@ export default function EquityCurveChart({
                 type="monotone" 
                 dataKey="equity" 
                 stroke={isPositiveEquity ? '#10b981' : '#ef4444'} 
-                strokeWidth={3}
+                strokeWidth={2.5}
                 fill={isPositiveEquity ? 'url(#equityPositiveGradient)' : 'url(#equityNegativeGradient)'} 
-                activeDot={{ r: 6, stroke: '#ffffff', strokeWidth: 2 }}
+                activeDot={{ r: 5, stroke: '#ffffff', strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>

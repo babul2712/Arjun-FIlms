@@ -335,25 +335,28 @@ export default function JournalDashboardPage() {
         </div>
       </div>
 
-      {/* Live Cumulative Equity Growth Curve */}
-      <div className="w-full">
-        <EquityCurveChart
-          trades={trades}
-          currencyMode={currencyMode}
-          usdRate={usdRate}
-        />
-      </div>
+      {/* Main Row: Calendar (3/4 width) & Equity Curve (1/4 width) in 1 Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Left: Monthly Heatmap Calendar (3/4 width = 9 of 12 cols) */}
+        <div className="lg:col-span-9 w-full min-w-0">
+          <MonthlyCalendar
+            trades={trades}
+            currencyMode={currencyMode}
+            usdRate={usdRate}
+            onAddTradeForDate={handleOpenNewTrade}
+            onEditTrade={handleEditTrade}
+            onTradeDeleted={handleTradeDeleted}
+          />
+        </div>
 
-      {/* Daily P&L Heatmap Calendar */}
-      <div className="w-full">
-        <MonthlyCalendar
-          trades={trades}
-          currencyMode={currencyMode}
-          usdRate={usdRate}
-          onAddTradeForDate={handleOpenNewTrade}
-          onEditTrade={handleEditTrade}
-          onTradeDeleted={handleTradeDeleted}
-        />
+        {/* Right: Cumulative Equity Curve (1/4 width = 3 of 12 cols) */}
+        <div className="lg:col-span-3 w-full min-w-0 flex flex-col">
+          <EquityCurveChart
+            trades={trades}
+            currencyMode={currencyMode}
+            usdRate={usdRate}
+          />
+        </div>
       </div>
 
       {/* Quantitative Overview & Market Breakdown Row (Balanced 2-Column Grid) */}
