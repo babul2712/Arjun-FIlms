@@ -13,6 +13,8 @@ import FinanceEntry from '@/lib/models/FinanceEntry';
 import Otp from '@/lib/models/Otp';
 import Notification from '@/lib/models/Notification';
 import BioProfile from '@/lib/models/BioProfile';
+import Trade from '@/lib/models/Trade';
+import Investment from '@/lib/models/Investment';
 import { DEFAULT_BIO_DATA } from '@/lib/bioConstants';
 import { Resend } from 'resend';
 import bcrypt from 'bcryptjs';
@@ -1503,3 +1505,147 @@ export async function importBatchFinanceEntries(entriesToImport: any[], mode: 'a
     throw error;
   }
 }
+
+// ============================================================================
+// 📈 TRADING JOURNAL & ASSET PORTFOLIO ACTIONS
+// ============================================================================
+
+export async function getTrades() {
+  await connectToDatabase();
+  try {
+    const trades = await Trade.find({}).sort({ date: -1, createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(trades));
+  } catch (error) {
+    console.error('getTrades error:', error);
+    return [];
+  }
+}
+
+export async function createTrade(data: any) {
+  await connectToDatabase();
+  try {
+    const tradeData = {
+      ...data,
+      date: data.date || new Date().toISOString(),
+      quantity: Number(data.quantity) || 1,
+      profitLoss: Number(data.profitLoss) || 0,
+      entryPrice: Number(data.entryPrice) || 0,
+      exitPrice: Number(data.exitPrice) || 0,
+    };
+    const trade = await Trade.create(tradeData);
+    revalidatePath('/journal');
+    revalidatePath('/journal/trades');
+    return JSON.parse(JSON.stringify(trade));
+  } catch (error) {
+    console.error('createTrade error:', error);
+    throw error;
+  }
+}
+
+export async function updateTrade(id: string, data: any) {
+  await connectToDatabase();
+  try {
+    const updated = await Trade.findByIdAndUpdate(id, data, { new: true }).lean();
+    revalidatePath('/journal');
+    revalidatePath('/journal/trades');
+    return JSON.parse(JSON.stringify(updated));
+  } catch (error) {
+    console.error('updateTrade error:', error);
+    throw error;
+  }
+}
+
+export async function deleteTrade(id: string) {
+  await connectToDatabase();
+  try {
+    await Trade.findByIdAndDelete(id);
+    revalidatePath('/journal');
+    revalidatePath('/journal/trades');
+    return { success: true };
+  } catch (error) {
+    console.error('deleteTrade error:', error);
+    throw error;
+  }
+}
+
+export async function getInvestments() {
+  await connectToDatabase();
+  try {
+    const investments = await Investment.find({}).sort({ createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(investments));
+  } catch (error) {
+    console.error('getInvestments error:', error);
+    return [];
+  }
+}
+
+export async function createInvestment(data: any) {
+  await connectToDatabase();
+  try {
+    const buyPrice = Number(data.buyPrice) || 0;
+    const currentPrice = Number(data.currentPrice) || buyPrice;
+    const quantity = Number(data.quantity) || 1;
+    const investmentValue = buyPrice * quantity;
+    const currentValue = currentPrice * quantity;
+    const profitLoss = currentValue - investmentValue;
+
+    const payload = {
+      ...data,
+      buyPrice,
+      currentPrice,
+      quantity,
+      investmentValue,
+      currentValue,
+      profitLoss,
+      dateAdded: data.dateAdded || new Date().toISOString(),
+    };
+
+    const inv = await Investment.create(payload);
+    revalidatePath('/journal');
+    revalidatePath('/journal/assets');
+    return JSON.parse(JSON.stringify(inv));
+  } catch (error) {
+    console.error('createInvestment error:', error);
+    throw error;
+  }
+}
+
+export async function updateInvestment(id: string, data: any) {
+  await connectToDatabase();
+  try {
+    const buyPrice = Number(data.buyPrice);
+    const currentPrice = Number(data.currentPrice);
+    const quantity = Number(data.quantity);
+    
+    let extra = {};
+    if (!isNaN(buyPrice) && !isNaN(currentPrice) && !isNaN(quantity)) {
+      const investmentValue = buyPrice * quantity;
+      const currentValue = currentPrice * quantity;
+      const profitLoss = currentValue - investmentValue;
+      extra = { investmentValue, currentValue, profitLoss };
+    }
+
+    const updated = await Investment.findByIdAndUpdate(id, { ...data, ...extra }, { new: true }).lean();
+    revalidatePath('/journal');
+    revalidatePath('/journal/assets');
+    return JSON.parse(JSON.stringify(updated));
+  } catch (error) {
+    console.error('updateInvestment error:', error);
+    throw error;
+  }
+}
+
+export async function deleteInvestment(id: string) {
+  await connectToDatabase();
+  try {
+    await Investment.findByIdAndDelete(id);
+    revalidatePath('/journal');
+    revalidatePath('/journal/assets');
+    return { success: true };
+  } catch (error) {
+    console.error('deleteInvestment error:', error);
+    throw error;
+  }
+}
+
+

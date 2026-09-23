@@ -23,7 +23,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
 import { getBioProfileAdmin } from '@/app/actions';
 
-const navItems = [
+const crmNavItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
   { name: 'Quotations', href: '/quotations', icon: FileText },
@@ -31,6 +31,12 @@ const navItems = [
   { name: 'Projects', href: '/projects', icon: Briefcase },
   { name: 'Blueprint', href: '/blueprints', icon: Users },
   { name: 'Finance', href: '/finance', icon: TrendingUp },
+];
+
+const journalNavItems = [
+  { name: 'Journal Overview', href: '/journal', icon: Home },
+  { name: 'Trade Log', href: '/journal/trades', icon: TrendingUp },
+  { name: 'Asset Portfolio', href: '/journal/assets', icon: Briefcase },
 ];
 
 export default function Sidebar() {
@@ -44,6 +50,11 @@ export default function Sidebar() {
   const toggleNotificationDrawer = useUIStore((state) => state.toggleNotificationDrawer);
   const userAvatar = useUIStore((state) => state.userAvatar);
   const setUserAvatar = useUIStore((state) => state.setUserAvatar);
+  const activeWorkspace = useUIStore((state) => state.activeWorkspace);
+  const setActiveWorkspace = useUIStore((state) => state.setActiveWorkspace);
+
+  const isJournal = pathname.startsWith('/journal') || activeWorkspace === 'journal';
+  const navItems = isJournal ? journalNavItems : crmNavItems;
 
   // Sync studio profile avatar on mount if not yet loaded or on change
   useEffect(() => {
@@ -83,7 +94,7 @@ export default function Sidebar() {
     <aside className="my-3 ml-3 md:my-4 md:ml-4 h-[calc(100vh-1.5rem)] md:h-[calc(100vh-2rem)] w-20 bg-white/85 dark:bg-[#121418]/90 backdrop-blur-xl border border-[#fee2e2] dark:border-gray-800/80 shadow-xl shadow-red-500/5 rounded-[32px] flex flex-col items-center justify-between py-6 z-50 shrink-0 transition-all">
       {/* Top Section: Logo */}
       <div className="flex flex-col items-center">
-        <Link href="/dashboard" className="cursor-pointer group flex flex-col items-center" title="Arjun Films CRM">
+        <Link href={isJournal ? "/journal" : "/dashboard"} className="cursor-pointer group flex flex-col items-center" title={isJournal ? "Zen Trading Journal" : "Arjun Films CRM"}>
           <div className="w-13 h-13 rounded-2xl bg-[#fef2f2] dark:bg-[#1c1f24] p-1.5 border border-[#fee2e2] dark:border-red-950/50 shadow-sm group-hover:shadow-md group-hover:border-[#e50914]/50 group-hover:scale-105 active:scale-95 transition-all flex items-center justify-center overflow-hidden">
             <img 
               src="/logo.jpeg" 
@@ -97,7 +108,7 @@ export default function Sidebar() {
       {/* Middle Section: Navigation Icons */}
       <nav className="flex-1 flex flex-col items-center justify-center gap-4.5 my-6">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || (item.href !== '/dashboard' && item.href !== '/journal' && pathname.startsWith(item.href));
           const Icon = item.icon;
 
           return (

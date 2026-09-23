@@ -357,6 +357,7 @@ interface UIState {
   siteFont: SiteFontId;
   themeColor: ThemeColorId;
   userAvatar: string;
+  activeWorkspace: 'crm' | 'journal';
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
   toggleFilterPanel: () => void;
@@ -370,6 +371,7 @@ interface UIState {
   setSiteFont: (font: SiteFontId) => void;
   setThemeColor: (color: ThemeColorId) => void;
   setUserAvatar: (avatar: string) => void;
+  setActiveWorkspace: (ws: 'crm' | 'journal') => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -383,6 +385,7 @@ export const useUIStore = create<UIState>()(
       siteFont: 'montserrat',
       themeColor: 'crimson',
       userAvatar: '/logo.jpeg',
+      activeWorkspace: 'crm',
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open: boolean) => set({ sidebarOpen: open }),
       toggleFilterPanel: () => set((state) => ({ filterPanelOpen: !state.filterPanelOpen })),
@@ -405,16 +408,18 @@ export const useUIStore = create<UIState>()(
         applyThemeColor(color);
       },
       setUserAvatar: (avatar: string) => set({ userAvatar: avatar }),
+      setActiveWorkspace: (ws: 'crm' | 'journal') => set({ activeWorkspace: ws }),
     }),
     {
       name: 'arjun-ui-storage',
       storage: createJSONStorage(() => localStorage),
-      // Persist theme, siteFont, themeColor, and userAvatar
+      // Persist theme, siteFont, themeColor, userAvatar, and activeWorkspace
       partialize: (state) => ({ 
         theme: state.theme, 
         siteFont: state.siteFont, 
         themeColor: state.themeColor,
         userAvatar: state.userAvatar,
+        activeWorkspace: state.activeWorkspace,
       }),
     }
   )
