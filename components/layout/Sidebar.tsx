@@ -52,10 +52,13 @@ export default function Sidebar() {
   const toggleNotificationDrawer = useUIStore((state) => state.toggleNotificationDrawer);
   const userAvatar = useUIStore((state) => state.userAvatar);
   const setUserAvatar = useUIStore((state) => state.setUserAvatar);
+  const crmTheme = useUIStore((state) => state.crmTheme);
+  const journalTheme = useUIStore((state) => state.journalTheme);
   const activeWorkspace = useUIStore((state) => state.activeWorkspace);
   const setActiveWorkspace = useUIStore((state) => state.setActiveWorkspace);
 
   const isJournal = pathname.startsWith('/journal') || activeWorkspace === 'journal';
+  const currentWorkspaceTheme = isJournal ? journalTheme : crmTheme;
   const navItems = isJournal ? journalNavItems : crmNavItems;
 
   // Sync studio profile avatar on mount if not yet loaded or on change
@@ -81,14 +84,6 @@ export default function Sidebar() {
   useEffect(() => {
     setAvatarLoadError(false);
   }, [userAvatar, user?.avatar]);
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
 
   const isProfileActive = pathname === '/profile' || pathname === '/social-links';
 
@@ -159,13 +154,13 @@ export default function Sidebar() {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#e50914] border-2 border-white dark:border-[#121418] animate-pulse" />
         </button>
 
-        {/* Theme Switcher Button */}
+        {/* Workspace Theme Switcher Button */}
         <button 
-          onClick={toggleTheme}
+          onClick={() => toggleTheme(isJournal ? 'journal' : 'crm')}
           className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-[#e50914] dark:hover:text-amber-400 hover:bg-[#fef2f2] dark:hover:bg-red-950/40 transition-all cursor-pointer active:scale-95"
-          title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          title={currentWorkspaceTheme === 'dark' ? `Switch ${isJournal ? 'Trading Journal' : 'CRM'} to Light Mode` : `Switch ${isJournal ? 'Trading Journal' : 'CRM'} to Dark Mode`}
         >
-          {theme === 'dark' ? (
+          {currentWorkspaceTheme === 'dark' ? (
             <Sun className="w-[18px] h-[18px] text-amber-400 fill-amber-400/20" />
           ) : (
             <Moon className="w-[18px] h-[18px]" />

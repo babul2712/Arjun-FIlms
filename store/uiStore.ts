@@ -353,7 +353,9 @@ interface UIState {
   filterPanelOpen: boolean; // right filters panel in Images 1 & 3
   notificationDrawerOpen: boolean; // Notification Drawer
   commandPaletteOpen: boolean; // Universal Omnibar / ⌘K Command Palette
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark'; // Currently active theme
+  crmTheme: 'light' | 'dark'; // Dedicated CRM theme
+  journalTheme: 'light' | 'dark'; // Dedicated Trading Journal theme
   siteFont: SiteFontId;
   themeColor: ThemeColorId;
   userAvatar: string;
@@ -367,7 +369,8 @@ interface UIState {
   openCommandPalette: () => void;
   closeCommandPalette: () => void;
   toggleCommandPalette: () => void;
-  toggleTheme: () => void;
+  toggleTheme: (targetWorkspace?: 'crm' | 'journal') => void;
+  setWorkspaceTheme: (ws: 'crm' | 'journal', theme: 'light' | 'dark') => void;
   setSiteFont: (font: SiteFontId) => void;
   setThemeColor: (color: ThemeColorId) => void;
   setUserAvatar: (avatar: string) => void;
@@ -376,12 +379,14 @@ interface UIState {
 
 export const useUIStore = create<UIState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       sidebarOpen: false,
       filterPanelOpen: false,
       notificationDrawerOpen: false,
       commandPaletteOpen: false,
       theme: 'light',
+      crmTheme: 'light',
+      journalTheme: 'dark', // Default Trading Journal to Dark Mode
       siteFont: 'montserrat',
       themeColor: 'crimson',
       userAvatar: '/logo.jpeg',
@@ -395,10 +400,54 @@ export const useUIStore = create<UIState>()(
       openCommandPalette: () => set({ commandPaletteOpen: true }),
       closeCommandPalette: () => set({ commandPaletteOpen: false }),
       toggleCommandPalette: () => set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
-      toggleTheme: () => set((state) => {
-        const nextTheme = state.theme === 'light' ? 'dark' : 'light';
-        return { theme: nextTheme };
-      }),
+      
+      toggleTheme: (targetWorkspace) => {
+        const state = get();
+        const currentWs = targetWorkspace || state.activeWorkspace;
+        if (currentWs === 'journal') {
+          const nextTheme = state.journalTheme === 'light' ? 'dark' : 'light';
+          set({ journalTheme: nextTheme, theme: nextTheme });
+          if (typeof document !== 'undefined') {
+            if (nextTheme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            applyThemeColor(state.themeColor);
+          }
+        } else {
+          const nextTheme = state.crmTheme === 'light' ? 'dark' : 'light';
+          set({ crmTheme: nextTheme, theme: nextTheme });
+          if (typeof document !== 'undefined') {
+            if (nextTheme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            applyThemeColor(state.themeColor);
+          }
+        }
+      },
+
+      setWorkspaceTheme: (ws, theme) => {
+        const state = get();
+        if (ws === 'journal') {
+          set({ journalTheme: theme });
+          if (state.activeWorkspace === 'journal') {
+            set({ theme });
+            if (typeof document !== 'undefined') {
+              if (theme === 'dark') document.documentElement.classList.add('dark');
+              else document.documentElement.classList.remove('dark');
+              applyThemeColor(state.themeColor);
+            }
+          }
+        } else {
+          set({ crmTheme: theme });
+          if (state.activeWorkspace === 'crm') {
+            set({ theme });
+            if (typeof document !== 'undefined') {
+              if (theme === 'dark') document.documentElement.classList.add('dark');
+              else document.documentElement.classList.remove('dark');
+              applyThemeColor(state.themeColor);
+            }
+          }
+        }
+      },
+
       setSiteFont: (font: SiteFontId) => {
         set({ siteFont: font });
         applySiteFont(font);
@@ -408,14 +457,29 @@ export const useUIStore = create<UIState>()(
         applyThemeColor(color);
       },
       setUserAvatar: (avatar: string) => set({ userAvatar: avatar }),
-      setActiveWorkspace: (ws: 'crm' | 'journal') => set({ activeWorkspace: ws }),
+      
+      setActiveWorkspace: (ws: 'crm' | 'journal') => {
+        const state = get();
+        const targetTheme = ws === 'journal' ? state.journalTheme : state.crmTheme;
+        set({ activeWorkspace: ws, theme: targetTheme });
+        if (typeof document !== 'undefined') {
+          if (targetTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          applyThemeColor(state.themeColor);
+        }
+      },
     }),
     {
       name: 'arjun-ui-storage',
       storage: createJSONStorage(() => localStorage),
-      // Persist theme, siteFont, themeColor, userAvatar, and activeWorkspace
+      // Persist theme, crmTheme, journalTheme, siteFont, themeColor, userAvatar, and activeWorkspace
       partialize: (state) => ({ 
-        theme: state.theme, 
+        theme: state.theme,
+        crmTheme: state.crmTheme,
+        journalTheme: state.journalTheme,
         siteFont: state.siteFont, 
         themeColor: state.themeColor,
         userAvatar: state.userAvatar,
