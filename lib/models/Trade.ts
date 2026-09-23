@@ -1,14 +1,10 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-export type Currency = '₹' | '$' | '€' | '£';
-export type TradeType = 'Buy' | 'Sell';
-export type MarketType = 'Forex' | 'Crypto' | 'Indian Stock' | 'Binary' | 'US Stock' | 'Other';
-
 export interface ITrade extends Document {
   assetName: string;
-  marketType: MarketType;
-  currency: Currency;
-  tradeType?: TradeType;
+  marketType: string;
+  currency: string;
+  tradeType: string;
   entryPrice?: number;
   quantity: number;
   entryTime?: string;
@@ -29,13 +25,9 @@ export interface ITrade extends Document {
 const TradeSchema = new Schema<ITrade>(
   {
     assetName: { type: String, required: true, trim: true },
-    marketType: { 
-      type: String, 
-      enum: ['Forex', 'Crypto', 'Indian Stock', 'Binary', 'US Stock', 'Other'], 
-      default: 'Indian Stock' 
-    },
-    currency: { type: String, default: '₹' },
-    tradeType: { type: String, enum: ['Buy', 'Sell'], default: 'Buy' },
+    marketType: { type: String, default: 'Forex' },
+    currency: { type: String, default: 'USD' },
+    tradeType: { type: String, default: 'BUY' },
     entryPrice: { type: Number, default: 0 },
     quantity: { type: Number, default: 1 },
     entryTime: { type: String },
@@ -43,9 +35,9 @@ const TradeSchema = new Schema<ITrade>(
     profitTarget: { type: Number, default: 0 },
     stopLoss: { type: Number, default: 0 },
     exitPrice: { type: Number, default: 0 },
-    mindsetBeforeTrade: { type: String, default: 'Confident' },
+    mindsetBeforeTrade: { type: String, default: 'Disciplined Plan' },
     tradeSetup: { type: String, default: 'Price Action' },
-    screenshot: { type: String },
+    screenshot: { type: String, default: '' },
     journalText: { type: String, default: '' },
     date: { type: String, required: true },
     profitLoss: { type: Number, required: true, default: 0 },

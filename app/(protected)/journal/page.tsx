@@ -25,6 +25,7 @@ import TradeCard from '@/components/journal/TradeCard';
 import AddTradeDrawer from '@/components/journal/AddTradeDrawer';
 import AddInvestmentDrawer from '@/components/journal/AddInvestmentDrawer';
 import ZenQuotesCard from '@/components/journal/ZenQuotesCard';
+import EquityCurveChart from '@/components/journal/EquityCurveChart';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -335,11 +336,19 @@ export default function JournalDashboardPage() {
         </div>
       </div>
 
-      {/* Main Grid: Heatmap Calendar & Zen Quotes */}
+      {/* Main Grid: Equity Curve, Heatmap Calendar & Zen Quotes */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left: Monthly Calendar Heatmap (col-span-8) */}
+        {/* Left Column: Equity Curve & Monthly Calendar (col-span-8) */}
         <div className="lg:col-span-8 space-y-6">
+          {/* Live Cumulative Equity Growth Curve */}
+          <EquityCurveChart
+            trades={trades}
+            currencyMode={currencyMode}
+            usdRate={usdRate}
+          />
+
+          {/* Daily P&L Heatmap Calendar */}
           <MonthlyCalendar
             trades={trades}
             onAddTradeForDate={handleOpenNewTrade}

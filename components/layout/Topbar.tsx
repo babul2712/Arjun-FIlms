@@ -51,6 +51,7 @@ export default function Topbar() {
     '/social-links': 'Bio & Social Links Manager',
     '/profile': 'Studio Profile & Settings',
     '/journal': 'Trading Journal Dashboard',
+    '/journal/analytics': 'Trading Analytics & Equity Curve',
     '/journal/trades': 'Trade Execution Log',
     '/journal/assets': 'Asset Portfolio & Valuation',
   };

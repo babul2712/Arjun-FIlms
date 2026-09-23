@@ -162,6 +162,16 @@ export default function AddTradeDrawer({
 
     setLoading(true);
     try {
+      let formattedDate = new Date().toISOString();
+      if (date) {
+        try {
+          const parsed = new Date(date);
+          if (!isNaN(parsed.getTime())) {
+            formattedDate = parsed.toISOString();
+          }
+        } catch (e) {}
+      }
+
       const payload = {
         assetName: assetName.trim().toUpperCase(),
         marketType,
@@ -175,7 +185,7 @@ export default function AddTradeDrawer({
         mindsetBeforeTrade,
         journalText: journalText.trim(),
         screenshot: screenshot.trim(),
-        date: new Date(date).toISOString(),
+        date: formattedDate,
       };
 
       let saved;

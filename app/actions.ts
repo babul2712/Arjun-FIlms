@@ -1525,33 +1525,49 @@ export async function createTrade(data: any) {
   await connectToDatabase();
   try {
     const tradeData = {
-      ...data,
-      date: data.date || new Date().toISOString(),
-      quantity: Number(data.quantity) || 1,
-      profitLoss: Number(data.profitLoss) || 0,
+      assetName: String(data.assetName || '').trim(),
+      marketType: String(data.marketType || 'Forex'),
+      currency: String(data.currency || 'USD'),
+      tradeType: String(data.tradeType || 'BUY').toUpperCase(),
       entryPrice: Number(data.entryPrice) || 0,
       exitPrice: Number(data.exitPrice) || 0,
+      quantity: Number(data.quantity) || 1,
+      profitLoss: Number(data.profitLoss) || 0,
+      tradeSetup: String(data.tradeSetup || '').trim(),
+      mindsetBeforeTrade: String(data.mindsetBeforeTrade || 'Disciplined Plan'),
+      journalText: String(data.journalText || '').trim(),
+      screenshot: String(data.screenshot || '').trim(),
+      date: data.date || new Date().toISOString(),
     };
     const trade = await Trade.create(tradeData);
     revalidatePath('/journal');
     revalidatePath('/journal/trades');
+    revalidatePath('/journal/analytics');
     return JSON.parse(JSON.stringify(trade));
-  } catch (error) {
+  } catch (error: any) {
     console.error('createTrade error:', error);
-    throw error;
+    throw new Error(error?.message || 'Failed to create trade');
   }
 }
 
 export async function updateTrade(id: string, data: any) {
   await connectToDatabase();
   try {
-    const updated = await Trade.findByIdAndUpdate(id, data, { new: true }).lean();
+    const tradeData = { ...data };
+    if (data.tradeType) tradeData.tradeType = String(data.tradeType).toUpperCase();
+    if (data.entryPrice !== undefined) tradeData.entryPrice = Number(data.entryPrice) || 0;
+    if (data.exitPrice !== undefined) tradeData.exitPrice = Number(data.exitPrice) || 0;
+    if (data.quantity !== undefined) tradeData.quantity = Number(data.quantity) || 1;
+    if (data.profitLoss !== undefined) tradeData.profitLoss = Number(data.profitLoss) || 0;
+
+    const updated = await Trade.findByIdAndUpdate(id, tradeData, { new: true }).lean();
     revalidatePath('/journal');
     revalidatePath('/journal/trades');
+    revalidatePath('/journal/analytics');
     return JSON.parse(JSON.stringify(updated));
-  } catch (error) {
+  } catch (error: any) {
     console.error('updateTrade error:', error);
-    throw error;
+    throw new Error(error?.message || 'Failed to update trade');
   }
 }
 
@@ -1561,10 +1577,11 @@ export async function deleteTrade(id: string) {
     await Trade.findByIdAndDelete(id);
     revalidatePath('/journal');
     revalidatePath('/journal/trades');
+    revalidatePath('/journal/analytics');
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('deleteTrade error:', error);
-    throw error;
+    throw new Error(error?.message || 'Failed to delete trade');
   }
 }
 
@@ -1604,9 +1621,9 @@ export async function createInvestment(data: any) {
     revalidatePath('/journal');
     revalidatePath('/journal/assets');
     return JSON.parse(JSON.stringify(inv));
-  } catch (error) {
+  } catch (error: any) {
     console.error('createInvestment error:', error);
-    throw error;
+    throw new Error(error?.message || 'Failed to create investment');
   }
 }
 
@@ -1629,9 +1646,9 @@ export async function updateInvestment(id: string, data: any) {
     revalidatePath('/journal');
     revalidatePath('/journal/assets');
     return JSON.parse(JSON.stringify(updated));
-  } catch (error) {
+  } catch (error: any) {
     console.error('updateInvestment error:', error);
-    throw error;
+    throw new Error(error?.message || 'Failed to update investment');
   }
 }
 
@@ -1642,9 +1659,9 @@ export async function deleteInvestment(id: string) {
     revalidatePath('/journal');
     revalidatePath('/journal/assets');
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('deleteInvestment error:', error);
-    throw error;
+    throw new Error(error?.message || 'Failed to delete investment');
   }
 }
 

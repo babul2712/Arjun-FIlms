@@ -1,12 +1,9 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-export type AssetType = 'Crypto' | 'Stock' | 'Commodity' | 'Index' | 'ETF' | 'Mutual Fund';
-export type Currency = '₹' | '$' | '€' | '£';
-
 export interface IInvestment extends Document {
   assetName: string;
-  assetType: AssetType;
-  currency: Currency;
+  assetType: string;
+  currency: string;
   buyPrice: number;
   currentPrice: number;
   quantity: number;
@@ -23,12 +20,8 @@ export interface IInvestment extends Document {
 const InvestmentSchema = new Schema<IInvestment>(
   {
     assetName: { type: String, required: true, trim: true },
-    assetType: { 
-      type: String, 
-      enum: ['Crypto', 'Stock', 'Commodity', 'Index', 'ETF', 'Mutual Fund'], 
-      default: 'Stock' 
-    },
-    currency: { type: String, default: '₹' },
+    assetType: { type: String, default: 'Crypto' },
+    currency: { type: String, default: 'INR' },
     buyPrice: { type: Number, required: true, default: 0 },
     currentPrice: { type: Number, required: true, default: 0 },
     quantity: { type: Number, required: true, default: 1 },

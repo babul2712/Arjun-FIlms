@@ -17,7 +17,8 @@ import {
   Moon,
   Share2,
   User,
-  TrendingUp
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
@@ -35,6 +36,7 @@ const crmNavItems = [
 
 const journalNavItems = [
   { name: 'Journal Overview', href: '/journal', icon: Home },
+  { name: 'Analytics & Charts', href: '/journal/analytics', icon: BarChart3 },
   { name: 'Trade Log', href: '/journal/trades', icon: TrendingUp },
   { name: 'Asset Portfolio', href: '/journal/assets', icon: Briefcase },
 ];
