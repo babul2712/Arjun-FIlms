@@ -20,6 +20,8 @@ import TradeCard from './TradeCard';
 
 interface MonthlyCalendarProps {
   trades: any[];
+  currencyMode?: 'USD' | 'INR';
+  usdRate?: number;
   onAddTradeForDate?: (dateString: string) => void;
   onEditTrade?: (trade: any) => void;
   onTradeDeleted?: (tradeId: string) => void;
@@ -34,12 +36,21 @@ const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export default function MonthlyCalendar({
   trades,
+  currencyMode = 'USD',
+  usdRate = 86.5,
   onAddTradeForDate,
   onEditTrade,
   onTradeDeleted
 }: MonthlyCalendarProps) {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDayTrades, setSelectedDayTrades] = useState<{ dayStr: string; trades: any[] } | null>(null);
+
+  const currencySymbol = currencyMode === 'INR' ? '₹' : '$';
+
+  const convertVal = (valInUSD: number) => {
+    if (currencyMode === 'INR') return valInUSD * usdRate;
+    return valInUSD;
+  };
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth(); // 0-indexed
@@ -123,7 +134,8 @@ export default function MonthlyCalendar({
       let losses = 0;
 
       dayTrades.forEach((t) => {
-        const val = Number(t.profitLoss) || 0;
+        const rawPnl = Number(t.profitLoss) || 0;
+        const val = convertVal(rawPnl);
         pnl += val;
         if (val > 0) wins++;
         else if (val < 0) losses++;
@@ -142,7 +154,7 @@ export default function MonthlyCalendar({
     }
 
     return cells;
-  }, [year, month, tradesByDate]);
+  }, [year, month, tradesByDate, currencyMode, usdRate]);
 
   // Current Month Performance Stats
   const monthStats = useMemo(() => {
@@ -166,7 +178,8 @@ export default function MonthlyCalendar({
       if (dayTrades.length > 0) {
         let dayPnL = 0;
         dayTrades.forEach((t) => {
-          const val = Number(t.profitLoss) || 0;
+          const rawPnl = Number(t.profitLoss) || 0;
+          const val = convertVal(rawPnl);
           dayPnL += val;
           totalTradesCount++;
           if (val > 0) {
@@ -204,7 +217,7 @@ export default function MonthlyCalendar({
       bestDayPnL,
       worstDayPnL,
     };
-  }, [year, month, tradesByDate]);
+  }, [year, month, tradesByDate, currencyMode, usdRate]);
 
   const handleCellClick = (cell: any) => {
     if (!cell.isCurrentMonth) return;
@@ -215,9 +228,9 @@ export default function MonthlyCalendar({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Top Controls Bar & Month KPI summary */}
-      <div className="p-5 md:p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-6">
+      <div className="w-full p-5 md:p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-6">
         
         {/* Navigation & Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -272,7 +285,7 @@ export default function MonthlyCalendar({
             <span className={`text-base font-black truncate block ${
               monthStats.totalPnL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
             }`}>
-              {monthStats.totalPnL >= 0 ? '+' : ''}${monthStats.totalPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {monthStats.totalPnL >= 0 ? '+' : ''}{currencySymbol}{monthStats.totalPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
 
@@ -322,7 +335,7 @@ export default function MonthlyCalendar({
               Best Day
             </span>
             <span className="text-base font-black text-emerald-600 truncate block">
-              +${monthStats.bestDayPnL.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+              +{currencySymbol}{monthStats.bestDayPnL.toLocaleString('en-US', { maximumFractionDigits: 2 })}
             </span>
           </div>
 
@@ -337,92 +350,94 @@ export default function MonthlyCalendar({
           </div>
         </div>
 
-        {/* Heatmap Grid */}
-        <div>
-          {/* Weekday Header */}
-          <div className="grid grid-cols-7 gap-2 mb-2 text-center text-xs font-black uppercase tracking-wider text-gray-400">
-            {WEEK_DAYS.map((w, idx) => (
-              <div key={w} className={`py-1.5 ${idx === 0 || idx === 6 ? 'text-gray-300 dark:text-gray-600' : ''}`}>
-                {w}
-              </div>
-            ))}
-          </div>
+        {/* Heatmap Grid with Responsive Scroll Container */}
+        <div className="w-full overflow-x-auto custom-scrollbar pb-1">
+          <div className="w-full min-w-[560px] sm:min-w-0">
+            {/* Weekday Header */}
+            <div className="grid grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mb-2 text-center text-xs font-black uppercase tracking-wider text-gray-400">
+              {WEEK_DAYS.map((w, idx) => (
+                <div key={w} className={`py-1.5 ${idx === 0 || idx === 6 ? 'text-gray-300 dark:text-gray-600' : ''}`}>
+                  {w}
+                </div>
+              ))}
+            </div>
 
-          {/* Calendar Cells Grid */}
-          <div className="grid grid-cols-7 gap-2">
-            {calendarCells.map((cell, idx) => {
-              if (!cell.dayNumber) {
+            {/* Calendar Cells Grid */}
+            <div className="grid grid-cols-7 gap-2 sm:gap-2.5 md:gap-3">
+              {calendarCells.map((cell) => {
+                if (!cell.dayNumber) {
+                  return (
+                    <div
+                      key={cell.dateKey}
+                      className="min-h-[85px] sm:min-h-[100px] md:min-h-[115px] rounded-2xl bg-gray-50/30 dark:bg-gray-900/20 border border-dashed border-gray-200/40 dark:border-gray-800/40 opacity-40 pointer-events-none"
+                    />
+                  );
+                }
+
+                const hasTrades = cell.trades.length > 0;
+                const isProfit = cell.dailyPnL > 0;
+                const isLoss = cell.dailyPnL < 0;
+
                 return (
                   <div
                     key={cell.dateKey}
-                    className="min-h-[90px] sm:min-h-[110px] rounded-2xl bg-gray-50/30 dark:bg-gray-900/20 border border-dashed border-gray-200/40 dark:border-gray-800/40 opacity-40 pointer-events-none"
-                  />
-                );
-              }
-
-              const hasTrades = cell.trades.length > 0;
-              const isProfit = cell.dailyPnL > 0;
-              const isLoss = cell.dailyPnL < 0;
-
-              return (
-                <div
-                  key={cell.dateKey}
-                  onClick={() => handleCellClick(cell)}
-                  className={`min-h-[90px] sm:min-h-[110px] rounded-2xl p-2.5 sm:p-3 flex flex-col justify-between transition-all cursor-pointer relative group border ${
-                    cell.isToday ? 'ring-2 ring-[#e50914] shadow-md shadow-red-500/15' : ''
-                  } ${
-                    hasTrades
-                      ? isProfit
-                        ? 'bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30 hover:border-emerald-500 hover:shadow-md hover:scale-[1.02]'
-                        : isLoss
-                        ? 'bg-red-500/10 dark:bg-red-950/30 border-red-500/30 hover:border-red-500 hover:shadow-md hover:scale-[1.02]'
-                        : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'
-                      : 'bg-gray-50/60 dark:bg-[#121418]/60 border-gray-200/60 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-white dark:hover:bg-[#181a20]'
-                  }`}
-                >
-                  {/* Top corner: Day Number & Today indicator */}
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-black ${
-                      cell.isToday
-                        ? 'bg-[#e50914] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]'
-                        : 'text-gray-700 dark:text-gray-300'
-                    }`}>
-                      {cell.dayNumber}
-                    </span>
-
-                    {hasTrades && (
-                      <span className="text-[10px] font-bold text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200">
-                        {cell.trades.length} {cell.trades.length === 1 ? 'trade' : 'trades'}
+                    onClick={() => handleCellClick(cell)}
+                    className={`min-h-[85px] sm:min-h-[100px] md:min-h-[115px] rounded-2xl p-2 sm:p-2.5 md:p-3 flex flex-col justify-between transition-all cursor-pointer relative group border ${
+                      cell.isToday ? 'ring-2 ring-[#e50914] shadow-md shadow-red-500/15' : ''
+                    } ${
+                      hasTrades
+                        ? isProfit
+                          ? 'bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30 hover:border-emerald-500 hover:shadow-md hover:scale-[1.01]'
+                          : isLoss
+                          ? 'bg-red-500/10 dark:bg-red-950/30 border-red-500/30 hover:border-red-500 hover:shadow-md hover:scale-[1.01]'
+                          : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'
+                        : 'bg-gray-50/60 dark:bg-[#121418]/60 border-gray-200/60 dark:border-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-white dark:hover:bg-[#181a20]'
+                    }`}
+                  >
+                    {/* Top corner: Day Number & Today indicator */}
+                    <div className="flex items-center justify-between">
+                      <span className={`text-xs font-black ${
+                        cell.isToday
+                          ? 'bg-[#e50914] text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]'
+                          : 'text-gray-700 dark:text-gray-300'
+                      }`}>
+                        {cell.dayNumber}
                       </span>
+
+                      {hasTrades && (
+                        <span className="text-[10px] font-bold text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200">
+                          {cell.trades.length} {cell.trades.length === 1 ? 'trade' : 'trades'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Center / Bottom: Daily P&L Badge */}
+                    {hasTrades ? (
+                      <div className="my-auto text-center py-1">
+                        <span className={`text-xs sm:text-sm font-black tracking-tight block ${
+                          isProfit 
+                            ? 'text-emerald-700 dark:text-emerald-400' 
+                            : isLoss 
+                            ? 'text-red-700 dark:text-red-400' 
+                            : 'text-gray-600 dark:text-gray-300'
+                        }`}>
+                          {isProfit ? '+' : ''}{currencySymbol}{cell.dailyPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <div className="flex items-center justify-center gap-1 text-[9px] font-bold text-gray-400 mt-0.5">
+                          <span className="text-emerald-600">{cell.winCount}W</span>
+                          <span>/</span>
+                          <span className="text-red-600">{cell.lossCount}L</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center text-[10px] text-gray-400/60 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>Click to view</span>
+                      </div>
                     )}
                   </div>
-
-                  {/* Center / Bottom: Daily P&L Badge */}
-                  {hasTrades ? (
-                    <div className="my-auto text-center py-1">
-                      <span className={`text-xs sm:text-sm font-black tracking-tight block ${
-                        isProfit 
-                          ? 'text-emerald-700 dark:text-emerald-400' 
-                          : isLoss 
-                          ? 'text-red-700 dark:text-red-400' 
-                          : 'text-gray-600 dark:text-gray-300'
-                      }`}>
-                        {isProfit ? '+' : ''}${cell.dailyPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                      <div className="flex items-center justify-center gap-1 text-[9px] font-bold text-gray-400 mt-0.5">
-                        <span className="text-emerald-600">{cell.winCount}W</span>
-                        <span>/</span>
-                        <span className="text-red-600">{cell.lossCount}L</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center text-[10px] text-gray-400/60 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span>Click to view</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

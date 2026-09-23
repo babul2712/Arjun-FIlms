@@ -335,107 +335,107 @@ export default function JournalDashboardPage() {
         </div>
       </div>
 
-      {/* Main Grid: Equity Curve, Heatmap Calendar & Zen Quotes */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Column: Equity Curve & Monthly Calendar (col-span-8) */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Live Cumulative Equity Growth Curve */}
-          <EquityCurveChart
-            trades={trades}
-            currencyMode={currencyMode}
-            usdRate={usdRate}
-          />
+      {/* Live Cumulative Equity Growth Curve */}
+      <div className="w-full">
+        <EquityCurveChart
+          trades={trades}
+          currencyMode={currencyMode}
+          usdRate={usdRate}
+        />
+      </div>
 
-          {/* Daily P&L Heatmap Calendar */}
-          <MonthlyCalendar
-            trades={trades}
-            onAddTradeForDate={handleOpenNewTrade}
-            onEditTrade={handleEditTrade}
-            onTradeDeleted={handleTradeDeleted}
-          />
-        </div>
+      {/* Daily P&L Heatmap Calendar */}
+      <div className="w-full">
+        <MonthlyCalendar
+          trades={trades}
+          currencyMode={currencyMode}
+          usdRate={usdRate}
+          onAddTradeForDate={handleOpenNewTrade}
+          onEditTrade={handleEditTrade}
+          onTradeDeleted={handleTradeDeleted}
+        />
+      </div>
 
-        {/* Right Column: Quantitative Overview & Market Breakdown (col-span-4) */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Quantitative Analytics Summary Card */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-              <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">
-                Edge & Performance
-              </h3>
-              <Link href="/journal/analytics" className="text-xs font-bold text-[#e50914] hover:underline flex items-center gap-0.5">
-                <span>Deep Analytics</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between">
-                <span className="text-gray-500 font-semibold">Profit Factor</span>
-                <span className="font-black text-gray-900 dark:text-white text-sm">
-                  {analytics.profitFactor.toFixed(2)}x
-                </span>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between">
-                <span className="text-gray-500 font-semibold">Win / Loss Ratio</span>
-                <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                  {analytics.winCount}W / {analytics.lossCount}L ({analytics.winRate.toFixed(1)}%)
-                </span>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between">
-                <span className="text-gray-500 font-semibold">Best Trade P&L</span>
-                <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                  +{formatCurrency(analytics.bestTradePnL)}
-                </span>
-              </div>
-            </div>
-
-            <Link
-              href="/journal/analytics"
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-[#fee2e2]/60 dark:hover:bg-red-950/40 text-gray-800 dark:text-gray-200 hover:text-[#e50914] text-xs font-bold transition-all cursor-pointer border border-gray-200 dark:border-gray-700/60"
-            >
-              <BarChart3 className="w-4 h-4 text-[#e50914]" />
-              <span>View Strategy Matrix & Sessions</span>
+      {/* Quantitative Overview & Market Breakdown Row (Balanced 2-Column Grid) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        {/* Quantitative Analytics Summary Card */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+            <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">
+              Edge & Performance Summary
+            </h3>
+            <Link href="/journal/analytics" className="text-xs font-bold text-[#e50914] hover:underline flex items-center gap-0.5">
+              <span>Deep Analytics</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Market Performance Breakdown Card */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-              <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">
-                Market Breakdown
-              </h3>
-              <Link href="/journal/trades" className="text-xs font-bold text-[#e50914] hover:underline">
-                See All
-              </Link>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex flex-col justify-between">
+              <span className="text-gray-500 font-semibold mb-1">Profit Factor</span>
+              <span className="font-black text-gray-900 dark:text-white text-base">
+                {analytics.profitFactor.toFixed(2)}x
+              </span>
             </div>
 
-            <div className="space-y-3">
-              {Object.entries(analytics.marketBreakdown).map(([market, data]) => {
-                const isProfitable = data.pnl >= 0;
-                return (
-                  <div key={market} className="p-3 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between">
-                    <div>
-                      <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200 block">
-                        {market}
-                      </span>
-                      <span className="text-[11px] text-gray-400 font-semibold">
-                        {data.count} {data.count === 1 ? 'trade' : 'trades'}
-                      </span>
-                    </div>
+            <div className="p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex flex-col justify-between">
+              <span className="text-gray-500 font-semibold mb-1">Win / Loss Ratio</span>
+              <span className="font-black text-emerald-600 dark:text-emerald-400 text-base">
+                {analytics.winCount}W / {analytics.lossCount}L
+              </span>
+              <span className="text-[10px] text-gray-400 font-bold">({analytics.winRate.toFixed(1)}% Win Rate)</span>
+            </div>
 
-                    <span className={`text-sm font-black ${
-                      isProfitable ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
-                    }`}>
-                      {isProfitable ? '+' : ''}{formatCurrency(data.pnl)}
+            <div className="p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex flex-col justify-between">
+              <span className="text-gray-500 font-semibold mb-1">Best Trade P&L</span>
+              <span className="font-black text-emerald-600 dark:text-emerald-400 text-base">
+                +{formatCurrency(analytics.bestTradePnL)}
+              </span>
+            </div>
+          </div>
+
+          <Link
+            href="/journal/analytics"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-[#fee2e2]/60 dark:hover:bg-red-950/40 text-gray-800 dark:text-gray-200 hover:text-[#e50914] text-xs font-bold transition-all cursor-pointer border border-gray-200 dark:border-gray-700/60"
+          >
+            <BarChart3 className="w-4 h-4 text-[#e50914]" />
+            <span>Open Advanced Analytics Hub & Heatmaps</span>
+          </Link>
+        </div>
+
+        {/* Market Performance Breakdown Card */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#15171c] border border-gray-200/90 dark:border-gray-800/90 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+            <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">
+              Market Breakdown
+            </h3>
+            <Link href="/journal/trades" className="text-xs font-bold text-[#e50914] hover:underline">
+              See All Trades
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {Object.entries(analytics.marketBreakdown).map(([market, data]) => {
+              const isProfitable = data.pnl >= 0;
+              return (
+                <div key={market} className="p-3 rounded-2xl bg-gray-50/70 dark:bg-[#121418]/60 border border-gray-200/60 dark:border-gray-800/60 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200 block">
+                      {market}
+                    </span>
+                    <span className="text-[11px] text-gray-400 font-semibold">
+                      {data.count} {data.count === 1 ? 'trade' : 'trades'}
                     </span>
                   </div>
-                );
-              })}
-            </div>
+
+                  <span className={`text-sm font-black ${
+                    isProfitable ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {isProfitable ? '+' : ''}{formatCurrency(data.pnl)}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
