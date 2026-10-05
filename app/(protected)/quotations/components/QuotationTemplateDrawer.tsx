@@ -21,7 +21,9 @@ interface TemplateConfig {
   footerBgColor: string;
   watermarkUrl: string;
   watermarkOpacity: number;
+  signatureUrl?: string;
   defaultTemplateId?: string;
+  defaultHideItemPrices?: boolean;
 }
 
 const DEFAULT_TEMPLATE: TemplateConfig = {
@@ -45,7 +47,9 @@ const DEFAULT_TEMPLATE: TemplateConfig = {
   footerBgColor: "#e50914",
   watermarkUrl: "/logo.jpeg",
   watermarkOpacity: 0.08,
-  defaultTemplateId: "invoice1"
+  signatureUrl: "/signature.png",
+  defaultTemplateId: "invoice1",
+  defaultHideItemPrices: false
 };
 
 interface QuotationTemplateDrawerProps {
@@ -218,6 +222,38 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
               </div>
             </div>
 
+            {/* Default Pricing Visibility */}
+            <div className="space-y-3 pt-4 border-t border-gray-100 dark:border-gray-850">
+              <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Default Pricing Visibility in Proposals</h3>
+              <p className="text-[11px] text-gray-400 font-semibold mb-3">Choose whether newly created quotations show itemized sub-prices or hide sub-prices and directly show the total.</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div 
+                  onClick={() => setConfig({ ...config, defaultHideItemPrices: false })}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    !config.defaultHideItemPrices
+                      ? 'border-[#e50914] bg-[#fee2e2]/40 dark:bg-red-950/20'
+                      : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1c1f24]'
+                  }`}
+                >
+                  <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Show Item Prices</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Displays line item rates & subtotals per service.</div>
+                </div>
+
+                <div 
+                  onClick={() => setConfig({ ...config, defaultHideItemPrices: true })}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    config.defaultHideItemPrices
+                      ? 'border-[#e50914] bg-[#fee2e2]/40 dark:bg-red-950/20'
+                      : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1c1f24]'
+                  }`}
+                >
+                  <div className="font-bold text-[12.5px] text-gray-900 dark:text-white">Hide Sub-Prices</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Hides individual rates; displays only total.</div>
+                </div>
+              </div>
+            </div>
+
             {/* Drag and Drop Sections Order */}
             <div className="space-y-3">
               <h3 className="text-[12px] font-bold text-[#e50914] dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-2">Drag & Drop Section Layout</h3>
@@ -381,6 +417,15 @@ export default function QuotationTemplateDrawer({ isOpen, onClose }: QuotationTe
                 label="Invoice & Watermark Logo"
                 value={config.watermarkUrl}
                 onChange={(url) => setConfig({ ...config, watermarkUrl: url })}
+              />
+
+              {/* Authorized Digital Signature */}
+              <CloudinaryUpload
+                variant="compact"
+                folder="quotations"
+                label="Authorized Digital Signature"
+                value={config.signatureUrl || '/signature.png'}
+                onChange={(url) => setConfig({ ...config, signatureUrl: url })}
               />
 
               {/* Watermark opacity */}

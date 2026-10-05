@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, FileText, Edit2, Trash2, Calendar, MapPin, Sparkles, X, LayoutGrid, List } from 'lucide-react';
+import { Plus, Search, FileText, Edit2, Trash2, Calendar, MapPin, Sparkles, X, LayoutGrid, List, Eye } from 'lucide-react';
 import { getQuotations, deleteQuotation } from '@/app/actions';
 import { Quotation } from '@/lib/types';
 import dayjs from 'dayjs';
@@ -11,6 +11,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useRouter } from 'next/navigation';
 import QuotationTemplateDrawer from './components/QuotationTemplateDrawer';
 import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
+import { generateQuotationHTML } from '@/lib/quotationTemplates';
 
 export default function QuotationsDashboardPage() {
   const router = useRouter();
@@ -36,6 +37,45 @@ export default function QuotationsDashboardPage() {
   useEffect(() => {
     fetchQuotations();
   }, []);
+
+  const handlePreviewQuotation = (quotation: Quotation) => {
+    try {
+      let savedConfig = undefined;
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('arjun-quotation-template');
+        if (saved) savedConfig = JSON.parse(saved);
+      }
+      const html = generateQuotationHTML({
+        quotationId: quotation._id || quotation.id,
+        customerName: quotation.customerName,
+        phone: quotation.phone,
+        email: quotation.email,
+        location: quotation.location,
+        bookingDate: quotation.bookingDate,
+        eventType: quotation.eventType,
+        discount: quotation.discount,
+        paymentTerms: quotation.paymentTerms,
+        termsConditions: quotation.termsConditions,
+        services: quotation.services || [],
+        subTotal: quotation.subTotal || 0,
+        grandTotal: quotation.grandTotal || 0,
+        hideItemPrices: quotation.hideItemPrices,
+        templateConfig: savedConfig
+      }, quotation.templateId || 'invoice1');
+
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.open();
+        newWindow.document.write(html);
+        newWindow.document.close();
+      } else {
+        toast.error('Pop-up blocked. Please enable pop-ups.');
+      }
+    } catch (e) {
+      console.error('Failed to preview quotation', e);
+      toast.error('Failed to open preview');
+    }
+  };
 
   const handleDelete = async () => {
     if (!quotationToDelete) return;
@@ -186,13 +226,31 @@ export default function QuotationsDashboardPage() {
                     <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
                     {quotation.location}
                   </p>
-                  <p className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-[#fef2f2] dark:bg-red-950/40 text-[#e50914] dark:text-red-400 mt-2">
-                    {quotation.eventType}
-                  </p>
+                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                    <p className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide bg-[#fef2f2] dark:bg-red-950/40 text-[#e50914] dark:text-red-400">
+                      {quotation.eventType}
+                    </p>
+                    {quotation.hideItemPrices ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/40">
+                        Direct Total
+                      </span>
+                    ) : quotation.services?.some((s: any) => s.hidePrice) ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/40">
+                        Custom Pricing
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
 
               <div className="flex justify-end gap-2 border-t border-gray-50 dark:border-gray-800/60 pt-4 mt-4">
+                <button 
+                  onClick={() => handlePreviewQuotation(quotation)}
+                  className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer"
+                  title="Preview / Print Proposal"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
                 <button 
                   onClick={() => router.push(`/quotations/edit/${quotation._id || quotation.id}`)}
                   className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
@@ -224,8 +282,17 @@ export default function QuotationsDashboardPage() {
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-[14.5px] font-extrabold text-gray-900 dark:text-white truncate">{quotation.customerName}</h4>
-                  <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5 font-semibold">
+                  <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5 font-semibold flex-wrap">
                     <span className="text-[#e50914] font-bold">{quotation.eventType || 'Photography'}</span>
+                    {quotation.hideItemPrices ? (
+                      <span className="text-[9.5px] px-1.5 py-0.2 rounded bg-amber-100/70 text-amber-800 font-bold">
+                        Direct Total
+                      </span>
+                    ) : quotation.services?.some((s: any) => s.hidePrice) ? (
+                      <span className="text-[9.5px] px-1.5 py-0.2 rounded bg-amber-100/70 text-amber-800 font-bold">
+                        Custom Pricing
+                      </span>
+                    ) : null}
                     <span>•</span>
                     <span className="truncate">{quotation.email}</span>
                   </div>
@@ -250,6 +317,13 @@ export default function QuotationsDashboardPage() {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
+                <button 
+                  onClick={() => handlePreviewQuotation(quotation)}
+                  className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+                  title="Preview / Print Proposal"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
                 <button 
                   onClick={() => router.push(`/quotations/edit/${quotation._id || quotation.id}`)}
                   className="p-2 text-gray-400 hover:text-[#e50914] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"

@@ -357,7 +357,8 @@ export default function PaymentPage() {
                   <p style={{ margin: '0', fontSize: '13px', fontWeight: 'bold' }}>Client: {formData.customerName}</p>
                   <p style={{ margin: '0', fontSize: '11px', color: '#666' }}>Date: {new Date().toLocaleDateString()}</p>
                 </div>
-                <div style={{ borderTop: '1px solid #999', width: '220px', paddingTop: '8px' }}>
+                <div style={{ borderTop: '1px solid #999', width: '220px', paddingTop: '8px', textAlign: 'center' }}>
+                  <img src="/signature.png" alt="Authorized Signature" style={{ height: '44px', maxWidth: '160px', objectFit: 'contain', margin: '0 auto 4px auto', display: 'block' }} />
                   <p style={{ margin: '0', fontSize: '13px', fontWeight: 'bold' }}>Arjun Films</p>
                   <p style={{ margin: '0', fontSize: '11px', color: '#666' }}>Authorized Signature</p>
                 </div>

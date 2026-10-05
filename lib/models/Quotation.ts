@@ -5,6 +5,7 @@ interface ServiceItem {
   description?: string;
   quantity: number;
   price: number;
+  hidePrice?: boolean;
 }
 
 export interface IQuotation extends Document {
@@ -24,6 +25,7 @@ export interface IQuotation extends Document {
   updatedAt: Date;
   projectId?: string;
   templateId?: string;
+  hideItemPrices?: boolean;
 }
 
 const ServiceItemSchema = new Schema({
@@ -31,6 +33,7 @@ const ServiceItemSchema = new Schema({
   description: { type: String },
   quantity: { type: Number, required: true, default: 1 },
   price: { type: Number, required: true, default: 0 },
+  hidePrice: { type: Boolean, default: false },
 });
 
 const QuotationSchema: Schema = new Schema({
@@ -50,6 +53,7 @@ const QuotationSchema: Schema = new Schema({
   updatedAt: { type: Date, default: Date.now },
   projectId: { type: Schema.Types.ObjectId, ref: 'Project' },
   templateId: { type: String, default: 'invoice1' },
+  hideItemPrices: { type: Boolean, default: false },
 });
 
 delete mongoose.models.Quotation;

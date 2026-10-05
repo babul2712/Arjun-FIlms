@@ -32,6 +32,8 @@ import ProjectListView from '@/components/dashboard/ProjectListView';
 import FiltersPanel from '@/components/dashboard/FiltersPanel';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import CalendarView from './components/CalendarView';
+import PendingPaymentsModal from './components/PendingPaymentsModal';
+import PendingProjectsModal from './components/PendingProjectsModal';
 import UniversalSearchBar from '@/components/search/UniversalSearchBar';
 import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
 import { toast } from 'sonner';
@@ -87,6 +89,10 @@ export default function DashboardPage() {
   // Toggle card states
   const [showBookings, setShowBookings] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
+
+  // Modal states
+  const [isPendingPaymentsModalOpen, setIsPendingPaymentsModalOpen] = useState(false);
+  const [isPendingProjectsModalOpen, setIsPendingProjectsModalOpen] = useState(false);
 
   // Cases lists tab & details drawer state
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -680,21 +686,29 @@ export default function DashboardPage() {
               </div>
 
               {/* Card 2: Pending Payments */}
-              <div className="bg-gradient-to-br from-rose-50/70 via-white to-rose-50/30 dark:from-rose-950/20 dark:via-[#16181c] dark:to-rose-950/10 border border-rose-200/60 dark:border-rose-900/40 shadow-sm shadow-rose-500/5 rounded-[28px] p-5 flex flex-col justify-between h-[115px] relative overflow-hidden">
-                <div className="absolute -top-6 -right-6 w-20 h-20 bg-rose-500/15 rounded-full blur-xl pointer-events-none" />
+              <div 
+                onClick={() => setIsPendingPaymentsModalOpen(true)}
+                className="bg-gradient-to-br from-rose-50/70 via-white to-rose-50/30 dark:from-rose-950/20 dark:via-[#16181c] dark:to-rose-950/10 border border-rose-200/60 dark:border-rose-900/40 shadow-sm shadow-rose-500/5 rounded-[28px] p-5 flex flex-col justify-between h-[115px] relative overflow-hidden cursor-pointer hover:shadow-md hover:scale-[1.02] hover:border-rose-400 dark:hover:border-rose-700 active:scale-98 transition-all group"
+                title="Click to view pending payments breakdown of all clients"
+              >
+                <div className="absolute -top-6 -right-6 w-20 h-20 bg-rose-500/15 rounded-full blur-xl pointer-events-none group-hover:bg-rose-500/25 transition-all" />
                 <div className="flex justify-between items-start relative z-10">
-                  <div className="w-8 h-8 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center shadow-sm shadow-rose-500/10">
+                  <div className="w-8 h-8 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center justify-center shadow-sm shadow-rose-500/10 group-hover:bg-rose-500 group-hover:text-white transition-all">
                     <CreditCard className="w-4 h-4 stroke-[2.5]" />
                   </div>
-                  <span className="text-[9px] text-rose-600 dark:text-rose-400 font-extrabold uppercase bg-rose-500/10 dark:bg-rose-500/20 px-2 py-0.5 rounded-md border border-rose-500/20">
-                    Due
+                  <span className="text-[9px] text-rose-600 dark:text-rose-400 font-extrabold uppercase bg-rose-500/10 dark:bg-rose-500/20 px-2 py-0.5 rounded-md border border-rose-500/20 flex items-center gap-1 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all">
+                    <span>Due</span>
+                    <ArrowUpRight className="w-2.5 h-2.5 stroke-[3]" />
                   </span>
                 </div>
                 <div className="relative z-10">
                   <h3 className="text-[18px] font-black text-rose-600 dark:text-rose-400">
                     <AnimatedCashAmount amount={displayStats.pendingPaymentsAmount} />
                   </h3>
-                  <span className="text-[10px] text-rose-700/80 dark:text-rose-400/80 font-bold uppercase tracking-wider block mt-0.5">Pending Pay</span>
+                  <span className="text-[10px] text-rose-700/80 dark:text-rose-400/80 font-bold uppercase tracking-wider block mt-0.5 flex items-center justify-between">
+                    <span>Pending Pay</span>
+                    <span className="text-[9px] lowercase font-normal opacity-0 group-hover:opacity-100 transition-opacity">view all →</span>
+                  </span>
                 </div>
               </div>
 
@@ -780,22 +794,27 @@ export default function DashboardPage() {
 
               {/* Card 4: Pending / Finished Projects Toggle Card */}
               <div 
-                className={`border shadow-sm rounded-[28px] p-5 flex flex-col justify-between h-[115px] relative overflow-hidden transition-all duration-300 ${
+                className={`border shadow-sm rounded-[28px] p-5 flex flex-col justify-between h-[115px] relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-98 group ${
                   showFinished
-                    ? 'bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 dark:from-emerald-950/30 dark:via-[#16181c] dark:to-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/50 shadow-emerald-500/5'
-                    : 'bg-gradient-to-br from-red-50/90 via-white to-red-50/40 dark:from-red-950/30 dark:via-[#16181c] dark:to-red-950/20 border-red-200/80 dark:border-red-900/50 shadow-red-500/5'
+                    ? 'bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 dark:from-emerald-950/30 dark:via-[#16181c] dark:to-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/50 shadow-emerald-500/5 hover:border-emerald-400'
+                    : 'bg-gradient-to-br from-red-50/90 via-white to-red-50/40 dark:from-red-950/30 dark:via-[#16181c] dark:to-red-950/20 border-red-200/80 dark:border-red-900/50 shadow-red-500/5 hover:border-red-400'
                 }`}
+                onClick={() => setIsPendingProjectsModalOpen(true)}
+                title="Click to view full pending & active projects breakdown"
               >
                 {/* Decorative Half-Circle Corner Display / Glow */}
                 <div 
-                  className={`absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl pointer-events-none transition-all ${
+                  className={`absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl pointer-events-none transition-all group-hover:scale-125 ${
                     showFinished ? 'bg-emerald-500/20' : 'bg-red-500/20'
                   }`} 
                 />
 
                 <div className="flex justify-between items-start w-full relative z-10">
                   {/* Miniature toggle switch */}
-                  <div className="flex bg-white/90 dark:bg-[#24272c] p-0.5 rounded-lg border border-gray-200/60 dark:border-gray-800/60 text-[9px] font-bold shadow-xs">
+                  <div 
+                    className="flex bg-white/90 dark:bg-[#24272c] p-0.5 rounded-lg border border-gray-200/60 dark:border-gray-800/60 text-[9px] font-bold shadow-xs"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button 
                       type="button"
                       onClick={() => setShowFinished(false)}
@@ -824,8 +843,8 @@ export default function DashboardPage() {
                   <div 
                     className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0 border ${
                       showFinished 
-                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shadow-sm shadow-emerald-500/15' 
-                        : 'bg-red-500/15 text-[#e50914] dark:text-red-400 border-red-500/30 shadow-sm shadow-red-500/15'
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shadow-sm shadow-emerald-500/15 group-hover:bg-emerald-600 group-hover:text-white' 
+                        : 'bg-red-500/15 text-[#e50914] dark:text-red-400 border-red-500/30 shadow-sm shadow-red-500/15 group-hover:bg-[#e50914] group-hover:text-white'
                     }`}
                   >
                     {showFinished ? (
@@ -847,13 +866,14 @@ export default function DashboardPage() {
                     {showFinished ? displayStats.finishedProjects : displayStats.pendingProjects}
                   </h3>
                   <span 
-                    className={`text-[10px] font-extrabold uppercase tracking-wider block mt-0.5 transition-colors ${
+                    className={`text-[10px] font-extrabold uppercase tracking-wider block mt-0.5 transition-colors flex items-center justify-between ${
                       showFinished 
                         ? 'text-emerald-700/80 dark:text-emerald-400/80' 
                         : 'text-red-700/80 dark:text-red-400/80'
                     }`}
                   >
-                    {showFinished ? 'Finished Projects' : 'Pending Projects'}
+                    <span>{showFinished ? 'Finished Projects' : 'Pending Projects'}</span>
+                    <span className="text-[9px] lowercase font-normal opacity-0 group-hover:opacity-100 transition-opacity">view all →</span>
                   </span>
                 </div>
               </div>
@@ -1399,6 +1419,26 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Pending Payments Breakdown Modal */}
+      <PendingPaymentsModal
+        isOpen={isPendingPaymentsModalOpen}
+        onClose={() => setIsPendingPaymentsModalOpen(false)}
+        projects={projects}
+        projectPaidMap={projectPaidMap}
+        rawPayments={rawPayments}
+        onSelectProject={(p) => setSelectedProject(p)}
+      />
+
+      {/* Pending & Active Projects Breakdown Modal */}
+      <PendingProjectsModal
+        isOpen={isPendingProjectsModalOpen}
+        onClose={() => setIsPendingProjectsModalOpen(false)}
+        projects={projects}
+        projectPaidMap={projectPaidMap}
+        initialTab={showFinished ? 'finished' : 'pending'}
+        onSelectProject={(p) => setSelectedProject(p)}
+      />
 
       {/* Slide-out Filters Panel overlay */}
       <FiltersPanel onFilterChange={handleFilterChange} />

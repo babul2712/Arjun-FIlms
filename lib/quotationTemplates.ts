@@ -38,12 +38,14 @@ export interface QuotationData {
   paymentTerms?: string;
   termsConditions?: string;
   projectNumber?: string;
+  hideItemPrices?: boolean;
   services: Array<{
     id?: string;
     name: string;
     description?: string;
     quantity: number;
     price: number;
+    hidePrice?: boolean;
   }>;
   subTotal: number;
   grandTotal: number;
@@ -63,7 +65,27 @@ export interface QuotationData {
     footerBgColor?: string;
     watermarkUrl?: string;
     watermarkOpacity?: number;
+    signatureUrl?: string;
   };
+}
+
+function renderPreviewBanner(studioName: string): string {
+  return `
+  <div class="no-print" style="position: sticky; top: 0; left: 0; right: 0; background: #09090b; color: #ffffff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 99999; box-shadow: 0 4px 20px rgba(0,0,0,0.25); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin-bottom: 20px; border-bottom: 1px solid #27272a;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 900; font-size: 14px; letter-spacing: 0.5px; color: #f87171;">${studioName}</span>
+      <span style="font-size: 11.5px; background: #27272a; color: #d4d4d8; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Proposal Preview</span>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button onclick="window.print()" style="background: #e50914; color: #ffffff; font-size: 12.5px; font-weight: 700; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(229,9,20,0.35);">
+        🖨️ Print / Save as PDF
+      </button>
+      <button onclick="window.close()" style="background: #27272a; color: #e4e4e7; font-size: 12.5px; font-weight: 600; border: 1px solid #3f3f46; padding: 8px 14px; border-radius: 8px; cursor: pointer;">
+        ✕ Close
+      </button>
+    </div>
+  </div>
+  `;
 }
 
 /**
@@ -89,6 +111,14 @@ export function generateInvoice1HTML(data: QuotationData): string {
   }
   const logoUrl = resolvedLogo;
 
+  let resolvedSignature = cfg.signatureUrl;
+  if (!resolvedSignature) {
+    resolvedSignature = '/signature.png';
+  }
+  if (typeof window !== 'undefined' && resolvedSignature.startsWith('/')) {
+    resolvedSignature = window.location.origin + resolvedSignature;
+  }
+
   const invoiceNo = data.quotationId ? data.quotationId.slice(-4).toUpperCase() : Math.floor(1000 + Math.random() * 9000).toString();
   const invoiceDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const eventDate = data.bookingDate 
@@ -100,11 +130,14 @@ export function generateInvoice1HTML(data: QuotationData): string {
     : new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const poNumber = data.projectNumber || `ARJ-${invoiceNo}`;
+  const hideGlobal = Boolean(data.hideItemPrices);
+  const allPricesHidden = hideGlobal || (data.services.length > 0 && data.services.every(s => Boolean(s.hidePrice)));
 
   const rowsHtml = data.services.map((item, idx) => {
     const qty = item.quantity || 1;
     const unitPrice = Number(item.price) || 0;
     const amount = qty * unitPrice;
+    const isItemHidden = hideGlobal || Boolean(item.hidePrice);
     const descriptionSubLines = (item.description || '')
       .split(/\r\n|\n|\r/)
       .map(l => l.trim())
@@ -114,6 +147,36 @@ export function generateInvoice1HTML(data: QuotationData): string {
         return `<div style="font-size: 11.5px; color: #555; font-weight: normal; margin-top: 3px; line-height: 1.45;">• ${clean}</div>`;
       })
       .join('');
+
+    if (allPricesHidden) {
+      return `
+      <tr>
+        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
+        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+          ${item.name || 'Service Item'}
+          ${descriptionSubLines}
+        </td>
+      </tr>
+      `;
+    }
+
+    if (isItemHidden) {
+      return `
+      <tr>
+        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
+        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+          ${item.name || 'Service Item'}
+          ${descriptionSubLines}
+        </td>
+        <td style="padding: 13px 8px; text-align: right; font-size: 12px; font-weight: 600; color: #64748b; font-style: italic; vertical-align: top;">
+          Included
+        </td>
+        <td style="padding: 13px 8px; text-align: right; font-size: 12px; font-weight: 700; color: #64748b; font-style: italic; vertical-align: top;">
+          Included
+        </td>
+      </tr>
+      `;
+    }
 
     return `
       <tr>
@@ -144,9 +207,12 @@ export function generateInvoice1HTML(data: QuotationData): string {
 <head>
   <meta charset="UTF-8">
   <title>Invoice - ${data.customerName || 'Client'}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     @page {
-      size: A4;
+      size: A4 portrait;
       margin: 10mm;
     }
     * {
@@ -156,16 +222,26 @@ export function generateInvoice1HTML(data: QuotationData): string {
     }
     body {
       background: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #111827;
-      padding: 30px;
-      -webkit-print-color-adjust: exact;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
     }
     .invoice-container {
       max-width: 780px;
       margin: 0 auto;
       background: #ffffff;
-      padding: 20px 10px;
+      padding: 24px 20px;
     }
     .header-table {
       width: 100%;
@@ -320,6 +396,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
   </style>
 </head>
 <body>
+  ${renderPreviewBanner(studioName)}
   <div class="invoice-container">
     
     <!-- Top Header -->
@@ -384,9 +461,11 @@ export function generateInvoice1HTML(data: QuotationData): string {
       <thead>
         <tr>
           <th style="width: 50px; text-align: center;">QTY</th>
-          <th style="text-align: left;">DESCRIPTION</th>
+          <th style="text-align: left;">DESCRIPTION / DELIVERABLES</th>
+          ${!allPricesHidden ? `
           <th style="width: 140px; text-align: right;">UNIT PRICE</th>
           <th style="width: 140px; text-align: right;">AMOUNT</th>
+          ` : ''}
         </tr>
       </thead>
       <tbody>
@@ -396,12 +475,14 @@ export function generateInvoice1HTML(data: QuotationData): string {
 
     <!-- Totals Table -->
     <table class="totals-wrap">
+      ${(!allPricesHidden || data.discount > 0) ? `
       <tr>
-        <td style="font-weight: 600; color: #4b5563;">Subtotal</td>
+        <td style="font-weight: 600; color: #4b5563;">${allPricesHidden ? 'Package Value' : 'Subtotal'}</td>
         <td style="text-align: right; font-weight: 700; color: #111;">
           ₹${data.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </td>
       </tr>
+      ` : ''}
       ${data.discount > 0 ? `
       <tr>
         <td style="font-weight: 600; color: #4b5563;">Discount</td>
@@ -418,12 +499,14 @@ export function generateInvoice1HTML(data: QuotationData): string {
       </tr>
     </table>
 
-    <!-- Handwritten Signature -->
-    <div class="signature-wrap">
-      <div class="signature-script">
-        ${studioName.includes('ARJUN') ? 'Babul Samal' : studioName}
+    <!-- Authorized Signature with PNG Image -->
+    <div class="signature-wrap" style="margin-top: 28px; margin-bottom: 16px; text-align: right; padding-right: 15px;">
+      <div style="display: inline-block; text-align: center; min-width: 160px;">
+        <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 52px; max-width: 170px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
+        <div style="font-size: 11px; color: #4b5563; font-weight: 700; border-top: 1.5px solid #d1d5db; padding-top: 4px; letter-spacing: 0.5px; text-transform: uppercase;">
+          Authorized Signature
+        </div>
       </div>
-      <div style="font-size: 11px; color: #6b7280; font-weight: 600; margin-top: 2px;">Authorized Signature</div>
     </div>
 
     <!-- Bottom Thank You & Terms Bar -->
@@ -464,8 +547,19 @@ export function generateClassicHTML(data: QuotationData): string {
   const bankName = cfg.bankName || 'BABUL SAMAL';
   const bankAccount = cfg.bankAccount || '39149567096';
   const bankIfsc = cfg.bankIfsc || 'SBIN0000068';
+  const hideGlobal = Boolean(data.hideItemPrices);
+  const allPricesHidden = hideGlobal || (data.services.length > 0 && data.services.every(s => Boolean(s.hidePrice)));
+
+  let resolvedSignature = cfg.signatureUrl;
+  if (!resolvedSignature) {
+    resolvedSignature = '/signature.png';
+  }
+  if (typeof window !== 'undefined' && resolvedSignature.startsWith('/')) {
+    resolvedSignature = window.location.origin + resolvedSignature;
+  }
 
   const servicesHtml = data.services.map((s: any) => {
+    const isItemHidden = hideGlobal || Boolean(s.hidePrice);
     const details = (s.description || '')
       .split(/\r\n|\n|\r/)
       .map((line: string) => line.trim())
@@ -475,6 +569,32 @@ export function generateClassicHTML(data: QuotationData): string {
         return `<div style="font-size:11.5px; color:#555; margin-top:3px; line-height: 1.45;">• ${clean}</div>`;
       })
       .join('');
+
+    if (allPricesHidden) {
+      return `
+      <tr>
+        <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
+          <h4 style="margin:0 0 4px; font-size:15px; color:${accentColor};">${s.name || 'Service Item'}</h4>
+          ${details}
+        </td>
+        <td style="text-align:center; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">${s.quantity}</td>
+      </tr>
+      `;
+    }
+
+    if (isItemHidden) {
+      return `
+      <tr>
+        <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
+          <h4 style="margin:0 0 4px; font-size:15px; color:${accentColor};">${s.name || 'Service Item'}</h4>
+          ${details}
+        </td>
+        <td style="text-align:center; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">${s.quantity}</td>
+        <td style="text-align:right; padding:12px; font-size:13px; font-style:italic; color:#64748b; border-bottom: 1px solid #eee;">Included</td>
+      </tr>
+      `;
+    }
+
     return `
     <tr>
       <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
@@ -521,9 +641,9 @@ export function generateClassicHTML(data: QuotationData): string {
     <table style="width:100%; border-collapse:collapse; margin-top:20px;">
       <thead>
         <tr style="background:#faf5ff; border-bottom: 2px solid ${accentColor};">
-          <th style="padding:10px; color:${accentColor}; text-align:left;">Description</th>
-          <th class="rate" style="padding:10px; color:${accentColor}; text-align:center;">Qty</th>
-          <th class="subtotal" style="padding:10px; color:${accentColor}; text-align:right;">Subtotal</th>
+          <th style="padding:10px; color:${accentColor}; text-align:left;">Deliverables & Scope of Work</th>
+          <th class="rate" style="padding:10px; color:${accentColor}; text-align:center; width:80px;">Qty</th>
+          ${!allPricesHidden ? `<th class="subtotal" style="padding:10px; color:${accentColor}; text-align:right; width:120px;">Subtotal</th>` : ''}
         </tr>
       </thead>
       <tbody>
@@ -532,8 +652,8 @@ export function generateClassicHTML(data: QuotationData): string {
     </table>
     
     <table class="summary">
-      <tr><td>Subtotal</td><td align="right">₹${data.subTotal.toLocaleString()}</td></tr>
-      <tr><td>Discount</td><td align="right">₹${data.discount || 0}</td></tr>
+      ${(!allPricesHidden || data.discount > 0) ? `<tr><td>${allPricesHidden ? 'Package Value' : 'Subtotal'}</td><td align="right">₹${data.subTotal.toLocaleString()}</td></tr>` : ''}
+      ${data.discount > 0 ? `<tr><td>Discount</td><td align="right">₹${data.discount || 0}</td></tr>` : ''}
       <tr class="total"><td style="padding:10px;">Grand Total</td><td align="right" style="padding:10px;">₹${data.grandTotal.toLocaleString()}</td></tr>
     </table>
   `;
@@ -572,11 +692,40 @@ export function generateClassicHTML(data: QuotationData): string {
 <head>
   <meta charset="UTF-8">
   <title>Quotation - ${studioName}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    @page{size:A4;margin:10mm}
-    *{box-sizing:border-box}
-    body{margin:0;background:${cfg.pageBgColor || '#fdf6f6'};font-family:Arial,Helvetica,sans-serif;color:#333;padding:20px}
-    .container{max-width:800px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.05);border:1px solid #eee;display:flex;flex-direction:column;justify-content:space-between;min-height:98vh;position:relative;}
+    @page { size: A4 portrait; margin: 10mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: ${cfg.pageBgColor || '#fdf6f6'};
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #333;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { padding: 0 !important; background: #ffffff !important; }
+      .container { margin: 0 auto !important; box-shadow: none !important; border: none !important; }
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.05);
+      border: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 98vh;
+      position: relative;
+    }
     .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;height:320px;opacity:${cfg.watermarkOpacity !== undefined ? cfg.watermarkOpacity : 0.05};background-image:url('${cfg.watermarkUrl || '/logo.jpeg'}');background-repeat:no-repeat;background-position:center;background-size:contain;pointer-events:none;z-index:0;}
     .header{background:${cfg.headerBgColor || '#fef2f2'};color:${accentColor};padding:24px;display:flex;justify-content:space-between;position:relative;z-index:1;}
     .header h1{margin:0;font-size:26px;font-weight:bold;}
@@ -603,6 +752,7 @@ export function generateClassicHTML(data: QuotationData): string {
   </style>
 </head>
 <body>
+  ${renderPreviewBanner(studioName)}
   <div class="container">
     ${cfg.watermarkUrl ? `<div class="watermark"></div>` : ''}
     ${headerHtml}
@@ -611,6 +761,19 @@ export function generateClassicHTML(data: QuotationData): string {
       ${servicesTableHtml}
       ${paymentScheduleHtml}
       ${termsConditionsHtml}
+      
+      <!-- Authorized Signature Section -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding: 0 14px 14px 14px; position: relative; z-index: 1;">
+        <div style="font-size: 11.5px; color: #64748b;">
+          <p style="margin: 0; font-weight: 700; color: #333;">Client Acceptance & E-Sign</p>
+          <p style="margin: 2px 0 0 0; font-size: 10.5px; color: #94a3b8;">Digitally Verified Official Proposal / Invoice</p>
+        </div>
+        <div style="text-align: center; border-top: 1.5px solid #e2e8f0; padding-top: 6px; width: 180px;">
+          <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 48px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
+          <div style="font-size: 11px; font-weight: 800; color: #333; text-transform: uppercase; letter-spacing: 0.3px;">Authorized Signature</div>
+          <div style="font-size: 10px; color: #777; margin-top: 1px;">${studioName}</div>
+        </div>
+      </div>
     </div>
     ${footerHtml}
   </div>
@@ -641,6 +804,14 @@ export function generateInvoice3HTML(data: QuotationData): string {
     resolvedLogo = window.location.origin + resolvedLogo;
   }
 
+  let resolvedSignature = cfg.signatureUrl;
+  if (!resolvedSignature) {
+    resolvedSignature = '/signature.png';
+  }
+  if (typeof window !== 'undefined' && resolvedSignature.startsWith('/')) {
+    resolvedSignature = window.location.origin + resolvedSignature;
+  }
+
   const invoiceRaw = data.quotationId ? data.quotationId.slice(-4).replace(/\D/g, '') : '2712';
   const invoiceFormatted = `0000${invoiceRaw.padStart(4, '0')}`.slice(-7);
   
@@ -648,6 +819,8 @@ export function generateInvoice3HTML(data: QuotationData): string {
   const eventDate = data.bookingDate 
     ? new Date(data.bookingDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
     : invoiceDate;
+  const hideGlobal = Boolean(data.hideItemPrices);
+  const allPricesHidden = hideGlobal || (data.services.length > 0 && data.services.every(s => Boolean(s.hidePrice)));
 
   // Table rows HTML with alternating zebra striping
   const rowsHtml = data.services.map((item, idx) => {
@@ -656,10 +829,57 @@ export function generateInvoice3HTML(data: QuotationData): string {
     const total = qty * unitPrice;
     const isEven = idx % 2 === 0;
     const rowBg = isEven ? '#f1f3f5' : '#ffffff';
+    const isItemHidden = hideGlobal || Boolean(item.hidePrice);
 
     const descLines = item.description 
       ? item.description.split('\n').map(l => l.trim()).filter(Boolean)
       : [];
+
+    if (allPricesHidden) {
+      return `
+      <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
+        <td style="padding: 13px 18px; vertical-align: top;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px;">
+            ${item.name || 'SERVICE LINE ITEM'}
+          </div>
+          ${descLines.length > 0 ? `
+            <div style="margin-top: 4px; font-size: 11px; color: #64748b; line-height: 1.45;">
+              ${descLines.map(d => `<div>• ${d.replace(/^[•\-\*]\s*/, '')}</div>`).join('')}
+            </div>
+          ` : ''}
+        </td>
+        <td style="padding: 13px 18px; text-align: center; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 600;">
+          ${qty}
+        </td>
+      </tr>
+      `;
+    }
+
+    if (isItemHidden) {
+      return `
+      <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
+        <td style="padding: 13px 18px; vertical-align: top;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px;">
+            ${item.name || 'SERVICE LINE ITEM'}
+          </div>
+          ${descLines.length > 0 ? `
+            <div style="margin-top: 4px; font-size: 11px; color: #64748b; line-height: 1.45;">
+              ${descLines.map(d => `<div>• ${d.replace(/^[•\-\*]\s*/, '')}</div>`).join('')}
+            </div>
+          ` : ''}
+        </td>
+        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12px; color: #64748b; font-style: italic; font-weight: 500;">
+          Included
+        </td>
+        <td style="padding: 13px 18px; text-align: center; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 600;">
+          ${qty}
+        </td>
+        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12px; color: #64748b; font-style: italic; font-weight: 700;">
+          Included
+        </td>
+      </tr>
+      `;
+    }
 
     return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
@@ -696,6 +916,9 @@ export function generateInvoice3HTML(data: QuotationData): string {
 <head>
   <meta charset="UTF-8">
   <title>Invoice - ${studioName}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     @page {
       size: A4 portrait;
@@ -710,12 +933,18 @@ export function generateInvoice3HTML(data: QuotationData): string {
     }
     body {
       background: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #1e293b;
       margin: 0;
-      padding: 24px 0;
+      padding: 0;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { padding: 0 !important; background: #ffffff !important; }
+      .invoice-card { margin: 0 auto !important; box-shadow: none !important; border: none !important; }
     }
     .invoice-card {
       width: 780px;
@@ -728,6 +957,7 @@ export function generateInvoice3HTML(data: QuotationData): string {
       justify-content: space-between;
       overflow: hidden;
       border: 1px solid #e2e8f0;
+      margin: 20px auto;
     }
     .main-body {
       padding: 48px 50px 24px 50px;
@@ -736,8 +966,8 @@ export function generateInvoice3HTML(data: QuotationData): string {
   </style>
 </head>
 <body>
-
-<div class="invoice-card">
+  ${renderPreviewBanner(studioName)}
+  <div class="invoice-card">
   <div class="main-body">
     
     <!-- Top Header: Logo/Studio (Left) & Giant Red INVOICE (Right) -->
@@ -807,17 +1037,19 @@ export function generateInvoice3HTML(data: QuotationData): string {
         <thead>
           <tr style="background: #1e2229; color: #ffffff;">
             <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;">
-              PRODUCT / SERVICES
+              PRODUCT / SERVICES & DELIVERABLES
             </th>
+            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: center; width: ${allPricesHidden ? '90px' : '75px'};">
+              QTY
+            </th>
+            ${!allPricesHidden ? `
             <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; width: 110px;">
               PRICE
-            </th>
-            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: center; width: 75px;">
-              QTY
             </th>
             <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; width: 120px;">
               TOTAL
             </th>
+            ` : ''}
           </tr>
         </thead>
         <tbody>
@@ -850,10 +1082,12 @@ export function generateInvoice3HTML(data: QuotationData): string {
 
       <!-- Right: Subtotal & Grand Total -->
       <div style="width: 40%; text-align: right;">
+        ${(!allPricesHidden || discount > 0) ? `
         <div style="display: flex; justify-content: space-between; font-size: 13px; color: #334155; margin-bottom: 6px; font-weight: 700;">
-          <span style="text-transform: uppercase; color: #64748b;">SUBTOTAL</span>
+          <span style="text-transform: uppercase; color: #64748b;">${allPricesHidden ? 'PACKAGE VALUE' : 'SUBTOTAL'}</span>
           <span>₹${subTotal.toLocaleString('en-IN')}</span>
         </div>
+        ` : ''}
 
         ${discount > 0 ? `
           <div style="display: flex; justify-content: space-between; font-size: 13px; color: #16a34a; margin-bottom: 6px; font-weight: 700;">
@@ -879,6 +1113,18 @@ export function generateInvoice3HTML(data: QuotationData): string {
       <p style="font-size: 10.5px; color: #64748b; line-height: 1.6; text-align: justify;">
         ${data.termsConditions || '50% advance booking deposit is required to confirm reservation. Final high-resolution edited photo gallery and 4K cinematic film deliverables are provided within 25 working days. Client cancellations within 14 days of shoot date are non-refundable. High-speed raw cloud storage is archived for 60 days following handover.'}
       </p>
+    </div>
+
+    <!-- Authorized Signature Section -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 24px; padding-top: 8px;">
+      <div style="font-size: 11px; color: #64748b; font-weight: 500; max-width: 420px; line-height: 1.45;">
+        Thank you for choosing <strong style="color: #0f172a;">${studioName}</strong>. This is a computer-generated proposal/invoice valid with authorized digital signature.
+      </div>
+      <div style="text-align: center; border-top: 1.5px solid #cbd5e1; padding-top: 6px; width: 175px;">
+        <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 48px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
+        <div style="font-size: 10.5px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px;">Authorized Signature</div>
+        <div style="font-size: 9.5px; color: #64748b; font-weight: 600; margin-top: 1px;">${studioName}</div>
+      </div>
     </div>
 
     <!-- Contact Info (3 Red Badges) -->

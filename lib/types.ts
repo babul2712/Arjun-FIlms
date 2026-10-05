@@ -15,6 +15,7 @@ export interface ServiceItem {
   description?: string;
   quantity: number;
   price: number;
+  hidePrice?: boolean;
 }
 
 export interface Quotation {
@@ -36,6 +37,7 @@ export interface Quotation {
   updatedAt: string;
   projectId?: string;
   templateId?: string;
+  hideItemPrices?: boolean;
 }
 
 export type PaymentMethod = 'UPI QR' | 'UPI ID' | 'Bank Transfer';
@@ -77,6 +79,7 @@ export interface Booking {
 }
 
 export interface CrewBlueprintItem {
+  _id?: string;
   role: string;
   assignedCrewId?: string;
   charges?: number;
@@ -108,7 +111,7 @@ export interface Project {
   payments: string[];
   crewBlueprint: CrewBlueprintItem[];
   bookingId?: string;
-  expenses: { _id?: string; date: string; description: string; amount: number }[];
+  expenses: { _id?: string; date: string; description: string; amount: number; crewMemberId?: string; crewBlueprintId?: string }[];
   services?: IServiceStage[];
   isStarred?: boolean;
   createdAt: string;

@@ -11,6 +11,7 @@ import {
   updateProjectPayment, 
   deletePayment, 
   addProjectCrew, 
+  removeProjectCrew,
   getCrew, 
   deleteProject 
 } from '@/app/actions';
@@ -94,7 +95,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       paymentMethod: p.paymentMethod || 'UPI QR',
       remarks: p.remarks || '',
       type: 'IN' as const,
-      date: dayjs(p.date),
+      date: p.date ? dayjs(p.date) : dayjs(project.createdAt || new Date()),
       rawDate: p.date,
       description: `Client Payment via ${p.paymentMethod || 'UPI QR'}${p.remarks ? ` (${p.remarks})` : ''}`,
       amount: p.amount || 0
@@ -102,9 +103,11 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     ...expenses.map((e: any, idx: number) => ({
       id: e._id || `exp-${idx}`,
       expenseIndex: idx,
+      crewBlueprintId: e.crewBlueprintId,
+      crewMemberId: e.crewMemberId,
       itemType: 'EXPENSE' as const,
       type: 'OUT' as const,
-      date: dayjs(e.date),
+      date: e.date ? dayjs(e.date) : dayjs(project.createdAt || new Date()),
       rawDate: e.date,
       description: e.description || 'Expense',
       amount: e.amount || 0
@@ -267,7 +270,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         charges: Number(crewForm.charges),
         assignedCrewId: crewForm.assignedCrewId || undefined
       });
-      toast.success('Crew assigned successfully');
+      toast.success('Crew assigned & ledger statement updated');
       setShowCrewModal(false);
       setCrewForm({ role: '', charges: '', assignedCrewId: '' });
       fetchDetails();
@@ -278,14 +281,32 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
 
   const handleRemoveCrew = async (idxToRemove: number) => {
     if (!confirm('Are you sure you want to remove this crew member?')) return;
-    const currentCrew = project.crewBlueprint || [];
-    const updatedCrew = currentCrew.filter((_: any, idx: number) => idx !== idxToRemove);
+    const crewToRemove = project.crewBlueprint?.[idxToRemove];
     try {
-      await updateProject(project._id, { crewBlueprint: updatedCrew });
-      toast.success('Crew allocation removed');
+      await removeProjectCrew(project._id, idxToRemove, crewToRemove?._id);
+      toast.success('Crew removed and ledger debit entry deleted');
       fetchDetails();
     } catch (e) {
-      toast.error('Failed to remove crew allocation');
+      console.error('removeProjectCrew error, applying fallback sync:', e);
+      // Fallback
+      const currentCrew = project.crewBlueprint || [];
+      const updatedCrew = currentCrew.filter((_: any, idx: number) => idx !== idxToRemove);
+      const staffDetails = availableCrew.find(c => c._id === crewToRemove?.assignedCrewId);
+      const crewName = staffDetails?.name || '';
+      const updatedExpenses = (project.expenses || []).filter((e: any) => {
+        if (crewToRemove?._id && e.crewBlueprintId && e.crewBlueprintId === crewToRemove._id) return false;
+        if (crewToRemove?.assignedCrewId && e.crewMemberId && e.crewMemberId === crewToRemove.assignedCrewId) return false;
+        const desc = (e.description || '').toLowerCase();
+        const role = (crewToRemove?.role || '').toLowerCase();
+        const isCrewDesc = desc.startsWith('crew:') || desc.startsWith('crew assigned:') || desc.startsWith('crew fee:');
+        if (isCrewDesc && ((role && desc.includes(role)) || (crewName && desc.includes(crewName.toLowerCase())))) {
+          return false;
+        }
+        return true;
+      });
+      await updateProject(project._id, { crewBlueprint: updatedCrew, expenses: updatedExpenses });
+      toast.success('Crew removed and ledger debit entry deleted');
+      fetchDetails();
     }
   };
 

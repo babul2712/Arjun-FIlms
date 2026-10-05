@@ -373,22 +373,122 @@ export async function updateProjectPayment(paymentId: string, data: { amount?: n
 
 export async function addProjectCrew(projectId: string, crewData: { role: string, assignedCrewId?: string, charges: number }) {
   await connectToDatabase();
-  const updateQuery: any = { $push: { crewBlueprint: crewData } };
+  const project = await Project.findById(projectId);
+  if (!project) throw new Error('Project not found');
 
-  if (crewData.charges && crewData.charges > 0) {
-    updateQuery.$push.expenses = {
-      date: new Date().toISOString(),
-      description: `Crew Assigned: ${crewData.role}`,
-      amount: crewData.charges
-    };
+  let crewName = '';
+  if (crewData.assignedCrewId) {
+    try {
+      const staff = await Crew.findById(crewData.assignedCrewId).lean() as any;
+      if (staff && staff.name) {
+        crewName = staff.name;
+      }
+    } catch (e) {
+      console.error('Crew lookup error:', e);
+    }
   }
 
-  const project = await Project.findByIdAndUpdate(
-    projectId,
-    updateQuery,
-    { new: true }
-  );
+  // Push new crew item
+  if (!project.crewBlueprint) project.crewBlueprint = [];
+  project.crewBlueprint.push({
+    role: crewData.role,
+    assignedCrewId: crewData.assignedCrewId || undefined,
+    charges: Number(crewData.charges || 0)
+  });
+
+  const addedItem = project.crewBlueprint[project.crewBlueprint.length - 1];
+  const blueprintId = addedItem?._id ? addedItem._id.toString() : undefined;
+
+  // If charges > 0, push expense debit
+  if (crewData.charges && Number(crewData.charges) > 0) {
+    const desc = crewName 
+      ? `Crew: ${crewName} (${crewData.role})`
+      : `Crew Fee: ${crewData.role}`;
+
+    if (!project.expenses) project.expenses = [];
+    project.expenses.push({
+      date: new Date(),
+      description: desc,
+      amount: Number(crewData.charges),
+      crewMemberId: crewData.assignedCrewId || undefined,
+      crewBlueprintId: blueprintId
+    } as any);
+  }
+
+  await project.save();
   revalidatePath('/projects', 'layout');
+  revalidatePath('/payments', 'layout');
+  revalidatePath('/dashboard', 'layout');
+  return JSON.parse(JSON.stringify(project));
+}
+
+export async function removeProjectCrew(projectId: string, crewIndex: number, crewBlueprintId?: string) {
+  await connectToDatabase();
+  const project = await Project.findById(projectId);
+  if (!project) throw new Error('Project not found');
+
+  const crewList = project.crewBlueprint || [];
+  let targetIndex = -1;
+
+  if (crewBlueprintId) {
+    targetIndex = crewList.findIndex((c: any) => c._id?.toString() === crewBlueprintId);
+  }
+  if (targetIndex === -1 && crewIndex >= 0 && crewIndex < crewList.length) {
+    targetIndex = crewIndex;
+  }
+
+  if (targetIndex !== -1) {
+    const crewToRemove = crewList[targetIndex];
+    const removedBlueprintId = crewToRemove._id?.toString();
+    const assignedCrewId = crewToRemove.assignedCrewId;
+    const role = crewToRemove.role;
+    const charges = Number(crewToRemove.charges || 0);
+
+    let crewName = '';
+    if (assignedCrewId) {
+      try {
+        const staff = await Crew.findById(assignedCrewId).lean() as any;
+        if (staff && staff.name) crewName = staff.name;
+      } catch (e) {}
+    }
+
+    // Remove crew member from blueprint
+    crewList.splice(targetIndex, 1);
+    project.crewBlueprint = crewList;
+
+    // Remove associated expense debit from project.expenses
+    if (project.expenses && project.expenses.length > 0) {
+      const expIdx = project.expenses.findIndex((e: any) => {
+        // 1. Check matching blueprint ID
+        if (removedBlueprintId && e.crewBlueprintId && e.crewBlueprintId.toString() === removedBlueprintId) {
+          return true;
+        }
+        // 2. Check matching crew member ID
+        if (assignedCrewId && e.crewMemberId && e.crewMemberId.toString() === assignedCrewId.toString()) {
+          return true;
+        }
+        // 3. Fallback matching on description & role/name
+        const desc = (e.description || '').toLowerCase();
+        const isCrewDesc = desc.startsWith('crew:') || desc.startsWith('crew assigned:') || desc.startsWith('crew fee:');
+        if (isCrewDesc) {
+          if (crewName && desc.includes(crewName.toLowerCase())) return true;
+          if (role && desc.includes(role.toLowerCase())) return true;
+          if (charges > 0 && Number(e.amount) === charges) return true;
+        }
+        return false;
+      });
+
+      if (expIdx !== -1) {
+        project.expenses.splice(expIdx, 1);
+      }
+    }
+
+    await project.save();
+  }
+
+  revalidatePath('/projects', 'layout');
+  revalidatePath('/payments', 'layout');
+  revalidatePath('/dashboard', 'layout');
   return JSON.parse(JSON.stringify(project));
 }
 

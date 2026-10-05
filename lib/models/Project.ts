@@ -74,7 +74,9 @@ const ProjectSchema: Schema = new Schema({
   expenses: [{
     date: { type: Date, required: true },
     description: { type: String, required: true },
-    amount: { type: Number, required: true }
+    amount: { type: Number, required: true },
+    crewMemberId: { type: String },
+    crewBlueprintId: { type: String }
   }],
   services: [ServiceStageSchema],
   isStarred: { type: Boolean, default: false },
