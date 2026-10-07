@@ -16,19 +16,23 @@ async function connectToDatabase() {
 
   if (!MONGODB_URI) {
     console.error('MONGO_URI or MONGODB_URI is not defined in environment variables');
-    throw new Error('Please define the MONGO_URI environment variable');
+    throw new Error('Please define the MONGO_URI or MONGODB_URI environment variable in Vercel Project Settings');
   }
-  if (cached.conn) {
+
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
-  if (!cached.promise) {
+  if (!cached.promise || mongoose.connection.readyState !== 1) {
     const opts = {
       bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI as string, opts).then((mongoose) => {
-      return mongoose;
+    cached.promise = mongoose.connect(MONGODB_URI as string, opts).then((mongooseInstance) => {
+      return mongooseInstance;
     });
   }
 
@@ -36,6 +40,7 @@ async function connectToDatabase() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    cached.conn = null;
     throw e;
   }
 
