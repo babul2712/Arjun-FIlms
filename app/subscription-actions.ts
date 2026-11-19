@@ -38,8 +38,8 @@ export async function getSubscriptions() {
     const enriched = await Promise.all(
       subs.map(async (sub: any) => {
         const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
         const shoots = await SubscriptionShoot.find({
           subscriptionId: sub._id,
@@ -92,8 +92,8 @@ export async function getSubscriptionById(id: string) {
       .lean();
 
     const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
     const thisMonthShoots = shoots.filter((s: any) => {
       const d = new Date(s.scheduledDate);
@@ -220,6 +220,14 @@ export async function getSubscriptionShoots(subscriptionId: string) {
   }
 }
 
+function parseSafeDate(d: string | undefined): Date | undefined {
+  if (!d) return undefined;
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    return new Date(`${d}T12:00:00.000Z`);
+  }
+  return new Date(d);
+}
+
 export async function createSubscriptionShoot(data: {
   subscriptionId: string;
   clientName: string;
@@ -232,7 +240,7 @@ export async function createSubscriptionShoot(data: {
     await connectToDatabase();
     const shoot = new SubscriptionShoot({
       ...data,
-      scheduledDate: new Date(data.scheduledDate),
+      scheduledDate: parseSafeDate(data.scheduledDate),
     });
     await shoot.save();
     revalidatePath(`/subscriptions/${data.subscriptionId}`);
@@ -262,7 +270,7 @@ export async function updateSubscriptionShoot(
     if (data.completedAt) update.completedAt = new Date(data.completedAt);
     if (data.cancelledAt) update.cancelledAt = new Date(data.cancelledAt);
     if (data.rescheduledTo) update.rescheduledTo = new Date(data.rescheduledTo);
-    if (data.scheduledDate) update.scheduledDate = new Date(data.scheduledDate);
+    if (data.scheduledDate) update.scheduledDate = parseSafeDate(data.scheduledDate);
     await SubscriptionShoot.findByIdAndUpdate(id, update);
     revalidatePath('/subscriptions');
     return { success: true };
@@ -283,7 +291,7 @@ export async function bulkScheduleShoots(
     const docs = dates.map((d) => ({
       subscriptionId,
       clientName,
-      scheduledDate: new Date(d),
+      scheduledDate: parseSafeDate(d),
       status: 'Scheduled',
       shootType: shootType || 'Photography & Videography',
       location: location || '',
@@ -381,8 +389,8 @@ export async function getSubscriptionDashboardStats() {
     await connectToDatabase();
 
     const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
     const monthStr = now.toLocaleString('default', { month: 'long', year: 'numeric' });
 
     const [allSubs, allPayments, allShoots] = await Promise.all([

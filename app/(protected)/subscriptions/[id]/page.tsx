@@ -120,14 +120,37 @@ const paymentStatusConfig = {
   Overdue: { bg: 'bg-red-100 dark:bg-red-950/30', text: 'text-red-600 dark:text-red-400' },
 };
 
-function formatDate(d: string) {
+function formatDate(d: string | Date) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const [y, m, day] = d.split('-').map(Number);
+    const dt = new Date(y, m - 1, day, 12, 0, 0);
+    return dt.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  const dateObj = new Date(d);
+  if (isNaN(dateObj.getTime())) return '—';
+  return dateObj.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function formatDateShort(d: string) {
+function formatDateShort(d: string | Date) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const [y, m, day] = d.split('-').map(Number);
+    const dt = new Date(y, m - 1, day, 12, 0, 0);
+    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  }
+  const dateObj = new Date(d);
+  if (isNaN(dateObj.getTime())) return '—';
+  return dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+}
+
+function formatBulkPreviewChip(dateStr: string) {
+  if (!dateStr) return '—';
+  const [yyyy, mm, dd] = dateStr.split('-').map(Number);
+  const dt = new Date(yyyy, mm - 1, dd, 12, 0, 0);
+  const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dt.getDay()];
+  const monthName = MONTHS_FULL[mm - 1]?.slice(0, 3) || '';
+  return `${weekday}, ${dd} ${monthName}`;
 }
 
 function formatTimeAgo(d: string) {
@@ -573,9 +596,13 @@ function ShootSchedulerModal({ sub, onClose, onSave }: {
     const dates: string[] = [];
     const daysInMonth = new Date(bulkYear, bulkMonth + 1, 0).getDate();
     for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(bulkYear, bulkMonth, d);
+      // Create local date at noon (12:00:00) so getDay() matches local calendar day
+      const date = new Date(bulkYear, bulkMonth, d, 12, 0, 0);
       if (selectedWeekdays.includes(date.getDay())) {
-        dates.push(date.toISOString().split('T')[0]);
+        const yyyy = bulkYear;
+        const mm = String(bulkMonth + 1).padStart(2, '0');
+        const dd = String(d).padStart(2, '0');
+        dates.push(`${yyyy}-${mm}-${dd}`);
       }
     }
     setBulkDates(dates);
@@ -641,10 +668,24 @@ function ShootSchedulerModal({ sub, onClose, onSave }: {
                 </div>
               </div>
               {bulkDates.length > 0 && (
-                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 rounded-2xl p-3">
-                  <p className="text-xs font-black text-emerald-600 dark:text-emerald-400 mb-2">{bulkDates.length} dates:</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {bulkDates.map(d => <span key={d} className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full font-bold">{formatDateShort(d)}</span>)}
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 rounded-2xl p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-black text-emerald-700 dark:text-emerald-300">
+                      {bulkDates.length} Shoot Days Selected for {MONTHS_FULL[bulkMonth]} {bulkYear}
+                    </p>
+                    <span className="text-[10px] font-bold text-emerald-600/80 dark:text-emerald-400/80">
+                      ~{Math.round(bulkDates.length / 4)} shoots/wk
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                    {bulkDates.map(d => (
+                      <span
+                        key={d}
+                        className="text-[11px] bg-white dark:bg-[#16181c] border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 px-2.5 py-1 rounded-xl font-bold shadow-sm"
+                      >
+                        {formatBulkPreviewChip(d)}
+                      </span>
+                    ))}
                   </div>
                 </div>
               )}
