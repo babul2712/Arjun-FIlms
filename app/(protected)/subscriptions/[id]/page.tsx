@@ -152,6 +152,30 @@ function currentMonthStr() {
   return `${MONTHS_FULL[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+function InputField({
+  label, icon, value, onChange, type = 'text', placeholder = '', readOnly = false
+}: {
+  label: string; icon: React.ReactNode; value: string | number;
+  onChange: (v: string) => void; type?: string; placeholder?: string; readOnly?: boolean;
+}) {
+  return (
+    <div>
+      <label className="block text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">{label}</label>
+      <div className="relative">
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
+        <input
+          type={type}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#1c1f24] border border-gray-200 dark:border-gray-700 text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50914]/30 focus:border-[#e50914]/50 transition-all ${readOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ─── EDIT MODAL ───────────────────────────────────────────────────────────────
 
 function EditModal({ sub, onClose, onSaved }: {
@@ -229,28 +253,6 @@ function EditModal({ sub, onClose, onSaved }: {
       setError(result.error || 'Failed to save changes');
     }
   };
-
-  const InputField = ({
-    label, icon, value, onChange, type = 'text', placeholder = '', readOnly = false
-  }: {
-    label: string; icon: React.ReactNode; value: string | number;
-    onChange: (v: string) => void; type?: string; placeholder?: string; readOnly?: boolean;
-  }) => (
-    <div>
-      <label className="block text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">{label}</label>
-      <div className="relative">
-        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
-        <input
-          type={type}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#1c1f24] border border-gray-200 dark:border-gray-700 text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50914]/30 focus:border-[#e50914]/50 transition-all ${readOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>

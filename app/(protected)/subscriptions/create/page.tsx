@@ -43,6 +43,21 @@ interface FormData {
 
 const steps = ['Client Info', 'Plan Details', 'Schedule', 'Review'];
 
+function InputField({ label, icon, ...props }: { label: string; icon: React.ReactNode } & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div>
+      <label className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">{label}</label>
+      <div className="relative">
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
+        <input
+          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#1c1f24] border border-gray-200 dark:border-gray-800 text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50914]/30 focus:border-[#e50914]/50 transition-all"
+          {...props}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function CreateSubscriptionPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -123,19 +138,6 @@ export default function CreateSubscriptionPage() {
       setError(result.error || 'Failed to create subscription');
     }
   };
-
-  const InputField = ({ label, icon, ...props }: { label: string; icon: React.ReactNode } & React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div>
-      <label className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">{label}</label>
-      <div className="relative">
-        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
-        <input
-          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#1c1f24] border border-gray-200 dark:border-gray-800 text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e50914]/30 focus:border-[#e50914]/50 transition-all"
-          {...props}
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="flex-1 p-4 md:p-6 overflow-auto">
