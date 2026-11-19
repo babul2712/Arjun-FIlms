@@ -65,7 +65,7 @@ export default function SubscriptionAnalyticsPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) {
-    return <SubscriptionLoader title="Subscription Analytics" subtitle="Analyzing financial trends & shoot delivery..." showSkeletonPreview={false} />;
+    return <SubscriptionLoader variant="analytics" />;
   }
 
   const maxRevenue = data?.monthlyTrend

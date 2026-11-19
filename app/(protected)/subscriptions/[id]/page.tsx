@@ -892,7 +892,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
   };
 
   if (loading) {
-    return <SubscriptionLoader title="Client Subscription" subtitle="Loading client portfolio & schedule..." showSkeletonPreview={false} />;
+    return <SubscriptionLoader variant="detail" />;
   }
 
   if (!sub) {

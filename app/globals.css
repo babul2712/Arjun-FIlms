@@ -343,6 +343,19 @@ body {
   animation: floatSmooth 3.5s infinite ease-in-out;
 }
 
+@keyframes liquidShimmer {
+  0% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+}
+
+.animate-liquid-shimmer {
+  animation: liquidShimmer 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Card Scoop Notch Inverted Radius Curves */
 .notch-inverted-radius-top {
   position: absolute;
