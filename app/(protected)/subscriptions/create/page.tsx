@@ -152,7 +152,7 @@ export default function CreateSubscriptionPage() {
             <ArrowLeft className="w-4 h-4 text-gray-500" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-gray-900 dark:text-white">New Subscription Client – Arjun Films</h1>
+            <h1 className="text-2xl font-black text-gray-900 dark:text-white">New Subscription Client</h1>
             <p className="text-sm text-gray-400">Step {step + 1} of {steps.length} — {steps[step]}</p>
           </div>
         </div>

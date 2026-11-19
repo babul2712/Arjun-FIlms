@@ -93,7 +93,7 @@ export default function SubscriptionAnalyticsPage() {
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <div className="w-1.5 h-5 bg-[#e50914] rounded-full" />
-              <span className="text-[11px] font-black text-[#e50914] uppercase tracking-[0.15em]">Subscription Analytics – Arjun Films</span>
+              <span className="text-[11px] font-black text-[#e50914] uppercase tracking-[0.15em]">Subscription Analytics</span>
             </div>
             <h1 className="text-2xl font-black text-gray-900 dark:text-white">Business Performance</h1>
           </div>

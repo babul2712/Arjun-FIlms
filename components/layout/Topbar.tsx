@@ -50,9 +50,9 @@ export default function Topbar() {
     '/finance': 'Financial Hub & Analytics',
     '/social-links': 'Bio & Social Links Manager',
     '/profile': 'Studio Profile & Settings',
-    '/subscriptions': 'Subscriptions – Arjun Films',
-    '/subscriptions/create': 'New Subscription Client – Arjun Films',
-    '/subscriptions/analytics': 'Subscription Analytics – Arjun Films',
+    '/subscriptions': 'Client Subscription',
+    '/subscriptions/create': 'New Subscription Client',
+    '/subscriptions/analytics': 'Subscription Analytics',
     '/journal': 'Trading Journal Dashboard',
     '/journal/analytics': 'Trading Analytics & Equity Curve',
     '/journal/trades': 'Trade Execution Log',
@@ -61,12 +61,12 @@ export default function Topbar() {
 
   const currentTitle = titleMap[pathname] || 
     (pathname.startsWith('/subscriptions/')
-      ? 'Client Subscription – Arjun Films'
+      ? 'Client Subscription'
       : pathname.startsWith('/projects/')
       ? 'Project Details'
       : isJournal
       ? 'Zen Trading Journal'
-      : 'Arjun Films');
+      : 'Studio CRM');
 
   return (
     <header className="flex justify-between items-center px-6 md:px-10 h-20 w-full bg-transparent sticky top-0 z-40 gap-4">
