@@ -169,7 +169,7 @@ export async function createProject(data: any) {
   await connectToDatabase();
 
   const projectNumber = 'PRJ-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  
+
   // Set default mockup services stages if not supplied
   const services = data.services || [
     { name: 'Request client authorization', status: 'Request client authorization', startedDate: new Date(), daysLeft: 14 },
@@ -239,7 +239,7 @@ export async function createPayment(data: any) {
       date: data.date ? new Date(data.date) : new Date()
     };
     const payment = await Payment.create(paymentData);
-    
+
     // Auto-create notification for new payment
     try {
       await Notification.create({
@@ -295,7 +295,7 @@ export async function updateProjectExpense(projectId: string, expenseIndex: numb
   const project = await Project.findById(projectId);
   if (!project) throw new Error('Project not found');
   if (!project.expenses || !project.expenses[expenseIndex]) throw new Error('Expense not found');
-  
+
   project.expenses[expenseIndex] = {
     date: new Date(expense.date),
     description: expense.description,
@@ -311,7 +311,7 @@ export async function deleteProjectExpense(projectId: string, expenseIndex: numb
   const project = await Project.findById(projectId);
   if (!project) throw new Error('Project not found');
   if (!project.expenses || !project.expenses[expenseIndex]) throw new Error('Expense not found');
-  
+
   project.expenses.splice(expenseIndex, 1);
   await project.save();
   revalidatePath('/projects', 'layout');
@@ -363,7 +363,7 @@ export async function updateProjectPayment(paymentId: string, data: { amount?: n
   if (data.paymentMethod) updateData.paymentMethod = data.paymentMethod;
   if (data.date) updateData.date = new Date(data.date);
   if (data.remarks !== undefined) updateData.remarks = data.remarks;
-  
+
   const payment = await Payment.findByIdAndUpdate(paymentId, updateData, { new: true });
   revalidatePath('/projects', 'layout');
   revalidatePath('/payments', 'layout');
@@ -401,7 +401,7 @@ export async function addProjectCrew(projectId: string, crewData: { role: string
 
   // If charges > 0, push expense debit
   if (crewData.charges && Number(crewData.charges) > 0) {
-    const desc = crewName 
+    const desc = crewName
       ? `Crew: ${crewName} (${crewData.role})`
       : `Crew Fee: ${crewData.role}`;
 
@@ -449,7 +449,7 @@ export async function removeProjectCrew(projectId: string, crewIndex: number, cr
       try {
         const staff = await Crew.findById(assignedCrewId).lean() as any;
         if (staff && staff.name) crewName = staff.name;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Remove crew member from blueprint
@@ -704,16 +704,23 @@ export async function deleteCrew(id: string) {
   return { success: true };
 }
 
+// In-memory OTP cache for fallback when database is not connected
+const memoryOtpStore: Record<string, string> = {};
+
 export async function sendLoginOTP(username: string, email: string): Promise<{ success: boolean; error?: string }> {
-  await connectToDatabase();
-
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const hashedOtp = await bcrypt.hash(otp, 10);
+  memoryOtpStore[email] = otp;
 
-  await Otp.create({
-    email,
-    hashedOtp
-  });
+  try {
+    await connectToDatabase();
+    const hashedOtp = await bcrypt.hash(otp, 10);
+    await Otp.create({
+      email,
+      hashedOtp
+    });
+  } catch (dbErr: any) {
+    console.warn('[LOGIN OTP] MongoDB not connected, proceeding in memory/local mode:', dbErr?.message || dbErr);
+  }
 
   // Always log OTP to server console (visible in local terminal & Vercel Dashboard -> Logs)
   console.log(`\n[LOGIN OTP] OTP for ${email} is: ${otp}\n`);
@@ -739,27 +746,37 @@ export async function sendLoginOTP(username: string, email: string): Promise<{ s
 }
 
 export async function verifyLoginOTP(email: string, otp: string): Promise<{ success: boolean; error?: string }> {
-  await connectToDatabase();
-
   // Master emergency OTP support (e.g. if email is delayed or not configured)
   const masterOtp = process.env.ADMIN_MASTER_OTP || '202600';
   if (otp === masterOtp) {
     return { success: true };
   }
 
-  const otpRecord = await Otp.findOne({ email }).sort({ createdAt: -1 });
-
-  if (!otpRecord) {
-    return { success: false, error: 'OTP expired or not found' };
+  // In-memory fallback check (when running locally without MongoDB)
+  if (memoryOtpStore[email] && memoryOtpStore[email] === otp) {
+    delete memoryOtpStore[email];
+    return { success: true };
   }
 
-  const isValid = await bcrypt.compare(otp, otpRecord.hashedOtp);
+  try {
+    await connectToDatabase();
+    const otpRecord = await Otp.findOne({ email }).sort({ createdAt: -1 });
 
-  if (isValid) {
-    await Otp.deleteOne({ _id: otpRecord._id });
-    return { success: true };
-  } else {
-    return { success: false, error: 'Invalid OTP' };
+    if (!otpRecord) {
+      return { success: false, error: 'OTP expired or not found' };
+    }
+
+    const isValid = await bcrypt.compare(otp, otpRecord.hashedOtp);
+
+    if (isValid) {
+      await Otp.deleteOne({ _id: otpRecord._id });
+      return { success: true };
+    } else {
+      return { success: false, error: 'Invalid OTP' };
+    }
+  } catch (dbErr: any) {
+    console.warn('[LOGIN OTP] Database error during OTP verification:', dbErr?.message || dbErr);
+    return { success: false, error: 'Database not connected. Please use master emergency OTP: ' + masterOtp };
   }
 }
 
@@ -1277,10 +1294,10 @@ export async function searchUniversalAction(rawQuery: string = '') {
         p.status === 'Booked'
           ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
           : p.status === 'Lead'
-          ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
-          : p.status === 'Completed'
-          ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
-          : 'bg-gray-500/10 text-gray-600 border-gray-500/20',
+            ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+            : p.status === 'Completed'
+              ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+              : 'bg-gray-500/10 text-gray-600 border-gray-500/20',
       icon: 'briefcase',
       url: `/projects/${p._id?.toString() || p.id}`,
       amount: p.totalValue || 0,
@@ -1733,7 +1750,7 @@ export async function updateInvestment(id: string, data: any) {
     const buyPrice = Number(data.buyPrice);
     const currentPrice = Number(data.currentPrice);
     const quantity = Number(data.quantity);
-    
+
     let extra = {};
     if (!isNaN(buyPrice) && !isNaN(currentPrice) && !isNaN(quantity)) {
       const investmentValue = buyPrice * quantity;

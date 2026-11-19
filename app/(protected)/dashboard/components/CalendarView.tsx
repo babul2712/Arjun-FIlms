@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import { ChevronLeft, ChevronRight, X, Calendar as CalendarIcon, MapPin, Camera, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Calendar as CalendarIcon, MapPin, Camera, ArrowUpRight, Plus, Film } from 'lucide-react';
 import { Project } from '@/lib/types';
 import AnimatedCashAmount from '@/components/ui/AnimatedCashAmount';
+import { getEventTypeTheme } from '@/app/(protected)/calendar/page';
 
 export default function CalendarView({ projects }: { projects: Project[] }) {
   const router = useRouter();
@@ -40,26 +41,26 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
         <div 
           key={dayStr} 
           onClick={() => hasProjects && setSelectedDateData({ date: dayStr, projects: dayProjects })}
-          className={`min-h-[92px] p-2.5 rounded-2xl flex flex-col justify-between transition-all border ${
+          className={`min-h-[96px] p-2.5 rounded-2xl flex flex-col justify-between transition-all duration-150 border ${
             !isCurrentMonth 
-              ? 'text-gray-400/50 dark:text-gray-600 bg-white/30 dark:bg-white/[0.02] backdrop-blur-xs border-gray-150/40 dark:border-gray-800/30' 
-              : 'bg-white/85 dark:bg-[#1c2027]/75 backdrop-blur-md text-gray-800 dark:text-gray-200 border-white/80 dark:border-gray-800/80 hover:bg-white dark:hover:bg-[#222730] hover:border-[#e50914]/40 hover:-translate-y-0.5'
-          } ${hasProjects ? 'cursor-pointer ring-1 ring-red-500/25 bg-gradient-to-b from-white/95 to-red-50/25 dark:from-[#1c2027]/95 dark:to-red-950/25 backdrop-blur-md' : ''} ${
+              ? 'text-gray-400/40 dark:text-gray-600/40 bg-white/20 dark:bg-white/[0.01] border-gray-100 dark:border-gray-800/40' 
+              : 'bg-white/90 dark:bg-[#161a22]/85 backdrop-blur-md text-gray-800 dark:text-gray-200 border-gray-200/70 dark:border-gray-800/80 hover:bg-white dark:hover:bg-[#1c222d] hover:border-red-400/60 hover:shadow-md hover:-translate-y-0.5'
+          } ${hasProjects ? 'cursor-pointer ring-1 ring-red-500/25 bg-gradient-to-b from-white to-red-50/20 dark:from-[#161a22] dark:to-red-950/20' : ''} ${
             isToday ? 'ring-2 ring-[#e50914] border-transparent' : ''
           }`}
         >
           <div className="flex justify-between items-center">
             {isToday ? (
-              <span className="w-5.5 h-5.5 rounded-full bg-[#e50914] text-white text-[10px] font-black flex items-center justify-center">
+              <span className="w-5.5 h-5.5 rounded-full bg-gradient-to-r from-[#e50914] to-red-600 text-white text-[10px] font-black flex items-center justify-center shadow-md shadow-red-500/25">
                 {formattedDate}
               </span>
             ) : (
-              <span className={`text-[11.5px] font-extrabold ${hasProjects ? 'text-[#e50914]' : !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-800 dark:text-gray-200'}`}>
+              <span className={`text-[11.5px] font-black ${hasProjects ? 'text-[#e50914] dark:text-red-400' : !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-800 dark:text-gray-200'}`}>
                 {formattedDate}
               </span>
             )}
             {hasProjects && (
-              <span className="text-[9px] font-black text-[#e50914] bg-red-50/90 dark:bg-red-950/60 border border-red-200/50 dark:border-red-900/40 px-1.5 py-0.5 rounded-md">
+              <span className="text-[8.5px] font-black text-[#e50914] bg-red-50 dark:bg-red-950/60 border border-red-200/60 dark:border-red-900/40 px-1.5 py-0.2 rounded-md">
                 {dayProjects.length}
               </span>
             )}
@@ -67,19 +68,15 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
 
           <div className="mt-1 flex flex-col gap-1 overflow-y-auto max-h-[52px] custom-scrollbar">
             {dayProjects.map((p, idx) => {
-              const pDate = typeof p.eventDate === 'string' ? p.eventDate.substring(0, 10) : dayjs(p.eventDate).format('YYYY-MM-DD');
-              const isPast = dayjs(pDate).isBefore(dayjs().startOf('day'));
+              const theme = getEventTypeTheme(p.eventType);
               return (
                 <div 
                   key={idx} 
-                  className={`text-[9.5px] font-bold truncate px-2 py-0.5 rounded-lg transition-all ${
-                    isPast 
-                      ? 'bg-gray-100/80 text-gray-500 dark:bg-gray-800/80 dark:text-gray-400' 
-                      : 'bg-red-50/90 text-[#e50914] border border-red-200/70 dark:bg-red-950/60 dark:text-red-300 dark:border-red-900/50'
-                  }`}
-                  title={p.name}
+                  className={`text-[9px] font-black truncate px-1.5 py-0.5 rounded-md transition-all border flex items-center gap-1 ${theme.pill}`}
+                  title={`${p.name} (${typeof p.eventType === 'string' ? p.eventType : (p.eventType as any)?.name || 'Event'})`}
                 >
-                  {p.name}
+                  <span className={`w-1 h-1 rounded-full ${theme.dot} shrink-0`} />
+                  <span className="truncate">{p.name}</span>
                 </div>
               );
             })}
@@ -101,43 +98,53 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
 
   return (
     <div className="w-full flex flex-col relative font-sans text-gray-800 dark:text-gray-100">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
         <div>
-          <h4 className="text-[15px] font-extrabold text-gray-800 dark:text-white flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[#e50914]" />
+          <h4 className="text-[12px] font-black text-[#e50914] uppercase tracking-wider flex items-center gap-1.5">
+            <Film className="w-3.5 h-3.5" />
             Shoot Calendar
           </h4>
-          <h3 className="text-[20px] font-black text-[#1a1c22] dark:text-white mt-0.5">
+          <h3 className="text-[20px] font-black text-gray-950 dark:text-white mt-0.5">
             {currentDate.format('MMMM YYYY')}
           </h3>
         </div>
-        <div className="flex items-center gap-1.5 bg-white/70 dark:bg-white/[0.06] backdrop-blur-md border border-gray-200/50 dark:border-gray-700/40 p-1 rounded-xl">
-          <button 
-            onClick={prevMonth} 
-            className="p-1.5 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg transition-colors cursor-pointer"
-            title="Previous Month"
-          >
-            <ChevronLeft className="w-4 h-4"/>
-          </button>
+        
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setCurrentDate(dayjs())}
-            className="px-2.5 py-1 text-[11px] font-bold text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+            onClick={() => router.push('/calendar')}
+            className="text-[11.5px] font-black text-gray-500 hover:text-[#e50914] px-2.5 py-1 rounded-xl transition-colors cursor-pointer flex items-center gap-1"
           >
-            Today
+            Full Calendar <ArrowUpRight className="w-3.5 h-3.5" />
           </button>
-          <button 
-            onClick={nextMonth} 
-            className="p-1.5 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg transition-colors cursor-pointer"
-            title="Next Month"
-          >
-            <ChevronRight className="w-4 h-4"/>
-          </button>
+
+          <div className="flex items-center gap-1 bg-white/80 dark:bg-[#1a1e27] border border-gray-200/60 dark:border-gray-800 p-1 rounded-xl shadow-xs">
+            <button 
+              onClick={prevMonth} 
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg transition-colors cursor-pointer"
+              title="Previous Month"
+            >
+              <ChevronLeft className="w-4 h-4"/>
+            </button>
+            <button
+              onClick={() => setCurrentDate(dayjs())}
+              className="px-2.5 py-1 text-[11px] font-black text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+            >
+              Today
+            </button>
+            <button 
+              onClick={nextMonth} 
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg transition-colors cursor-pointer"
+              title="Next Month"
+            >
+              <ChevronRight className="w-4 h-4"/>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-2 sm:gap-2.5 mb-2.5 text-center bg-white/40 dark:bg-white/[0.03] backdrop-blur-md py-2 px-1 rounded-2xl border border-white/50 dark:border-white/[0.03]">
+      <div className="grid grid-cols-7 gap-2 sm:gap-2.5 mb-2.5 text-center bg-gray-100/60 dark:bg-[#161a22]/60 py-2 px-1 rounded-2xl border border-gray-200/50 dark:border-gray-800/40">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-          <div key={d} className="text-[10px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{d}</div>
+          <div key={d} className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{d}</div>
         ))}
       </div>
 
@@ -148,67 +155,75 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
       {/* Date Details Modal */}
       {selectedDateData && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in"
           onClick={() => setSelectedDateData(null)}
         >
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-[#16181c] w-full max-w-lg max-h-[80vh] rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-gray-200/60 dark:border-gray-800 animate-slide-in"
+            className="bg-white dark:bg-[#15181f] w-full max-w-lg max-h-[80vh] rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-gray-200/80 dark:border-gray-800 animate-slide-in"
           >
-            <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/40 shrink-0">
+            <div className="flex justify-between items-center p-6 border-b border-gray-150 dark:border-gray-800 bg-gray-50/70 dark:bg-[#121419]/70 shrink-0">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-50 dark:bg-blue-950/40 text-[#e50914] rounded-2xl border border-blue-100/30 dark:border-blue-900/30">
-                  <CalendarIcon className="w-5.5 h-5.5" />
+                <div className="p-2.5 bg-red-50 dark:bg-red-950/40 text-[#e50914] rounded-2xl border border-red-200/60 dark:border-red-900/40 shadow-xs">
+                  <CalendarIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-[17px] font-extrabold text-gray-900 dark:text-white leading-tight">
+                  <h2 className="text-[18px] font-black text-gray-950 dark:text-white leading-tight">
                     {dayjs(selectedDateData.date).format('MMMM D, YYYY')}
                   </h2>
-                  <p className="text-[11px] text-gray-400 font-bold mt-0.5 uppercase tracking-wider">
-                    {selectedDateData.projects.length} case{selectedDateData.projects.length !== 1 ? 's' : ''} scheduled
+                  <p className="text-[11px] text-gray-400 font-black mt-0.5 uppercase tracking-wider">
+                    {selectedDateData.projects.length} shoot{selectedDateData.projects.length !== 1 ? 's' : ''} scheduled
                   </p>
                 </div>
               </div>
-              <button onClick={() => setSelectedDateData(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+              <button 
+                onClick={() => setSelectedDateData(null)} 
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-3.5">
               {selectedDateData.projects.map((project, idx) => {
                 const isPast = dayjs(selectedDateData.date).isBefore(dayjs().startOf('day'));
+                const theme = getEventTypeTheme(project.eventType);
+
                 return (
-                  <div key={idx} className="bg-white dark:bg-[#1c1f24] border border-gray-150 dark:border-gray-800 rounded-2xl p-4.5 hover:border-[#e50914]/50 transition-all group">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-extrabold text-[15px] text-[#1a1c22] dark:text-white group-hover:text-[#e50914] transition-colors">{project.name}</h3>
-                      <span className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-md uppercase tracking-wider ${
+                  <div key={idx} className="bg-white dark:bg-[#1a1e27] border border-gray-200 dark:border-gray-800 rounded-2xl p-4.5 hover:border-red-500/50 transition-all group">
+                    <div className="flex justify-between items-start mb-2.5">
+                      <div>
+                        <span className="text-[9.5px] font-black text-[#e50914] uppercase tracking-wider block">
+                          {project.projectNumber}
+                        </span>
+                        <h3 className="font-black text-[15px] text-gray-950 dark:text-white group-hover:text-[#e50914] transition-colors">
+                          {project.name}
+                        </h3>
+                      </div>
+                      <span className={`text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                         isPast 
                           ? 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700' 
-                          : 'bg-[#fef2f2] text-[#e50914] dark:bg-red-950/40 dark:text-red-300 border border-[#fee2e2] dark:border-red-900/40'
+                          : 'bg-red-50 text-[#e50914] dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-900/40'
                       }`}>
-                        {isPast ? 'Completed' : 'Upcoming'}
+                        {isPast ? 'Delivered' : project.status || 'Booked'}
                       </span>
                     </div>
                     
-                    <div className="space-y-2 text-[12px] font-semibold text-gray-500 dark:text-gray-400">
-                      <div className="flex items-start gap-2">
-                        <Camera className="w-4 h-4 shrink-0 text-[#e50914]/80 mt-0.5" />
-                        <span className="text-[#1a1c22] dark:text-gray-200 font-bold">Client: <span className="text-gray-500 dark:text-gray-400 font-normal">{project.name}</span></span>
+                    <div className="space-y-1.5 text-[12px] font-semibold text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Camera className="w-4 h-4 shrink-0 text-[#e50914]" />
+                        <span className="text-gray-700 dark:text-gray-300">{theme.name}</span>
                       </div>
-                      {project.eventType && (
-                        <div className="flex items-start gap-2">
-                          <CalendarIcon className="w-4 h-4 shrink-0 text-[#e50914]/80 mt-0.5" />
-                          <span className="text-[#1a1c22] dark:text-gray-200 font-bold">Case Type: <span className="text-gray-500 dark:text-gray-400 font-normal">{typeof project.eventType === 'string' ? project.eventType : (project.eventType as any).name || 'Unknown'}</span></span>
+                      {project.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 shrink-0 text-gray-400" />
+                          <span>{project.location}</span>
                         </div>
                       )}
-                      <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 shrink-0 text-[#e50914]/80 mt-0.5" />
-                        <span className="text-[#1a1c22] dark:text-gray-200 font-bold">Venue: <span className="text-gray-500 dark:text-gray-400 font-normal">{project.location || 'Not specified'}</span></span>
-                      </div>
                     </div>
 
-                    <div className="mt-3.5 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                      <span className="text-[13px] font-extrabold text-gray-900 dark:text-white">
+                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                      <span className="text-[14px] font-black text-gray-950 dark:text-white">
                         <AnimatedCashAmount amount={Number(project.totalValue || 0)} />
                       </span>
                       <button
@@ -216,7 +231,7 @@ export default function CalendarView({ projects }: { projects: Project[] }) {
                           setSelectedDateData(null);
                           router.push(`/projects/${project.id || (project as any)._id}`);
                         }}
-                        className="text-[12px] font-bold text-[#e50914] hover:underline flex items-center gap-1 cursor-pointer"
+                        className="text-[12px] font-black text-[#e50914] hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         Open Case File
                         <ArrowUpRight className="w-3.5 h-3.5" />

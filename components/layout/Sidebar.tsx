@@ -18,7 +18,8 @@ import {
   Share2,
   User,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Repeat
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
@@ -27,6 +28,7 @@ import { getBioProfileAdmin } from '@/app/actions';
 const crmNavItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Subscriptions', href: '/subscriptions', icon: Repeat },
   { name: 'Quotations', href: '/quotations', icon: FileText },
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Projects', href: '/projects', icon: Briefcase },
