@@ -12,6 +12,7 @@ import {
   getSubscriptionDashboardStats,
   deleteSubscription,
 } from '@/app/subscription-actions';
+import SubscriptionLoader from '@/components/subscriptions/SubscriptionLoader';
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
@@ -244,14 +245,7 @@ export default function SubscriptionsPage() {
   });
 
   if (loading) {
-    return (
-      <div className="flex-1 p-6 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full border-4 border-[#e50914]/20 border-t-[#e50914] animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 font-bold">Loading subscriptions...</p>
-        </div>
-      </div>
-    );
+    return <SubscriptionLoader />;
   }
 
   return (

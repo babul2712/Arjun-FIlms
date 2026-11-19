@@ -8,6 +8,7 @@ import {
   RefreshCcw, Calendar, Star
 } from 'lucide-react';
 import { getSubscriptionAnalytics } from '@/app/subscription-actions';
+import SubscriptionLoader from '@/components/subscriptions/SubscriptionLoader';
 
 interface Analytics {
   clientRevenue: {
@@ -64,14 +65,7 @@ export default function SubscriptionAnalyticsPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) {
-    return (
-      <div className="flex-1 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full border-4 border-[#e50914]/20 border-t-[#e50914] animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 font-bold">Loading analytics...</p>
-        </div>
-      </div>
-    );
+    return <SubscriptionLoader title="Subscription Analytics" subtitle="Analyzing financial trends & shoot delivery..." showSkeletonPreview={false} />;
   }
 
   const maxRevenue = data?.monthlyTrend

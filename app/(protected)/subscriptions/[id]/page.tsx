@@ -22,6 +22,7 @@ import {
   bulkScheduleShoots,
   getSubscriptionHistory,
 } from '@/app/subscription-actions';
+import SubscriptionLoader from '@/components/subscriptions/SubscriptionLoader';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -891,14 +892,7 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
   };
 
   if (loading) {
-    return (
-      <div className="flex-1 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full border-4 border-[#e50914]/20 border-t-[#e50914] animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 font-bold">Loading client...</p>
-        </div>
-      </div>
-    );
+    return <SubscriptionLoader title="Client Subscription" subtitle="Loading client portfolio & schedule..." showSkeletonPreview={false} />;
   }
 
   if (!sub) {
