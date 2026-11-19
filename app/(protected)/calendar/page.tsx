@@ -161,6 +161,9 @@ export default function CalendarPage() {
             phone: '+91 98765 43210',
             email: 'priyanka.siddharth@example.com',
             totalValue: 185000,
+            payments: [],
+            expenses: [],
+            createdAt: now.toISOString(),
             crewBlueprint: [
               { role: 'Lead Candid Artist', charges: 25000 },
               { role: 'Cinema Director (Sony FX6 4K)', charges: 35000 },
@@ -179,6 +182,9 @@ export default function CalendarPage() {
             phone: '+91 98451 23456',
             email: 'ananya.rohan@example.com',
             totalValue: 75000,
+            payments: [],
+            expenses: [],
+            createdAt: now.toISOString(),
             crewBlueprint: [
               { role: 'Pre-wedding Director', charges: 22000 },
               { role: 'Gimbal Cinematographer', charges: 20000 }
@@ -196,6 +202,9 @@ export default function CalendarPage() {
             phone: '+91 97761 99887',
             email: 'production@titaniumauto.in',
             totalValue: 120000,
+            payments: [],
+            expenses: [],
+            createdAt: now.toISOString(),
             crewBlueprint: [
               { role: 'Commercial Lighting Master', charges: 35000 },
               { role: 'Gaffer & Grip Chief', charges: 15000 }
@@ -213,6 +222,9 @@ export default function CalendarPage() {
             phone: '+91 99370 12890',
             email: 'royal@palaceevents.com',
             totalValue: 420000,
+            payments: [],
+            expenses: [],
+            createdAt: now.toISOString(),
             crewBlueprint: [
               { role: 'Executive Cinema Crew (5 Members)', charges: 140000 },
               { role: 'Dual Cine Drone Pilots', charges: 45000 }
@@ -230,6 +242,9 @@ export default function CalendarPage() {
             phone: '+91 94371 44556',
             email: 'kabir.meera@outlook.com',
             totalValue: 160000,
+            payments: [],
+            expenses: [],
+            createdAt: now.toISOString(),
             crewBlueprint: [
               { role: 'Traditional Photo Lead', charges: 18000 },
               { role: 'Candid Artist', charges: 22000 }

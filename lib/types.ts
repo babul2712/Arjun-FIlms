@@ -108,13 +108,13 @@ export interface Project {
   totalValue: number;
   coverImage?: string;
   gallery?: string[];
-  payments: string[];
-  crewBlueprint: CrewBlueprintItem[];
+  payments?: string[];
+  crewBlueprint?: CrewBlueprintItem[];
   bookingId?: string;
-  expenses: { _id?: string; date: string; description: string; amount: number; crewMemberId?: string; crewBlueprintId?: string }[];
+  expenses?: { _id?: string; date: string; description: string; amount: number; crewMemberId?: string; crewBlueprintId?: string }[];
   services?: IServiceStage[];
   isStarred?: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Staff {
