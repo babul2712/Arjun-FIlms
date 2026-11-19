@@ -263,9 +263,9 @@ export default function SubscriptionsPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <div className="w-1.5 h-5 bg-[#e50914] rounded-full" />
-              <span className="text-[11px] font-black text-[#e50914] uppercase tracking-[0.15em]">Subscription Management</span>
+              <span className="text-[11px] font-black text-[#e50914] uppercase tracking-[0.15em]">Subscription Management – Arjun Films</span>
             </div>
-            <h1 className="text-3xl font-black text-gray-900 dark:text-white">Client Subscriptions</h1>
+            <h1 className="text-3xl font-black text-gray-900 dark:text-white">Client Subscriptions – Arjun Films</h1>
             <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
               {stats?.activeSubscribers || 0} active · {subs.length} total clients
             </p>
