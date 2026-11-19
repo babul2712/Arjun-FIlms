@@ -4,6 +4,7 @@ import connectToDatabase from '@/lib/mongoose';
 import Subscription from '@/lib/models/Subscription';
 import SubscriptionPayment from '@/lib/models/SubscriptionPayment';
 import SubscriptionShoot from '@/lib/models/SubscriptionShoot';
+import SubscriptionHistory from '@/lib/models/SubscriptionHistory';
 import { revalidatePath } from 'next/cache';
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
@@ -542,6 +543,134 @@ export async function getUpcomingSubscriptionShoots(limit = 5) {
       .lean();
     return safeSerialize(shoots);
   } catch (err) {
+    return [];
+  }
+}
+
+
+// ─── HISTORY-AWARE UPDATE ─────────────────────────────────────────────────────
+
+// Readable labels for each tracked field
+const FIELD_LABELS: Record<string, string> = {
+  clientName: 'Client Name',
+  businessType: 'Business Type',
+  ownerName: 'Owner Name',
+  ownerPhone: 'Phone',
+  ownerEmail: 'Email',
+  ownerAddress: 'Address',
+  subscriptionPlan: 'Plan Name',
+  monthlyFee: 'Monthly Fee',
+  workingDaysPerWeek: 'Working Days / Week',
+  totalMonthlyDays: 'Total Monthly Days',
+  startDate: 'Start Date',
+  endDate: 'End Date',
+  renewalDate: 'Renewal Date',
+  status: 'Status',
+  colorTag: 'Color Tag',
+  notes: 'Notes',
+};
+
+// Fields that are "important" and always tracked in history
+const TRACKED_FIELDS = [
+  'clientName', 'subscriptionPlan', 'monthlyFee', 'workingDaysPerWeek',
+  'totalMonthlyDays', 'status', 'renewalDate', 'startDate', 'endDate',
+  'ownerName', 'ownerPhone', 'ownerEmail',
+];
+
+export async function updateSubscriptionWithHistory(
+  id: string,
+  currentData: Record<string, any>,
+  newData: Record<string, any>,
+  changedBy = 'Admin',
+  historyNote = ''
+) {
+  try {
+    await connectToDatabase();
+
+    // Detect changes
+    const changes: { field: string; label: string; oldValue: string; newValue: string }[] = [];
+
+    for (const field of TRACKED_FIELDS) {
+      const oldRaw = currentData[field];
+      const newRaw = newData[field];
+      if (newRaw === undefined || newRaw === null) continue;
+
+      const oldStr = oldRaw != null ? String(oldRaw) : '';
+      const newStr = newRaw != null ? String(newRaw) : '';
+
+      // Normalize dates to compare
+      const normalizeDate = (v: string) => {
+        if (!v) return '';
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? v : d.toISOString().split('T')[0];
+      };
+
+      const isDateField = field.toLowerCase().includes('date');
+      const oldNorm = isDateField ? normalizeDate(oldStr) : oldStr;
+      const newNorm = isDateField ? normalizeDate(newStr) : newStr;
+
+      if (oldNorm !== newNorm && newNorm !== '') {
+        // Format display value
+        const formatVal = (v: string) => {
+          if (field === 'monthlyFee') return `₹${Number(v).toLocaleString('en-IN')}`;
+          if (isDateField && v) {
+            const d = new Date(v);
+            return isNaN(d.getTime()) ? v : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          }
+          return v;
+        };
+
+        changes.push({
+          field,
+          label: FIELD_LABELS[field] || field,
+          oldValue: formatVal(oldNorm),
+          newValue: formatVal(newNorm),
+        });
+      }
+    }
+
+    // Build the update object
+    const update: any = { ...newData };
+    if (newData.startDate) update.startDate = new Date(newData.startDate);
+    if (newData.endDate) update.endDate = newData.endDate ? new Date(newData.endDate) : undefined;
+    if (newData.renewalDate) update.renewalDate = newData.renewalDate ? new Date(newData.renewalDate) : undefined;
+
+    // Apply update
+    await Subscription.findByIdAndUpdate(id, update);
+
+    // Record history if anything changed
+    if (changes.length > 0) {
+      const histEntry = new SubscriptionHistory({
+        subscriptionId: id,
+        clientName: newData.clientName || currentData.clientName,
+        changedAt: new Date(),
+        changedBy,
+        changes,
+        notes: historyNote,
+      });
+      await histEntry.save();
+    }
+
+    revalidatePath('/subscriptions');
+    revalidatePath(`/subscriptions/${id}`);
+    return { success: true, changesRecorded: changes.length };
+  } catch (err: any) {
+    console.error('updateSubscriptionWithHistory error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// ─── GET HISTORY ──────────────────────────────────────────────────────────────
+
+export async function getSubscriptionHistory(subscriptionId: string) {
+  try {
+    await connectToDatabase();
+    const history = await SubscriptionHistory.find({ subscriptionId })
+      .sort({ changedAt: -1 })
+      .lean();
+    return safeSerialize(history);
+  } catch (err) {
+    console.error('getSubscriptionHistory error:', err);
     return [];
   }
 }
