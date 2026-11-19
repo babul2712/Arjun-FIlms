@@ -81,6 +81,7 @@ interface Sub {
     totalThisMonth: number;
     remaining: number;
     perDayValue: number;
+    generatedRevenue?: number;
   };
 }
 
@@ -996,18 +997,86 @@ export default function SubscriptionDetailPage({ params }: { params: Promise<{ i
                 <span className="text-white/60 text-[10px] font-bold">{sub.stats.remaining} remaining</span>
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Days/Week', value: sub.workingDaysPerWeek },
-                { label: 'Days/Month', value: sub.totalMonthlyDays },
-                { label: 'Completed', value: sub.stats.completedThisMonth },
-                { label: 'Remaining', value: sub.stats.remaining },
+                { label: 'Working Days / Wk', value: `${sub.workingDaysPerWeek} days` },
+                { label: 'Total Monthly Days', value: `${sub.totalMonthlyDays} days` },
+                { label: 'Days Worked', value: `${sub.stats.completedThisMonth} days` },
+                { label: 'Days Remaining', value: `${sub.stats.remaining} days` },
               ].map(({ label, value }) => (
                 <div key={label} className="bg-black/20 backdrop-blur rounded-2xl p-3">
                   <p className="text-white/60 text-[10px] font-bold">{label}</p>
                   <p className="text-white font-black text-xl">{value}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Revenue Calculation & Work Breakdown (Requested Feature) ── */}
+        <div className="bg-white dark:bg-[#16181c] rounded-[28px] border border-gray-100 dark:border-gray-800/70 p-5 md:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                <IndianRupee className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-black text-gray-900 dark:text-white text-base">Monthly Revenue Breakdown</h3>
+                <p className="text-xs text-gray-400">Calculated automatically on actual working days completed</p>
+              </div>
+            </div>
+
+            {/* Formula Pill */}
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-black">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/70">Formula:</span>
+              <span className="font-mono">₹{sub.stats.perDayValue.toLocaleString('en-IN')} × {sub.stats.completedThisMonth} Days = ₹{(sub.stats.completedThisMonth * sub.stats.perDayValue).toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* 1. Per-Day Revenue */}
+            <div className="p-4 rounded-2xl bg-gray-50 dark:bg-[#1c1f24] border border-gray-100 dark:border-gray-800/80 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">1. Per-Day Revenue</span>
+                <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">
+                  ₹{sub.stats.perDayValue.toLocaleString('en-IN')}
+                </p>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-800">
+                ₹{sub.monthlyFee.toLocaleString('en-IN')} monthly fee ÷ {sub.totalMonthlyDays} days
+              </p>
+            </div>
+
+            {/* 2. Total Working Days */}
+            <div className="p-4 rounded-2xl bg-gray-50 dark:bg-[#1c1f24] border border-gray-100 dark:border-gray-800/80 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">2. Total Working Days</span>
+                <div className="flex items-baseline gap-2 mt-1.5">
+                  <p className="text-2xl font-black text-gray-900 dark:text-white">
+                    {sub.stats.completedThisMonth} <span className="text-sm font-bold text-gray-400">Days</span>
+                  </p>
+                  <span className="text-xs font-bold text-gray-400">/ {sub.totalMonthlyDays} planned</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-800">
+                {sub.stats.remaining} remaining shoot days in cycle
+              </p>
+            </div>
+
+            {/* 3. Total Generated Revenue */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-2 border-emerald-500/40 flex flex-col justify-between shadow-sm">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">3. Total Generated Revenue</span>
+                  <span className="text-[10px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full shadow-sm">Calculated</span>
+                </div>
+                <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1.5">
+                  ₹{(sub.stats.completedThisMonth * sub.stats.perDayValue).toLocaleString('en-IN')}
+                </p>
+              </div>
+              <p className="text-[11px] font-mono font-bold text-emerald-700/90 dark:text-emerald-300/90 mt-3 pt-3 border-t border-emerald-500/20">
+                ₹{sub.stats.perDayValue.toLocaleString('en-IN')} × {sub.stats.completedThisMonth} Days = ₹{(sub.stats.completedThisMonth * sub.stats.perDayValue).toLocaleString('en-IN')}
+              </p>
             </div>
           </div>
         </div>

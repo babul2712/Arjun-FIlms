@@ -57,6 +57,9 @@ export async function getSubscriptions() {
           .sort({ createdAt: -1 })
           .lean();
 
+        const perDayValue = sub.totalMonthlyDays > 0 ? Math.round(sub.monthlyFee / sub.totalMonthlyDays) : 0;
+        const generatedRevenue = completed * perDayValue;
+
         return {
           ...sub,
           _id: sub._id.toString(),
@@ -64,7 +67,8 @@ export async function getSubscriptions() {
           scheduledShoots: scheduled,
           totalShootsThisMonth: totalSheduled,
           remainingShoots: sub.totalMonthlyDays - completed,
-          perDayValue: sub.totalMonthlyDays > 0 ? Math.round(sub.monthlyFee / sub.totalMonthlyDays) : 0,
+          perDayValue,
+          generatedRevenue,
           latestPaymentStatus: (latestPayment as any)?.status || null,
         };
       })
@@ -102,6 +106,11 @@ export async function getSubscriptionById(id: string) {
 
     const completedThisMonth = thisMonthShoots.filter((s: any) => s.status === 'Completed').length;
     const sub_any = sub as any;
+    const perDayValue = sub_any.totalMonthlyDays > 0
+      ? Math.round(sub_any.monthlyFee / sub_any.totalMonthlyDays)
+      : 0;
+    const generatedRevenue = completedThisMonth * perDayValue;
+
     return safeSerialize({
       ...sub,
       _id: sub_any._id.toString(),
@@ -111,9 +120,8 @@ export async function getSubscriptionById(id: string) {
         completedThisMonth,
         totalThisMonth: thisMonthShoots.length,
         remaining: sub_any.totalMonthlyDays - completedThisMonth,
-        perDayValue: sub_any.totalMonthlyDays > 0
-          ? Math.round(sub_any.monthlyFee / sub_any.totalMonthlyDays)
-          : 0,
+        perDayValue,
+        generatedRevenue,
       },
     });
   } catch (err) {

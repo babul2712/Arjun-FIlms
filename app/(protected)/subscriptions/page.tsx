@@ -33,6 +33,7 @@ interface Subscription {
   totalShootsThisMonth: number;
   remainingShoots: number;
   perDayValue: number;
+  generatedRevenue?: number;
   latestPaymentStatus: string | null;
 }
 
@@ -135,16 +136,30 @@ function SubscriptionCard({ sub, onDelete, router }: {
           </div>
         </div>
 
-        {/* Fee & Per-Day */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 bg-gray-50 dark:bg-[#1c1f24] rounded-2xl p-3">
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Monthly Fee</p>
-            <p className="text-xl font-black text-gray-900 dark:text-white mt-0.5">₹{sub.monthlyFee.toLocaleString('en-IN')}</p>
+        {/* Revenue & Working Days Breakdown */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="bg-gray-50 dark:bg-[#1c1f24] rounded-2xl p-2.5">
+            <p className="text-[9px] text-gray-400 font-black uppercase tracking-wider">Per-Day Value</p>
+            <p className="text-sm font-black text-gray-900 dark:text-white mt-0.5">₹{sub.perDayValue.toLocaleString('en-IN')}</p>
           </div>
-          <div className="flex-1 bg-gray-50 dark:bg-[#1c1f24] rounded-2xl p-3">
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Per Day Value</p>
-            <p className="text-xl font-black text-gray-900 dark:text-white mt-0.5">₹{sub.perDayValue.toLocaleString('en-IN')}</p>
+          <div className="bg-gray-50 dark:bg-[#1c1f24] rounded-2xl p-2.5">
+            <p className="text-[9px] text-gray-400 font-black uppercase tracking-wider">Working Days</p>
+            <p className="text-sm font-black text-gray-900 dark:text-white mt-0.5">
+              {sub.completedShoots} <span className="text-[10px] font-bold text-gray-400">/ {sub.totalMonthlyDays}</span>
+            </p>
           </div>
+          <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40 rounded-2xl p-2.5">
+            <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-wider truncate">Generated Rev</p>
+            <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+              ₹{((sub.generatedRevenue ?? (sub.completedShoots * sub.perDayValue))).toLocaleString('en-IN')}
+            </p>
+          </div>
+        </div>
+
+        {/* Calculation Pill */}
+        <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-gray-50/80 dark:bg-[#1c1f24]/80 text-[10px] text-gray-500 dark:text-gray-400 mb-4 font-mono">
+          <span>₹{sub.perDayValue.toLocaleString('en-IN')} × {sub.completedShoots} days worked</span>
+          <span className="font-black text-emerald-600 dark:text-emerald-400">₹{(sub.completedShoots * sub.perDayValue).toLocaleString('en-IN')}</span>
         </div>
 
         {/* Shoot Progress */}
@@ -397,7 +412,9 @@ export default function SubscriptionsPage() {
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
                   <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Client</th>
-                  <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Monthly Fee</th>
+                  <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Plan & Per-Day</th>
+                  <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Working Days</th>
+                  <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Generated Revenue</th>
                   <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Progress</th>
                   <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Status</th>
                   <th className="text-left p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Payment</th>
@@ -435,7 +452,19 @@ export default function SubscriptionsPage() {
                       </td>
                       <td className="p-4">
                         <p className="font-black text-gray-900 dark:text-white">₹{sub.monthlyFee.toLocaleString('en-IN')}</p>
-                        <p className="text-xs text-gray-400">₹{sub.perDayValue}/day</p>
+                        <p className="text-xs text-gray-400">₹{sub.perDayValue.toLocaleString('en-IN')}/day</p>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-black text-gray-900 dark:text-white">{sub.completedShoots} <span className="text-xs text-gray-400 font-normal">/ {sub.totalMonthlyDays} days</span></p>
+                        <p className="text-xs text-gray-400">{sub.remainingShoots} left</p>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-black text-emerald-600 dark:text-emerald-400">
+                          ₹{((sub.generatedRevenue ?? (sub.completedShoots * sub.perDayValue))).toLocaleString('en-IN')}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-mono">
+                          ₹{sub.perDayValue.toLocaleString('en-IN')} × {sub.completedShoots}d
+                        </p>
                       </td>
                       <td className="p-4 w-40">
                         <div className="flex items-center gap-2">
