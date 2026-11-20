@@ -334,8 +334,8 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       iframe.style.position = 'fixed';
       iframe.style.left = '-9999px';
       iframe.style.top = '0';
-      iframe.style.width = '800px';
-      iframe.style.height = '1200px';
+      iframe.style.width = '794px';
+      iframe.style.height = '1123px';
       iframe.style.border = 'none';
       iframe.style.zIndex = '-9999';
       document.body.appendChild(iframe);
@@ -360,19 +360,19 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       const clientName = (formData.customerName || 'Client').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
 
       const opt: any = {
-        margin:       [0, 0, 0, 0],
+        margin:       0,
         filename:     `Quotation_${clientName}.pdf`,
         image:        { type: 'jpeg' as const, quality: 0.98 },
         html2canvas:  { 
           scale: 2, 
           useCORS: true, 
           logging: false, 
-          windowWidth: 800,
+          windowWidth: 794,
           scrollX: 0,
           scrollY: 0
         },
         jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak:    { mode: ['avoid-all', 'css'] }
       };
 
       await html2pdf().set(opt).from(targetElement).save();

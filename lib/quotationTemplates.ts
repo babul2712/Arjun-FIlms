@@ -144,15 +144,15 @@ export function generateInvoice1HTML(data: QuotationData): string {
       .filter(Boolean)
       .map(l => {
         const clean = l.replace(/^[•\-\*]\s*/, '');
-        return `<div style="font-size: 11.5px; color: #555; font-weight: normal; margin-top: 3px; line-height: 1.45;">• ${clean}</div>`;
+        return `<div style="font-size: 10px; color: #555; font-weight: normal; margin-top: 1px; line-height: 1.35;">• ${clean}</div>`;
       })
       .join('');
 
     if (allPricesHidden) {
       return `
-      <tr>
-        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
-        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+      <tr style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 6px 8px; text-align: center; font-size: 11.5px; font-weight: 700; color: #222; vertical-align: middle;">${qty}</td>
+        <td style="padding: 6px 10px; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: middle;">
           ${item.name || 'Service Item'}
           ${descriptionSubLines}
         </td>
@@ -162,16 +162,16 @@ export function generateInvoice1HTML(data: QuotationData): string {
 
     if (isItemHidden) {
       return `
-      <tr>
-        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
-        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+      <tr style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 6px 8px; text-align: center; font-size: 11.5px; font-weight: 700; color: #222; vertical-align: middle;">${qty}</td>
+        <td style="padding: 6px 10px; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: middle;">
           ${item.name || 'Service Item'}
           ${descriptionSubLines}
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 12px; font-weight: 600; color: #64748b; font-style: italic; vertical-align: top;">
+        <td style="padding: 6px 8px; text-align: right; font-size: 11px; font-weight: 600; color: #64748b; font-style: italic; vertical-align: middle;">
           Included
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 12px; font-weight: 700; color: #64748b; font-style: italic; vertical-align: top;">
+        <td style="padding: 6px 8px; text-align: right; font-size: 11px; font-weight: 700; color: #64748b; font-style: italic; vertical-align: middle;">
           Included
         </td>
       </tr>
@@ -179,16 +179,16 @@ export function generateInvoice1HTML(data: QuotationData): string {
     }
 
     return `
-      <tr>
-        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
-        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+      <tr style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 6px 8px; text-align: center; font-size: 11.5px; font-weight: 700; color: #222; vertical-align: middle;">${qty}</td>
+        <td style="padding: 6px 10px; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: middle;">
           ${item.name || 'Service Item'}
           ${descriptionSubLines}
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 13px; font-weight: 600; color: #333; vertical-align: top;">
+        <td style="padding: 6px 8px; text-align: right; font-size: 11.5px; font-weight: 600; color: #333; vertical-align: middle;">
           ${unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+        <td style="padding: 6px 8px; text-align: right; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: middle;">
           ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </td>
       </tr>
@@ -199,7 +199,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
     "Payment is due within 15 days of invoice date.",
     "50% advance retainer is required to lock booking dates.",
     "Remaining balance must be cleared before final delivery."
-  ]).map(t => `<div style="margin-bottom: 4px; font-size: 12px; color: #444; line-height: 1.45;">• ${t}</div>`).join('');
+  ]).map(t => `<div style="margin-bottom: 2px; font-size: 10px; color: #444; line-height: 1.35;">• ${t}</div>`).join('');
 
   return `
 <!DOCTYPE html>
@@ -213,18 +213,19 @@ export function generateInvoice1HTML(data: QuotationData): string {
   <style>
     @page {
       size: A4 portrait;
-      margin: 10mm;
+      margin: 6mm 8mm;
     }
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    body {
+    html, body {
       background: #ffffff;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #111827;
       padding: 0;
+      margin: 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -232,23 +233,34 @@ export function generateInvoice1HTML(data: QuotationData): string {
       .no-print {
         display: none !important;
       }
-      body {
+      html, body {
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
         padding: 0 !important;
         background: #ffffff !important;
       }
+      .invoice-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
     .invoice-container {
-      max-width: 780px;
+      max-width: 760px;
       margin: 0 auto;
       background: #ffffff;
-      padding: 24px 20px;
+      padding: 16px 20px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .header-table {
       width: 100%;
-      margin-bottom: 28px;
+      margin-bottom: 10px;
     }
     .main-title {
-      font-size: 46px;
+      font-size: 32px;
       font-weight: 900;
       letter-spacing: -0.5px;
       color: #e50914;
@@ -256,19 +268,19 @@ export function generateInvoice1HTML(data: QuotationData): string {
       font-family: -apple-system, BlinkMacSystemFont, "Arial Black", sans-serif;
     }
     .studio-meta {
-      margin-top: 14px;
-      font-size: 13px;
-      line-height: 1.55;
+      margin-top: 5px;
+      font-size: 11px;
+      line-height: 1.35;
       color: #374151;
     }
     .studio-name {
       font-weight: 800;
       color: #111827;
-      font-size: 14px;
+      font-size: 13px;
     }
     .logo-circle {
-      width: 92px;
-      height: 92px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
@@ -277,7 +289,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
       justify-content: center;
       overflow: hidden;
       margin-left: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
     .logo-circle img {
       width: 100%;
@@ -288,39 +300,42 @@ export function generateInvoice1HTML(data: QuotationData): string {
     .meta-grid {
       display: flex;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: 10px;
       padding-top: 6px;
+      border-top: 1px solid #f1f5f9;
     }
     .meta-col {
       flex: 1;
-      font-size: 12.5px;
-      line-height: 1.45;
+      font-size: 11px;
+      line-height: 1.35;
     }
     .meta-label {
-      font-size: 12.5px;
+      font-size: 9.5px;
       font-weight: 900;
       color: #1a253c;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
     .meta-value {
       font-weight: 700;
       color: #111827;
+      font-size: 11.5px;
     }
     .meta-sub {
       color: #4b5563;
-      margin-top: 2px;
+      margin-top: 1px;
+      font-size: 10.5px;
     }
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px;
+      margin-top: 4px;
     }
     .items-table th {
-      padding: 10px 8px;
-      font-size: 12.5px;
+      padding: 6px 8px;
+      font-size: 10px;
       font-weight: 900;
       color: #1a253c;
       letter-spacing: 0.5px;
@@ -329,69 +344,68 @@ export function generateInvoice1HTML(data: QuotationData): string {
       border-bottom: 2px solid ${accentColor};
     }
     .totals-wrap {
-      width: 280px;
+      width: 250px;
       margin-left: auto;
-      margin-top: 16px;
       border-collapse: collapse;
-      font-size: 13.5px;
+      font-size: 11.5px;
     }
     .totals-wrap td {
-      padding: 6px 8px;
+      padding: 3px 6px;
     }
     .totals-total {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 900;
       color: #1a253c;
-      padding-top: 10px !important;
+      padding-top: 6px !important;
     }
-    .signature-wrap {
-      margin-top: 36px;
-      margin-bottom: 20px;
-      text-align: right;
-      padding-right: 20px;
-    }
-    .signature-script {
-      font-family: 'Brush Script MT', 'Dancing Script', 'Segoe Script', cursive;
-      font-size: 38px;
-      color: #1a253c;
-      transform: rotate(-3deg);
-      display: inline-block;
-    }
-    .footer-grid {
+    .bottom-layout {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-top: 30px;
-      padding-top: 18px;
+      align-items: flex-start;
+      margin-top: 10px;
+      gap: 16px;
+    }
+    .bottom-left {
+      flex: 1;
+      max-width: 440px;
+    }
+    .bottom-right {
+      width: 250px;
+      text-align: right;
     }
     .thankyou-text {
       font-family: 'Brush Script MT', 'Dancing Script', 'Segoe Script', cursive;
-      font-size: 54px;
+      font-size: 32px;
       font-weight: bold;
       color: #1a253c;
       line-height: 1;
+      margin-bottom: 6px;
     }
     .terms-box {
-      border-left: 3px solid ${accentColor};
-      padding-left: 14px;
-      max-width: 380px;
-      font-size: 12px;
+      border-left: 2.5px solid ${accentColor};
+      padding-left: 10px;
+      font-size: 9.5px;
     }
     .terms-title {
-      font-size: 12.5px;
+      font-size: 10px;
       font-weight: 900;
       color: ${accentColor};
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
     .bank-info {
-      margin-top: 10px;
+      margin-top: 5px;
       color: #374151;
-      line-height: 1.5;
+      line-height: 1.35;
+      font-size: 9.5px;
     }
     .bank-info strong {
       color: #111827;
+    }
+    .signature-wrap {
+      margin-top: 10px;
+      text-align: right;
     }
   </style>
 </head>
@@ -411,7 +425,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
             <div>${studioEmail}</div>
           </div>
         </td>
-        <td style="vertical-align: top; text-align: right; width: 120px;">
+        <td style="vertical-align: top; text-align: right; width: 100px;">
           <div class="logo-circle">
             <img src="${logoUrl}" alt="${studioName}" />
           </div>
@@ -442,7 +456,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
         <div class="meta-label">INVOICE #</div>
         <div class="meta-value">IN-${invoiceNo}</div>
         
-        <div class="meta-label" style="margin-top: 10px;">INVOICE DATE</div>
+        <div class="meta-label" style="margin-top: 6px;">INVOICE DATE</div>
         <div class="meta-value">${invoiceDate}</div>
       </div>
 
@@ -451,7 +465,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
         <div class="meta-label">P.O.#</div>
         <div class="meta-value">${poNumber}</div>
         
-        <div class="meta-label" style="margin-top: 10px;">DUE DATE</div>
+        <div class="meta-label" style="margin-top: 6px;">DUE DATE</div>
         <div class="meta-value">${dueDate}</div>
       </div>
     </div>
@@ -460,11 +474,11 @@ export function generateInvoice1HTML(data: QuotationData): string {
     <table class="items-table">
       <thead>
         <tr>
-          <th style="width: 50px; text-align: center;">QTY</th>
+          <th style="width: 45px; text-align: center;">QTY</th>
           <th style="text-align: left;">DESCRIPTION / DELIVERABLES</th>
           ${!allPricesHidden ? `
-          <th style="width: 140px; text-align: right;">UNIT PRICE</th>
-          <th style="width: 140px; text-align: right;">AMOUNT</th>
+          <th style="width: 120px; text-align: right;">UNIT PRICE</th>
+          <th style="width: 120px; text-align: right;">AMOUNT</th>
           ` : ''}
         </tr>
       </thead>
@@ -473,57 +487,57 @@ export function generateInvoice1HTML(data: QuotationData): string {
       </tbody>
     </table>
 
-    <!-- Totals Table -->
-    <table class="totals-wrap">
-      ${(!allPricesHidden || data.discount > 0) ? `
-      <tr>
-        <td style="font-weight: 600; color: #4b5563;">${allPricesHidden ? 'Package Value' : 'Subtotal'}</td>
-        <td style="text-align: right; font-weight: 700; color: #111;">
-          ₹${data.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </td>
-      </tr>
-      ` : ''}
-      ${data.discount > 0 ? `
-      <tr>
-        <td style="font-weight: 600; color: #4b5563;">Discount</td>
-        <td style="text-align: right; font-weight: 700; color: ${accentColor};">
-          -₹${data.discount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </td>
-      </tr>
-      ` : ''}
-      <tr style="border-top: 1px solid #e5e7eb;">
-        <td class="totals-total">TOTAL</td>
-        <td class="totals-total" style="text-align: right;">
-          ₹${data.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </td>
-      </tr>
-    </table>
-
-    <!-- Authorized Signature with PNG Image -->
-    <div class="signature-wrap" style="margin-top: 28px; margin-bottom: 16px; text-align: right; padding-right: 15px;">
-      <div style="display: inline-block; text-align: center; min-width: 160px;">
-        <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 52px; max-width: 170px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
-        <div style="font-size: 11px; color: #4b5563; font-weight: 700; border-top: 1.5px solid #d1d5db; padding-top: 4px; letter-spacing: 0.5px; text-transform: uppercase;">
-          Authorized Signature
+    <!-- Unified Post-Table Layout: Left (Thank You, Terms, Bank) + Right (Totals & Signature) -->
+    <div class="bottom-layout">
+      <!-- Left Column: Thank You + Terms & Bank -->
+      <div class="bottom-left">
+        <div class="thankyou-text">Thank you</div>
+        <div class="terms-box">
+          <div class="terms-title">TERMS & CONDITIONS</div>
+          ${termsListHtml}
+          <div class="bank-info">
+            <div><strong>${bankName}</strong></div>
+            <div>Account Number: <strong>${bankAccount}</strong> · IFSC: <strong>${bankIfsc}</strong></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Bottom Thank You & Terms Bar -->
-    <div class="footer-grid">
-      <!-- Cursive Thank You -->
-      <div class="thankyou-text">
-        Thank you
-      </div>
+      <!-- Right Column: Totals + Signature -->
+      <div class="bottom-right">
+        <!-- Totals Table -->
+        <table class="totals-wrap">
+          ${(!allPricesHidden || data.discount > 0) ? `
+          <tr>
+            <td style="font-weight: 600; color: #4b5563;">${allPricesHidden ? 'Package Value' : 'Subtotal'}</td>
+            <td style="text-align: right; font-weight: 700; color: #111;">
+              ₹${data.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </tr>
+          ` : ''}
+          ${data.discount > 0 ? `
+          <tr>
+            <td style="font-weight: 600; color: #4b5563;">Discount</td>
+            <td style="text-align: right; font-weight: 700; color: ${accentColor};">
+              -₹${data.discount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </tr>
+          ` : ''}
+          <tr style="border-top: 1px solid #e5e7eb;">
+            <td class="totals-total">TOTAL</td>
+            <td class="totals-total" style="text-align: right;">
+              ₹${data.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </tr>
+        </table>
 
-      <!-- Terms & Bank Details -->
-      <div class="terms-box">
-        <div class="terms-title">TERMS & CONDITIONS</div>
-        ${termsListHtml}
-        <div class="bank-info">
-          <div><strong>${bankName}</strong></div>
-          <div>Account Number: <strong>${bankAccount}</strong></div>
-          <div>IFSC / Routing: <strong>${bankIfsc}</strong></div>
+        <!-- Authorized Signature -->
+        <div class="signature-wrap">
+          <div style="display: inline-block; text-align: center; min-width: 140px;">
+            <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 38px; max-width: 140px; object-fit: contain; display: block; margin: 0 auto 2px auto;" />
+            <div style="font-size: 9.5px; color: #4b5563; font-weight: 700; border-top: 1.5px solid #d1d5db; padding-top: 3px; letter-spacing: 0.5px; text-transform: uppercase;">
+              Authorized Signature
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -566,18 +580,18 @@ export function generateClassicHTML(data: QuotationData): string {
       .filter(Boolean)
       .map((line: string) => {
         const clean = line.replace(/^[•\-\*]\s*/, '');
-        return `<div style="font-size:11.5px; color:#555; margin-top:3px; line-height: 1.45;">• ${clean}</div>`;
+        return `<div style="font-size:10px; color:#555; margin-top:2px; line-height: 1.35;">• ${clean}</div>`;
       })
       .join('');
 
     if (allPricesHidden) {
       return `
       <tr>
-        <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
-          <h4 style="margin:0 0 4px; font-size:15px; color:${accentColor};">${s.name || 'Service Item'}</h4>
+        <td class="package" style="padding: 6px 8px; border-bottom: 1px solid #eee;">
+          <h4 style="margin:0 0 2px; font-size:12.5px; color:${accentColor};">${s.name || 'Service Item'}</h4>
           ${details}
         </td>
-        <td style="text-align:center; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">${s.quantity}</td>
+        <td style="text-align:center; padding:6px 8px; font-size:12px; border-bottom: 1px solid #eee;">${s.quantity}</td>
       </tr>
       `;
     }
@@ -585,24 +599,24 @@ export function generateClassicHTML(data: QuotationData): string {
     if (isItemHidden) {
       return `
       <tr>
-        <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
-          <h4 style="margin:0 0 4px; font-size:15px; color:${accentColor};">${s.name || 'Service Item'}</h4>
+        <td class="package" style="padding: 6px 8px; border-bottom: 1px solid #eee;">
+          <h4 style="margin:0 0 2px; font-size:12.5px; color:${accentColor};">${s.name || 'Service Item'}</h4>
           ${details}
         </td>
-        <td style="text-align:center; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">${s.quantity}</td>
-        <td style="text-align:right; padding:12px; font-size:13px; font-style:italic; color:#64748b; border-bottom: 1px solid #eee;">Included</td>
+        <td style="text-align:center; padding:6px 8px; font-size:12px; border-bottom: 1px solid #eee;">${s.quantity}</td>
+        <td style="text-align:right; padding:6px 8px; font-size:11.5px; font-style:italic; color:#64748b; border-bottom: 1px solid #eee;">Included</td>
       </tr>
       `;
     }
 
     return `
     <tr>
-      <td class="package" style="padding: 12px; border-bottom: 1px solid #eee;">
-        <h4 style="margin:0 0 4px; font-size:15px; color:${accentColor};">${s.name || 'Service Item'}</h4>
+      <td class="package" style="padding: 6px 8px; border-bottom: 1px solid #eee;">
+        <h4 style="margin:0 0 2px; font-size:12.5px; color:${accentColor};">${s.name || 'Service Item'}</h4>
         ${details}
       </td>
-      <td style="text-align:center; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">${s.quantity}</td>
-      <td style="text-align:right; padding:12px; font-size:14px; border-bottom: 1px solid #eee;">₹${(s.price || 0).toLocaleString()}</td>
+      <td style="text-align:center; padding:6px 8px; font-size:12px; border-bottom: 1px solid #eee;">${s.quantity}</td>
+      <td style="text-align:right; padding:6px 8px; font-size:12px; font-weight:700; border-bottom: 1px solid #eee;">₹${(s.price || 0).toLocaleString()}</td>
     </tr>
     `;
   }).join('');
@@ -618,64 +632,27 @@ export function generateClassicHTML(data: QuotationData): string {
     <div class="header">
       <div>
         <h1>${studioName}</h1>
-        <p>Ph: ${studioPhone}</p>
-        <p>Mail: ${studioEmail}</p>
+        <p>Ph: ${studioPhone} · Mail: ${studioEmail}</p>
         <p>${studioAddress}</p>
       </div>
       <div style="text-align:right">
-        <p style="color:${accentColor};"><b>Quotation No:</b> ${data.quotationId ? data.quotationId.slice(-4) : 'NEW'}</p>
-        <p style="color:${accentColor};"><b>Invoice Date:</b> ${new Date().toLocaleDateString()}</p>
-        <p style="color:${accentColor};"><b>Booking Date:</b> ${data.bookingDate ? new Date(data.bookingDate).toLocaleDateString() : 'TBD'}</p>
+        <p style="color:${accentColor}; font-size:12px;"><b>Quotation No:</b> ${data.quotationId ? data.quotationId.slice(-4) : 'NEW'}</p>
+        <p style="color:${accentColor}; font-size:11px;"><b>Date:</b> ${new Date().toLocaleDateString()} · <b>Event:</b> ${data.bookingDate ? new Date(data.bookingDate).toLocaleDateString() : 'TBD'}</p>
       </div>
     </div>
   `;
 
   const clientHtml = `
     <div class="card">
-      <h3>Quotation For</h3>
-      <p style="margin:0;line-height:1.5;"><b>${data.customerName || 'Client Name'}</b><br>Phone: ${data.phone || '__________'}<br>Mail: ${data.email || '__________'}<br>Address: ${data.location || '__________'}</p>
-    </div>
-  `;
-
-  const servicesTableHtml = `
-    <table style="width:100%; border-collapse:collapse; margin-top:20px;">
-      <thead>
-        <tr style="background:#faf5ff; border-bottom: 2px solid ${accentColor};">
-          <th style="padding:10px; color:${accentColor}; text-align:left;">Deliverables & Scope of Work</th>
-          <th class="rate" style="padding:10px; color:${accentColor}; text-align:center; width:80px;">Qty</th>
-          ${!allPricesHidden ? `<th class="subtotal" style="padding:10px; color:${accentColor}; text-align:right; width:120px;">Subtotal</th>` : ''}
-        </tr>
-      </thead>
-      <tbody>
-        ${servicesHtml}
-      </tbody>
-    </table>
-    
-    <table class="summary">
-      ${(!allPricesHidden || data.discount > 0) ? `<tr><td>${allPricesHidden ? 'Package Value' : 'Subtotal'}</td><td align="right">₹${data.subTotal.toLocaleString()}</td></tr>` : ''}
-      ${data.discount > 0 ? `<tr><td>Discount</td><td align="right">₹${data.discount || 0}</td></tr>` : ''}
-      <tr class="total"><td style="padding:10px;">Grand Total</td><td align="right" style="padding:10px;">₹${data.grandTotal.toLocaleString()}</td></tr>
-    </table>
-  `;
-
-  const paymentScheduleHtml = `
-    <div class="payment" style="margin-top:24px;">
-      <h3>Payment Schedule & Account Info</h3>
-      <p style="margin-bottom:12px; font-size:13px; line-height: 1.5; color:#555;"><b>Bank Details:</b><br/>Name: <b>${bankName}</b><br/>A/C No: <b>${bankAccount}</b><br/>IFSC: <b>${bankIfsc}</b></p>
-      <div class="steps">
-        <div class="step"><div class="pct" style="color:${accentColor};">50%</div><p><b>Booking</b></p><p>Advance Retainer</p></div>
-        <div class="step"><div class="pct" style="color:${accentColor};">30%</div><p><b>Event Day</b></p><p>During Shoot</p></div>
-        <div class="step"><div class="pct" style="color:${accentColor};">20%</div><p><b>Delivery</b></p><p>Before Final Handover</p></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-size:10px; font-weight:800; color:${accentColor}; text-transform:uppercase;">Quotation For:</span>
+          <span style="font-size:12.5px; font-weight:800; color:#111; margin-left:6px;">${data.customerName || 'Client Name'}</span>
+        </div>
+        <div style="font-size:10.5px; color:#555;">
+          ${data.phone ? `Ph: ${data.phone}` : ''} ${data.location ? `· ${data.location}` : ''}
+        </div>
       </div>
-    </div>
-  `;
-
-  const termsConditionsHtml = `
-    <div class="terms">
-      <h3>Terms & Conditions</h3>
-      <ol>
-        ${termsHtml}
-      </ol>
     </div>
   `;
 
@@ -684,6 +661,21 @@ export function generateClassicHTML(data: QuotationData): string {
       <div><b>Thank you for choosing ${studioName}!</b></div>
       <div style="text-align:right">Tel: ${studioPhone}</div>
     </div>
+  `;
+
+  const servicesTableHtml = `
+    <table style="width:100%; border-collapse:collapse; margin-top:6px;">
+      <thead>
+        <tr style="background:#faf5ff; border-bottom: 2px solid ${accentColor};">
+          <th style="padding:6px 8px; color:${accentColor}; text-align:left; font-size:11px;">Deliverables & Scope of Work</th>
+          <th class="rate" style="padding:6px 8px; color:${accentColor}; text-align:center; width:60px; font-size:11px;">Qty</th>
+          ${!allPricesHidden ? `<th class="subtotal" style="padding:6px 8px; color:${accentColor}; text-align:right; width:100px; font-size:11px;">Subtotal</th>` : ''}
+        </tr>
+      </thead>
+      <tbody>
+        ${servicesHtml}
+      </tbody>
+    </table>
   `;
 
   return `
@@ -696,59 +688,56 @@ export function generateClassicHTML(data: QuotationData): string {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    @page { size: A4 portrait; margin: 10mm; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: ${cfg.pageBgColor || '#fdf6f6'};
+    @page { size: A4 portrait; margin: 6mm 8mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: ${cfg.pageBgColor || '#ffffff'};
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       color: #333;
       padding: 0;
+      margin: 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
     @media print {
       .no-print { display: none !important; }
-      body { padding: 0 !important; background: #ffffff !important; }
-      .container { margin: 0 auto !important; box-shadow: none !important; border: none !important; }
+      html, body { width: 100% !important; height: 100% !important; overflow: hidden !important; padding: 0 !important; background: #ffffff !important; }
+      .container { margin: 0 auto !important; box-shadow: none !important; border: none !important; max-width: 100% !important; }
     }
     .container {
-      max-width: 800px;
-      margin: 20px auto;
+      max-width: 760px;
+      margin: 0 auto;
       background: #fff;
-      border-radius: 14px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,.05);
       border: 1px solid #eee;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      min-height: 98vh;
       position: relative;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
-    .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;height:320px;opacity:${cfg.watermarkOpacity !== undefined ? cfg.watermarkOpacity : 0.05};background-image:url('${cfg.watermarkUrl || '/logo.jpeg'}');background-repeat:no-repeat;background-position:center;background-size:contain;pointer-events:none;z-index:0;}
-    .header{background:${cfg.headerBgColor || '#fef2f2'};color:${accentColor};padding:24px;display:flex;justify-content:space-between;position:relative;z-index:1;}
-    .header h1{margin:0;font-size:26px;font-weight:bold;}
-    .header p{margin:4px 0;font-size:13px;color:#555;}
-    .section{padding:20px;flex:1;position:relative;z-index:1;}
-    .card{background:#faf5ff;border-left:5px solid ${accentColor};border-radius:10px;padding:14px; margin-bottom:16px;}
-    .card h3{margin:0 0 8px;color:${accentColor};font-size:15px;}
+    .watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:260px;height:260px;opacity:${cfg.watermarkOpacity !== undefined ? cfg.watermarkOpacity : 0.04};background-image:url('${cfg.watermarkUrl || '/logo.jpeg'}');background-repeat:no-repeat;background-position:center;background-size:contain;pointer-events:none;z-index:0;}
+    .header{background:${cfg.headerBgColor || '#fef2f2'};color:${accentColor};padding:12px 18px;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
+    .header h1{margin:0;font-size:20px;font-weight:900;}
+    .header p{margin:2px 0;font-size:11px;color:#555;}
+    .section{padding:10px 18px;position:relative;z-index:1;}
+    .card{background:#faf5ff;border-left:3px solid ${accentColor};border-radius:8px;padding:6px 12px; margin-bottom:8px;}
     table{width:100%;border-collapse:collapse}
-    th{background:#faf5ff;color:${accentColor};padding:10px;text-align:left}
-    th.rate{text-align:center;width:100px;}
-    th.subtotal{text-align:right;width:120px;}
-    td{padding:12px;vertical-align:top}
-    .summary{width:280px;margin-left:auto;margin-top:12px}
-    .summary td{padding:8px}
+    th{background:#faf5ff;color:${accentColor};padding:6px 8px;text-align:left;font-size:10.5px;}
+    th.rate{text-align:center;width:70px;}
+    th.subtotal{text-align:right;width:100px;}
+    td{padding:6px 8px;vertical-align:middle}
+    .summary{width:240px;margin-left:auto;}
+    .summary td{padding:3px 6px;font-size:11.5px;}
     .total{background:${accentColor};color:#fff;font-weight:bold}
-    .payment h3,.terms h3{color:${accentColor};margin:16px 0 10px}
-    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .step{background:#faf5ff;border:1px solid #ebd9fc;border-radius:10px;padding:10px;text-align:center}
-    .step .pct{font-size:22px;font-weight:bold;color:${accentColor}}
-    .step p{margin:4px 0;font-size:12px}
-    .terms{background:#fdf8ff;border-left:5px solid ${accentColor};border-radius:10px;padding:12px;margin-top:15px}
-    .terms ol{margin:0;padding-left:18px;font-size:12px;line-height:1.45;color:#555;}
-    .footer{background:${cfg.footerBgColor || accentColor};color:#fff;padding:16px;display:flex;justify-content:space-between;font-size:12px;position:relative;z-index:1;}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px;}
+    .step{background:#faf5ff;border:1px solid #ebd9fc;border-radius:6px;padding:4px;text-align:center}
+    .step .pct{font-size:14px;font-weight:bold;color:${accentColor}}
+    .step p{margin:1px 0;font-size:9.5px;line-height:1.2;}
+    .terms{background:#fdf8ff;border-left:3px solid ${accentColor};border-radius:6px;padding:6px 10px;margin-top:6px;font-size:9.5px;}
+    .terms ol{margin:0;padding-left:14px;line-height:1.35;color:#555;}
+    .footer{background:${cfg.footerBgColor || accentColor};color:#fff;padding:8px 18px;display:flex;justify-content:space-between;font-size:10.5px;position:relative;z-index:1;}
   </style>
 </head>
 <body>
@@ -759,19 +748,43 @@ export function generateClassicHTML(data: QuotationData): string {
     <div class="section">
       ${clientHtml}
       ${servicesTableHtml}
-      ${paymentScheduleHtml}
-      ${termsConditionsHtml}
       
-      <!-- Authorized Signature Section -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding: 0 14px 14px 14px; position: relative; z-index: 1;">
-        <div style="font-size: 11.5px; color: #64748b;">
-          <p style="margin: 0; font-weight: 700; color: #333;">Client Acceptance & E-Sign</p>
-          <p style="margin: 2px 0 0 0; font-size: 10.5px; color: #94a3b8;">Digitally Verified Official Proposal / Invoice</p>
+      <!-- Split Bottom Area: Left (Payment Schedule & Terms) | Right (Totals & Signature) -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:8px; gap:16px;">
+        <!-- Left: Payment milestones & bank -->
+        <div style="flex:1; max-width:440px;">
+          <div style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:2px;">
+            Payment Milestones & Bank Details
+          </div>
+          <div style="font-size:10px; color:#555; line-height:1.35; margin-bottom:4px;">
+            <b>${bankName}</b> · A/C: <b>${bankAccount}</b> · IFSC: <b>${bankIfsc}</b>
+          </div>
+          <div class="steps">
+            <div class="step"><div class="pct">50%</div><p><b>Booking</b></p><p>Advance</p></div>
+            <div class="step"><div class="pct">30%</div><p><b>Shoot Day</b></p><p>During Event</p></div>
+            <div class="step"><div class="pct">20%</div><p><b>Delivery</b></p><p>Handover</p></div>
+          </div>
+          <div class="terms">
+            <div style="font-weight:700; color:${accentColor}; margin-bottom:2px;">Terms & Conditions:</div>
+            <ol>
+              ${termsHtml}
+            </ol>
+          </div>
         </div>
-        <div style="text-align: center; border-top: 1.5px solid #e2e8f0; padding-top: 6px; width: 180px;">
-          <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 48px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
-          <div style="font-size: 11px; font-weight: 800; color: #333; text-transform: uppercase; letter-spacing: 0.3px;">Authorized Signature</div>
-          <div style="font-size: 10px; color: #777; margin-top: 1px;">${studioName}</div>
+
+        <!-- Right: Summary Table & Signature -->
+        <div style="width:240px; text-align:right;">
+          <table class="summary">
+            ${(!allPricesHidden || data.discount > 0) ? `<tr><td style="color:#555;">${allPricesHidden ? 'Package Value' : 'Subtotal'}</td><td align="right" style="font-weight:700;">₹${data.subTotal.toLocaleString()}</td></tr>` : ''}
+            ${data.discount > 0 ? `<tr><td style="color:#555;">Discount</td><td align="right" style="font-weight:700; color:${accentColor};">-₹${data.discount || 0}</td></tr>` : ''}
+            <tr class="total"><td style="padding:6px;">Grand Total</td><td align="right" style="padding:6px; font-size:14px;">₹${data.grandTotal.toLocaleString()}</td></tr>
+          </table>
+
+          <!-- Authorized Signature -->
+          <div style="margin-top:10px; text-align:center; border-top:1.5px solid #e2e8f0; padding-top:4px; width:150px; margin-left:auto;">
+            <img src="${resolvedSignature}" alt="Authorized Signature" style="height:36px; max-width:140px; object-fit:contain; display:block; margin:0 auto 2px auto;" />
+            <div style="font-size:9.5px; font-weight:800; color:#333; text-transform:uppercase;">Authorized Signature</div>
+          </div>
         </div>
       </div>
     </div>
@@ -838,17 +851,17 @@ export function generateInvoice3HTML(data: QuotationData): string {
     if (allPricesHidden) {
       return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
-        <td style="padding: 13px 18px; vertical-align: top;">
-          <div style="font-weight: 700; color: #1e293b; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px;">
+        <td style="padding: 6px 12px; vertical-align: top;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;">
             ${item.name || 'SERVICE LINE ITEM'}
           </div>
           ${descLines.length > 0 ? `
-            <div style="margin-top: 4px; font-size: 11px; color: #64748b; line-height: 1.45;">
+            <div style="margin-top: 2px; font-size: 9.5px; color: #64748b; line-height: 1.35;">
               ${descLines.map(d => `<div>• ${d.replace(/^[•\-\*]\s*/, '')}</div>`).join('')}
             </div>
           ` : ''}
         </td>
-        <td style="padding: 13px 18px; text-align: center; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 600;">
+        <td style="padding: 6px 12px; text-align: center; vertical-align: top; font-size: 11.5px; color: #334155; font-weight: 600;">
           ${qty}
         </td>
       </tr>
@@ -858,23 +871,23 @@ export function generateInvoice3HTML(data: QuotationData): string {
     if (isItemHidden) {
       return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
-        <td style="padding: 13px 18px; vertical-align: top;">
-          <div style="font-weight: 700; color: #1e293b; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px;">
+        <td style="padding: 6px 12px; vertical-align: top;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;">
             ${item.name || 'SERVICE LINE ITEM'}
           </div>
           ${descLines.length > 0 ? `
-            <div style="margin-top: 4px; font-size: 11px; color: #64748b; line-height: 1.45;">
+            <div style="margin-top: 2px; font-size: 9.5px; color: #64748b; line-height: 1.35;">
               ${descLines.map(d => `<div>• ${d.replace(/^[•\-\*]\s*/, '')}</div>`).join('')}
             </div>
           ` : ''}
         </td>
-        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12px; color: #64748b; font-style: italic; font-weight: 500;">
+        <td style="padding: 6px 12px; text-align: right; vertical-align: top; font-size: 10.5px; color: #64748b; font-style: italic; font-weight: 500;">
           Included
         </td>
-        <td style="padding: 13px 18px; text-align: center; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 600;">
+        <td style="padding: 6px 12px; text-align: center; vertical-align: top; font-size: 11.5px; color: #334155; font-weight: 600;">
           ${qty}
         </td>
-        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12px; color: #64748b; font-style: italic; font-weight: 700;">
+        <td style="padding: 6px 12px; text-align: right; vertical-align: top; font-size: 10.5px; color: #64748b; font-style: italic; font-weight: 700;">
           Included
         </td>
       </tr>
@@ -883,23 +896,23 @@ export function generateInvoice3HTML(data: QuotationData): string {
 
     return `
       <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e9ecef;">
-        <td style="padding: 13px 18px; vertical-align: top;">
-          <div style="font-weight: 700; color: #1e293b; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px;">
+        <td style="padding: 6px 12px; vertical-align: top;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;">
             ${item.name || 'SERVICE LINE ITEM'}
           </div>
           ${descLines.length > 0 ? `
-            <div style="margin-top: 4px; font-size: 11px; color: #64748b; line-height: 1.45;">
+            <div style="margin-top: 2px; font-size: 9.5px; color: #64748b; line-height: 1.35;">
               ${descLines.map(d => `<div>• ${d.replace(/^[•\-\*]\s*/, '')}</div>`).join('')}
             </div>
           ` : ''}
         </td>
-        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 500;">
+        <td style="padding: 6px 12px; text-align: right; vertical-align: top; font-size: 11.5px; color: #334155; font-weight: 500;">
           ₹${unitPrice.toLocaleString('en-IN')}
         </td>
-        <td style="padding: 13px 18px; text-align: center; vertical-align: top; font-size: 12.5px; color: #334155; font-weight: 600;">
+        <td style="padding: 6px 12px; text-align: center; vertical-align: top; font-size: 11.5px; color: #334155; font-weight: 600;">
           ${qty}
         </td>
-        <td style="padding: 13px 18px; text-align: right; vertical-align: top; font-size: 12.5px; color: #1e293b; font-weight: 700;">
+        <td style="padding: 6px 12px; text-align: right; vertical-align: top; font-size: 11.5px; color: #1e293b; font-weight: 700;">
           ₹${total.toLocaleString('en-IN')}
         </td>
       </tr>
@@ -931,7 +944,7 @@ export function generateInvoice3HTML(data: QuotationData): string {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
-    body {
+    html, body {
       background: #f8fafc;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #1e293b;
@@ -943,24 +956,37 @@ export function generateInvoice3HTML(data: QuotationData): string {
     }
     @media print {
       .no-print { display: none !important; }
-      body { padding: 0 !important; background: #ffffff !important; }
-      .invoice-card { margin: 0 auto !important; box-shadow: none !important; border: none !important; }
+      html, body {
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+      .invoice-card {
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
     }
     .invoice-card {
-      width: 780px;
-      min-height: 1100px;
+      width: 760px;
       background: #ffffff;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       overflow: hidden;
       border: 1px solid #e2e8f0;
-      margin: 20px auto;
+      margin: 0 auto;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .main-body {
-      padding: 48px 50px 24px 50px;
+      padding: 18px 28px 8px 28px;
       flex: 1;
     }
   </style>
@@ -970,19 +996,19 @@ export function generateInvoice3HTML(data: QuotationData): string {
   <div class="invoice-card">
   <div class="main-body">
     
-    <!-- Top Header: Logo/Studio (Left) & Giant Red INVOICE (Right) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 24px;">
+    <!-- Top Header: Logo/Studio (Left) & INVOICE (Right) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #0f172a; padding-bottom: 10px;">
       
       <!-- Left: Brand Logo & Title -->
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <div style="width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #e50914; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(229,9,20,0.25);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 36px; height: 36px; border-radius: 6px; overflow: hidden; background: #e50914; display: flex; align-items: center; justify-content: center;">
           <img src="${resolvedLogo}" alt="Studio Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'" />
         </div>
         <div>
-          <h1 style="font-size: 20px; font-weight: 900; color: #1e293b; letter-spacing: 0.5px; text-transform: uppercase; margin: 0; font-family: 'Arial Black', Arial, sans-serif;">
+          <h1 style="font-size: 17px; font-weight: 900; color: #1e293b; letter-spacing: 0.5px; text-transform: uppercase; margin: 0; font-family: 'Arial Black', Arial, sans-serif;">
             ${studioName}
           </h1>
-          <p style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">
+          <p style="font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 1px;">
             Photography & Cinema
           </p>
         </div>
@@ -990,63 +1016,57 @@ export function generateInvoice3HTML(data: QuotationData): string {
 
       <!-- Right: Bold Red INVOICE Title -->
       <div>
-        <h2 style="font-size: 42px; font-weight: 900; color: #e50914; letter-spacing: 1px; margin: 0; text-transform: uppercase; line-height: 1; font-family: 'Arial Black', Arial, sans-serif;">
+        <h2 style="font-size: 28px; font-weight: 900; color: #e50914; letter-spacing: 1px; margin: 0; text-transform: uppercase; line-height: 1; font-family: 'Arial Black', Arial, sans-serif;">
           INVOICE
         </h2>
       </div>
     </div>
 
     <!-- Client Info (Left) & Invoice Meta (Right) -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px;">
       <!-- Left Client Meta -->
-      <div style="line-height: 1.45;">
-        <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">
+      <div style="line-height: 1.35;">
+        <h3 style="font-size: 14.5px; font-weight: 800; color: #0f172a; margin: 0 0 2px 0;">
           ${data.customerName || 'Client Name'}
         </h3>
-        <p style="font-size: 12px; color: #64748b; font-weight: 500;">
-          Event Date: <span style="color: #334155; font-weight: 700;">${eventDate}</span>
+        <p style="font-size: 10.5px; color: #64748b; font-weight: 500;">
+          Event Date: <span style="color: #334155; font-weight: 700;">${eventDate}</span> · Venue: <span style="color: #334155; font-weight: 700;">${data.location || 'Studio'}</span>
         </p>
-        <p style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
-          ${data.location || 'Bhubaneswar, Odisha'}
-        </p>
-        <p style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
-          ${data.email || studioEmail}
-        </p>
-        <p style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
-          ${data.phone || '+91 7788992712'}
+        <p style="font-size: 10.5px; color: #64748b; font-weight: 500; margin-top: 1px;">
+          ${data.email || studioEmail} · ${data.phone || '+91 7788992712'}
         </p>
       </div>
 
       <!-- Right Invoice Number -->
       <div style="text-align: right;">
-        <div style="font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase;">
-          INVOICE
+        <div style="font-size: 9.5px; font-weight: 800; color: #64748b; letter-spacing: 1px; text-transform: uppercase;">
+          INVOICE #
         </div>
-        <div style="font-size: 26px; font-weight: 700; color: #1e293b; letter-spacing: 2px; font-family: 'Courier New', Courier, monospace; margin-top: 2px;">
+        <div style="font-size: 18px; font-weight: 700; color: #1e293b; letter-spacing: 1.5px; font-family: 'Courier New', Courier, monospace; margin-top: 1px;">
           ${invoiceFormatted}
         </div>
-        <div style="font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 3px;">
+        <div style="font-size: 9.5px; color: #94a3b8; font-weight: 600; margin-top: 1px;">
           Issued: ${invoiceDate}
         </div>
       </div>
     </div>
 
     <!-- Items Table -->
-    <div style="margin-top: 26px; border-radius: 4px; overflow: hidden; border: 1px solid #e2e8f0;">
+    <div style="margin-top: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #e2e8f0;">
       <table style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
           <tr style="background: #1e2229; color: #ffffff;">
-            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;">
+            <th style="padding: 6px 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;">
               PRODUCT / SERVICES & DELIVERABLES
             </th>
-            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: center; width: ${allPricesHidden ? '90px' : '75px'};">
+            <th style="padding: 6px 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; text-align: center; width: ${allPricesHidden ? '80px' : '65px'};">
               QTY
             </th>
             ${!allPricesHidden ? `
-            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; width: 110px;">
+            <th style="padding: 6px 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; text-align: right; width: 95px;">
               PRICE
             </th>
-            <th style="padding: 12px 18px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; width: 120px;">
+            <th style="padding: 6px 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; text-align: right; width: 105px;">
               TOTAL
             </th>
             ` : ''}
@@ -1059,105 +1079,96 @@ export function generateInvoice3HTML(data: QuotationData): string {
     </div>
 
     <!-- Payment Data (Left) & Totals (Right) -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 32px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 8px;">
       
       <!-- Left: Payment Data -->
-      <div style="width: 55%; line-height: 1.6; font-size: 11.5px;">
-        <div style="font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-size: 12px;">
+      <div style="width: 55%; line-height: 1.4; font-size: 10px;">
+        <div style="font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; font-size: 10.5px;">
           PAYMENT DATA:
         </div>
         <div style="color: #475569;">
-          <span style="font-weight: 700; color: #1e293b;">ACCOUNT NO:</span> ${bankAccount}
+          <span style="font-weight: 700; color: #1e293b;">ACCOUNT NO:</span> ${bankAccount} · <span style="font-weight: 700; color: #1e293b;">BANK:</span> ${bankName} (${bankIfsc})
         </div>
         <div style="color: #475569;">
-          <span style="font-weight: 700; color: #1e293b;">NAME:</span> ${studioName}
-        </div>
-        <div style="color: #475569;">
-          <span style="font-weight: 700; color: #1e293b;">BANK & IFSC:</span> ${bankName} (${bankIfsc})
-        </div>
-        <div style="color: #475569;">
-          <span style="font-weight: 700; color: #1e293b;">PAYMENT METHOD:</span> UPI / QR / NET BANKING / CASH
+          <span style="font-weight: 700; color: #1e293b;">BENEFICIARY:</span> ${studioName} · <span style="font-weight: 700; color: #1e293b;">MODES:</span> UPI / QR / NET BANKING
         </div>
       </div>
 
       <!-- Right: Subtotal & Grand Total -->
       <div style="width: 40%; text-align: right;">
         ${(!allPricesHidden || discount > 0) ? `
-        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #334155; margin-bottom: 6px; font-weight: 700;">
-          <span style="text-transform: uppercase; color: #64748b;">${allPricesHidden ? 'PACKAGE VALUE' : 'SUBTOTAL'}</span>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #334155; margin-bottom: 2px; font-weight: 700;">
+          <span style="text-transform: uppercase; color: #64748b; font-size: 10px;">${allPricesHidden ? 'PACKAGE VALUE' : 'SUBTOTAL'}</span>
           <span>₹${subTotal.toLocaleString('en-IN')}</span>
         </div>
         ` : ''}
 
         ${discount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #16a34a; margin-bottom: 6px; font-weight: 700;">
-            <span style="text-transform: uppercase;">DISCOUNT</span>
+          <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #16a34a; margin-bottom: 2px; font-weight: 700;">
+            <span style="text-transform: uppercase; font-size: 10px;">DISCOUNT</span>
             <span>- ₹${discount.toLocaleString('en-IN')}</span>
           </div>
         ` : ''}
 
-        <div style="border-top: 1.5px solid #cbd5e1; margin: 10px 0 8px 0;"></div>
+        <div style="border-top: 1px solid #cbd5e1; margin: 4px 0;"></div>
 
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <span style="font-size: 15px; font-weight: 900; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">TOTAL</span>
-          <span style="font-size: 22px; font-weight: 900; color: #0f172a;">₹${grandTotal.toLocaleString('en-IN')}</span>
+          <span style="font-size: 12.5px; font-weight: 900; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">TOTAL</span>
+          <span style="font-size: 17px; font-weight: 900; color: #0f172a;">₹${grandTotal.toLocaleString('en-IN')}</span>
         </div>
       </div>
     </div>
 
     <!-- Terms and Conditions -->
-    <div style="margin-top: 32px; border-top: 1.5px solid #0f172a; padding-top: 16px;">
-      <h4 style="font-size: 12.5px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+    <div style="margin-top: 6px; border-top: 1px solid #0f172a; padding-top: 4px;">
+      <h4 style="font-size: 10.5px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
         TERMS AND CONDITIONS
       </h4>
-      <p style="font-size: 10.5px; color: #64748b; line-height: 1.6; text-align: justify;">
-        ${data.termsConditions || '50% advance booking deposit is required to confirm reservation. Final high-resolution edited photo gallery and 4K cinematic film deliverables are provided within 25 working days. Client cancellations within 14 days of shoot date are non-refundable. High-speed raw cloud storage is archived for 60 days following handover.'}
+      <p style="font-size: 9px; color: #64748b; line-height: 1.35; text-align: justify;">
+        ${data.termsConditions || '50% advance booking deposit is required to confirm reservation. Final high-resolution edited photo gallery and 4K cinematic film deliverables are provided within 25 working days. Client cancellations within 14 days of shoot date are non-refundable.'}
       </p>
     </div>
 
     <!-- Authorized Signature Section -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 24px; padding-top: 8px;">
-      <div style="font-size: 11px; color: #64748b; font-weight: 500; max-width: 420px; line-height: 1.45;">
-        Thank you for choosing <strong style="color: #0f172a;">${studioName}</strong>. This is a computer-generated proposal/invoice valid with authorized digital signature.
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 6px; padding-top: 2px;">
+      <div style="font-size: 9.5px; color: #64748b; font-weight: 500; max-width: 460px; line-height: 1.3;">
+        Thank you for choosing <strong style="color: #0f172a;">${studioName}</strong>. Computer-generated proposal valid with authorized digital signature.
       </div>
-      <div style="text-align: center; border-top: 1.5px solid #cbd5e1; padding-top: 6px; width: 175px;">
-        <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 48px; max-width: 160px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
-        <div style="font-size: 10.5px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px;">Authorized Signature</div>
-        <div style="font-size: 9.5px; color: #64748b; font-weight: 600; margin-top: 1px;">${studioName}</div>
+      <div style="text-align: center; border-top: 1.5px solid #cbd5e1; padding-top: 2px; width: 140px;">
+        <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 32px; max-width: 130px; object-fit: contain; display: block; margin: 0 auto 1px auto;" />
+        <div style="font-size: 9px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.4px;">Authorized Signature</div>
       </div>
     </div>
 
     <!-- Contact Info (3 Red Badges) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px; gap: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; gap: 8px;">
       
       <!-- Phone Badge -->
-      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-        <div style="width: 32px; height: 32px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; shrink: 0;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+      <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
+        <div style="width: 22px; height: 22px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; shrink: 0;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
         </div>
-        <div style="font-size: 10.5px; color: #334155; line-height: 1.35; font-weight: 600;">
+        <div style="font-size: 9px; color: #334155; line-height: 1.25; font-weight: 600;">
           <div>${studioPhone}</div>
-          <div>+91 9437000000</div>
         </div>
       </div>
 
       <!-- Email / Web Badge -->
-      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-        <div style="width: 32px; height: 32px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; shrink: 0;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
+        <div style="width: 22px; height: 22px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; shrink: 0;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </div>
-        <div style="font-size: 10.5px; color: #334155; line-height: 1.35; font-weight: 600;">
+        <div style="font-size: 9px; color: #334155; line-height: 1.25; font-weight: 600;">
           <div>${studioEmail}</div>
-          <div>www.arjunfilms.com</div>
         </div>
       </div>
 
       <!-- Location Badge -->
-      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-        <div style="width: 32px; height: 32px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; shrink: 0;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
+        <div style="width: 22px; height: 22px; background: #e50914; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #ffffff; shrink: 0;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
         </div>
-        <div style="font-size: 10.5px; color: #334155; line-height: 1.35; font-weight: 600;">
+        <div style="font-size: 9px; color: #334155; line-height: 1.25; font-weight: 600;">
           <div>${studioAddress}</div>
         </div>
       </div>
@@ -1168,7 +1179,7 @@ export function generateInvoice3HTML(data: QuotationData): string {
 
   <!-- Dual-Layer Bottom Geometric Wave (Red) & Base Bar (Navy/Charcoal) -->
   <div style="width: 100%; margin-top: auto; overflow: hidden; line-height: 0;">
-    <svg viewBox="0 0 780 50" style="display: block; width: 100%; height: 38px;" preserveAspectRatio="none">
+    <svg viewBox="0 0 760 20" style="display: block; width: 100%; height: 14px;" preserveAspectRatio="none">
       <defs>
         <linearGradient id="redWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#ff001e" />
@@ -1176,9 +1187,9 @@ export function generateInvoice3HTML(data: QuotationData): string {
           <stop offset="100%" stop-color="#b8050e" />
         </linearGradient>
       </defs>
-      <path d="M 0,38 Q 220,0 400,38 T 780,38 L 780,50 L 0,50 Z" fill="url(#redWaveGrad)" />
+      <path d="M 0,14 Q 220,0 380,14 T 760,14 L 760,20 L 0,20 Z" fill="url(#redWaveGrad)" />
     </svg>
-    <div style="background: #1e2229; height: 36px; width: 100%;"></div>
+    <div style="background: #1e2229; height: 14px; width: 100%;"></div>
   </div>
 
 </div>
