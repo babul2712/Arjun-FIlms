@@ -332,11 +332,13 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       
       iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
-      iframe.style.left = '-9999px';
+      iframe.style.left = '0';
       iframe.style.top = '0';
       iframe.style.width = '794px';
       iframe.style.height = '1123px';
       iframe.style.border = 'none';
+      iframe.style.opacity = '0';
+      iframe.style.pointerEvents = 'none';
       iframe.style.zIndex = '-9999';
       document.body.appendChild(iframe);
 
@@ -353,10 +355,33 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       const noPrintEls = doc.querySelectorAll('.no-print');
       noPrintEls.forEach(el => el.remove());
 
-      // Wait for fonts, layout, and images to settle in the iframe
-      await new Promise(resolve => setTimeout(resolve, 600));
+      // Wait for fonts to be ready
+      if (doc.fonts) {
+        await doc.fonts.ready;
+      }
 
-      const targetElement = doc.body;
+      // Wait for all images to fully load
+      const imgs = Array.from(doc.images);
+      await Promise.all(
+        imgs.map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
+      // Brief layout stabilization
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const targetElement = (doc.querySelector('.invoice-container, .invoice-card, .container') as HTMLElement) || doc.body;
+      if (targetElement && targetElement !== doc.body) {
+        targetElement.style.margin = '0 auto';
+        targetElement.style.boxShadow = 'none';
+        targetElement.style.border = 'none';
+      }
+
       const clientName = (formData.customerName || 'Client').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
 
       const opt: any = {
@@ -371,8 +396,8 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
           scrollX: 0,
           scrollY: 0
         },
-        jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css'] }
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       await html2pdf().set(opt).from(targetElement).save();
