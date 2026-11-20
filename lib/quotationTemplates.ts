@@ -150,9 +150,9 @@ export function generateInvoice1HTML(data: QuotationData): string {
 
     if (allPricesHidden) {
       return `
-      <tr>
-        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
-        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+      <tr style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 7px 8px; text-align: center; font-size: 11.5px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
+        <td style="padding: 7px 12px; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: top;">
           ${item.name || 'Service Item'}
           ${descriptionSubLines}
         </td>
@@ -162,16 +162,16 @@ export function generateInvoice1HTML(data: QuotationData): string {
 
     if (isItemHidden) {
       return `
-      <tr>
-        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
-        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+      <tr style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 7px 8px; text-align: center; font-size: 11.5px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
+        <td style="padding: 7px 12px; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: top;">
           ${item.name || 'Service Item'}
           ${descriptionSubLines}
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 12px; font-weight: 600; color: #64748b; font-style: italic; vertical-align: top;">
+        <td style="padding: 7px 8px; text-align: right; font-size: 11px; font-weight: 600; color: #64748b; font-style: italic; vertical-align: top;">
           Included
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 12px; font-weight: 700; color: #64748b; font-style: italic; vertical-align: top;">
+        <td style="padding: 7px 8px; text-align: right; font-size: 11px; font-weight: 700; color: #64748b; font-style: italic; vertical-align: top;">
           Included
         </td>
       </tr>
@@ -179,17 +179,17 @@ export function generateInvoice1HTML(data: QuotationData): string {
     }
 
     return `
-      <tr>
-        <td style="padding: 13px 8px; text-align: center; font-size: 13px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
-        <td style="padding: 13px 12px; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
+      <tr style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 7px 8px; text-align: center; font-size: 11.5px; font-weight: 700; color: #222; vertical-align: top;">${qty}</td>
+        <td style="padding: 7px 12px; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: top;">
           ${item.name || 'Service Item'}
           ${descriptionSubLines}
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 13px; font-weight: 600; color: #333; vertical-align: top;">
-          ${unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        <td style="padding: 7px 8px; text-align: right; font-size: 11.5px; font-weight: 600; color: #333; vertical-align: top;">
+          ₹${unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </td>
-        <td style="padding: 13px 8px; text-align: right; font-size: 13px; font-weight: 700; color: #111; vertical-align: top;">
-          ${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        <td style="padding: 7px 8px; text-align: right; font-size: 11.5px; font-weight: 700; color: #111; vertical-align: top;">
+          ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </td>
       </tr>
     `;
@@ -199,7 +199,7 @@ export function generateInvoice1HTML(data: QuotationData): string {
     "Payment is due within 15 days of invoice date.",
     "50% advance retainer is required to lock booking dates.",
     "Remaining balance must be cleared before final delivery."
-  ]).map(t => `<div style="margin-bottom: 4px; font-size: 12px; color: #444; line-height: 1.45;">• ${t}</div>`).join('');
+  ]).map(t => `<div style="margin-bottom: 3px; font-size: 10px; color: #444; line-height: 1.4;">• ${t}</div>`).join('');
 
   return `
 <!DOCTYPE html>
@@ -404,74 +404,74 @@ export function generateInvoice1HTML(data: QuotationData): string {
 </head>
 <body>
   ${renderPreviewBanner(studioName)}
-  <div class="invoice-container">
+  <div class="invoice-container" style="width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 24px 28px; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827;">
     
     <!-- Top Header -->
-    <table class="header-table">
+    <table class="header-table" style="width: 100%; margin-bottom: 16px; border-collapse: collapse;">
       <tr>
         <td style="vertical-align: top;">
-          <h1 class="main-title">INVOICE</h1>
-          <div class="studio-meta">
-            <div class="studio-name">${studioName}</div>
+          <h1 class="main-title" style="font-size: 38px; font-weight: 900; letter-spacing: -0.5px; color: ${accentColor}; line-height: 1; margin: 0 0 6px 0; font-family: -apple-system, BlinkMacSystemFont, 'Arial Black', sans-serif;">INVOICE</h1>
+          <div class="studio-meta" style="margin-top: 6px; font-size: 11.5px; line-height: 1.4; color: #374151;">
+            <div class="studio-name" style="font-weight: 800; color: #111827; font-size: 13.5px; margin-bottom: 2px;">${studioName}</div>
             <div>${studioAddress}</div>
             <div>Ph: ${studioPhone}</div>
             <div>${studioEmail}</div>
           </div>
         </td>
         <td style="vertical-align: top; text-align: right; width: 120px;">
-          <div class="logo-circle">
-            <img src="${logoUrl}" alt="${studioName}" />
+          <div class="logo-circle" style="width: 68px; height: 68px; border-radius: 50%; background: #f8fafc; border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-left: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <img src="${logoUrl}" alt="${studioName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" />
           </div>
         </td>
       </tr>
     </table>
 
     <!-- 4-Column Metadata Block -->
-    <div class="meta-grid">
+    <div class="meta-grid" style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding-top: 4px;">
       <!-- Bill To -->
-      <div class="meta-col">
-        <div class="meta-label">BILL TO</div>
-        <div class="meta-value">${data.customerName || 'Client Name'}</div>
-        <div class="meta-sub">${data.location || 'Client Address'}</div>
-        <div class="meta-sub">${data.phone || ''}</div>
+      <div class="meta-col" style="flex: 1; font-size: 11.5px; line-height: 1.35;">
+        <div class="meta-label" style="font-size: 11px; font-weight: 900; color: #1a253c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 4px;">BILL TO</div>
+        <div class="meta-value" style="font-weight: 700; color: #111827;">${data.customerName || 'Client Name'}</div>
+        <div class="meta-sub" style="color: #4b5563; margin-top: 2px;">${data.location || 'Client Address'}</div>
+        <div class="meta-sub" style="color: #4b5563; margin-top: 2px;">${data.phone || ''}</div>
       </div>
 
       <!-- Ship To / Event -->
-      <div class="meta-col">
-        <div class="meta-label">EVENT / SHOOT</div>
-        <div class="meta-value">${data.eventType || 'Event Shoot'}</div>
-        <div class="meta-sub">Date: ${eventDate}</div>
-        <div class="meta-sub">Venue: ${data.location || 'Studio'}</div>
+      <div class="meta-col" style="flex: 1; font-size: 11.5px; line-height: 1.35;">
+        <div class="meta-label" style="font-size: 11px; font-weight: 900; color: #1a253c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 4px;">EVENT / SHOOT</div>
+        <div class="meta-value" style="font-weight: 700; color: #111827;">${data.eventType || 'Event Shoot'}</div>
+        <div class="meta-sub" style="color: #4b5563; margin-top: 2px;">Date: ${eventDate}</div>
+        <div class="meta-sub" style="color: #4b5563; margin-top: 2px;">Venue: ${data.location || 'Studio'}</div>
       </div>
 
       <!-- Invoice Details Column 1 -->
-      <div class="meta-col" style="text-align: right;">
-        <div class="meta-label">INVOICE #</div>
-        <div class="meta-value">IN-${invoiceNo}</div>
+      <div class="meta-col" style="flex: 1; font-size: 11.5px; line-height: 1.35; text-align: right;">
+        <div class="meta-label" style="font-size: 11px; font-weight: 900; color: #1a253c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 4px;">INVOICE #</div>
+        <div class="meta-value" style="font-weight: 700; color: #111827;">IN-${invoiceNo}</div>
         
-        <div class="meta-label" style="margin-top: 10px;">INVOICE DATE</div>
-        <div class="meta-value">${invoiceDate}</div>
+        <div class="meta-label" style="font-size: 11px; font-weight: 900; color: #1a253c; letter-spacing: 0.3px; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px;">INVOICE DATE</div>
+        <div class="meta-value" style="font-weight: 700; color: #111827;">${invoiceDate}</div>
       </div>
 
       <!-- Invoice Details Column 2 -->
-      <div class="meta-col" style="text-align: right;">
-        <div class="meta-label">P.O.#</div>
-        <div class="meta-value">${poNumber}</div>
+      <div class="meta-col" style="flex: 1; font-size: 11.5px; line-height: 1.35; text-align: right;">
+        <div class="meta-label" style="font-size: 11px; font-weight: 900; color: #1a253c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 4px;">P.O.#</div>
+        <div class="meta-value" style="font-weight: 700; color: #111827;">${poNumber}</div>
         
-        <div class="meta-label" style="margin-top: 10px;">DUE DATE</div>
-        <div class="meta-value">${dueDate}</div>
+        <div class="meta-label" style="font-size: 11px; font-weight: 900; color: #1a253c; letter-spacing: 0.3px; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px;">DUE DATE</div>
+        <div class="meta-value" style="font-weight: 700; color: #111827;">${dueDate}</div>
       </div>
     </div>
 
     <!-- Line Items Table -->
-    <table class="items-table">
+    <table class="items-table" style="width: 100%; border-collapse: collapse; margin-top: 8px;">
       <thead>
         <tr>
-          <th style="width: 50px; text-align: center;">QTY</th>
-          <th style="text-align: left;">DESCRIPTION / DELIVERABLES</th>
+          <th style="width: 50px; text-align: center; padding: 7px 8px; font-size: 11.5px; font-weight: 900; color: #1a253c; letter-spacing: 0.5px; text-transform: uppercase; border-top: 2px solid ${accentColor}; border-bottom: 2px solid ${accentColor};">QTY</th>
+          <th style="text-align: left; padding: 7px 8px; font-size: 11.5px; font-weight: 900; color: #1a253c; letter-spacing: 0.5px; text-transform: uppercase; border-top: 2px solid ${accentColor}; border-bottom: 2px solid ${accentColor};">DESCRIPTION / DELIVERABLES</th>
           ${!allPricesHidden ? `
-          <th style="width: 140px; text-align: right;">UNIT PRICE</th>
-          <th style="width: 140px; text-align: right;">AMOUNT</th>
+          <th style="width: 140px; text-align: right; padding: 7px 8px; font-size: 11.5px; font-weight: 900; color: #1a253c; letter-spacing: 0.5px; text-transform: uppercase; border-top: 2px solid ${accentColor}; border-bottom: 2px solid ${accentColor};">UNIT PRICE</th>
+          <th style="width: 140px; text-align: right; padding: 7px 8px; font-size: 11.5px; font-weight: 900; color: #1a253c; letter-spacing: 0.5px; text-transform: uppercase; border-top: 2px solid ${accentColor}; border-bottom: 2px solid ${accentColor};">AMOUNT</th>
           ` : ''}
         </tr>
       </thead>
@@ -481,14 +481,14 @@ export function generateInvoice1HTML(data: QuotationData): string {
     </table>
 
     <!-- Bottom Section: Thank You, Terms & Bank on Left | Totals & Signature on Right -->
-    <div class="bottom-layout">
+    <div class="bottom-layout" style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 14px; gap: 16px;">
       <!-- Left: Thank you, Terms, Bank -->
-      <div class="bottom-left">
-        <div class="thankyou-text">Thank you</div>
-        <div class="terms-box">
-          <div class="terms-title">TERMS & CONDITIONS</div>
+      <div class="bottom-left" style="flex: 1; max-width: 440px;">
+        <div class="thankyou-text" style="font-family: 'Dancing Script', 'Brush Script MT', cursive; font-size: 40px; font-weight: bold; color: #1a253c; line-height: 1; margin-bottom: 6px;">Thank you</div>
+        <div class="terms-box" style="border-left: 3px solid ${accentColor}; padding-left: 10px; font-size: 10.5px; line-height: 1.4; color: #4b5563;">
+          <div class="terms-title" style="font-size: 11px; font-weight: 900; color: ${accentColor}; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px;">TERMS & CONDITIONS</div>
           ${termsListHtml}
-          <div class="bank-info">
+          <div class="bank-info" style="margin-top: 6px; color: #374151; font-size: 10px; line-height: 1.4;">
             <div><strong>${bankName}</strong></div>
             <div>Account Number: <strong>${bankAccount}</strong> · IFSC: <strong>${bankIfsc}</strong></div>
           </div>
@@ -496,34 +496,34 @@ export function generateInvoice1HTML(data: QuotationData): string {
       </div>
 
       <!-- Right: Totals & Authorized Signature -->
-      <div class="bottom-right">
-        <table class="totals-wrap">
+      <div class="bottom-right" style="width: 280px; text-align: right;">
+        <table class="totals-wrap" style="width: 100%; border-collapse: collapse; font-size: 12px;">
           ${(!allPricesHidden || data.discount > 0) ? `
           <tr>
-            <td style="font-weight: 600; color: #4b5563;">${allPricesHidden ? 'Package Value' : 'Subtotal'}</td>
-            <td style="text-align: right; font-weight: 700; color: #111;">
+            <td style="padding: 4px 6px; font-weight: 600; color: #4b5563;">${allPricesHidden ? 'Package Value' : 'Subtotal'}</td>
+            <td style="padding: 4px 6px; text-align: right; font-weight: 700; color: #111;">
               ₹${data.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </td>
           </tr>
           ` : ''}
           ${data.discount > 0 ? `
           <tr>
-            <td style="font-weight: 600; color: #4b5563;">Discount</td>
-            <td style="text-align: right; font-weight: 700; color: ${accentColor};">
+            <td style="padding: 4px 6px; font-weight: 600; color: #4b5563;">Discount</td>
+            <td style="padding: 4px 6px; text-align: right; font-weight: 700; color: ${accentColor};">
               -₹${data.discount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </td>
           </tr>
           ` : ''}
           <tr style="border-top: 1.5px solid #d1d5db;">
-            <td class="totals-total">TOTAL</td>
-            <td class="totals-total" style="text-align: right;">
+            <td class="totals-total" style="padding: 6px 6px 4px 6px; font-size: 16px; font-weight: 900; color: #1a253c;">TOTAL</td>
+            <td class="totals-total" style="padding: 6px 6px 4px 6px; text-align: right; font-size: 16px; font-weight: 900; color: #1a253c;">
               ₹${data.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </td>
           </tr>
         </table>
 
         <!-- Authorized Signature -->
-        <div class="signature-wrap">
+        <div class="signature-wrap" style="margin-top: 12px; text-align: right;">
           <div style="display: inline-block; text-align: center; min-width: 150px;">
             <img src="${resolvedSignature}" alt="Authorized Signature" style="height: 40px; max-width: 150px; object-fit: contain; display: block; margin: 0 auto 3px auto;" />
             <div style="font-size: 10px; color: #4b5563; font-weight: 700; border-top: 1.5px solid #d1d5db; padding-top: 3px; letter-spacing: 0.5px; text-transform: uppercase;">

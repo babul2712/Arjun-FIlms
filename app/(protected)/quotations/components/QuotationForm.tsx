@@ -1,22 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  User, 
-  Calendar, 
-  MapPin, 
-  Plus, 
-  Trash2, 
-  Eye, 
+import {
+  User,
+  Calendar,
+  MapPin,
+  Plus,
+  Trash2,
+  Eye,
   EyeOff,
-  Printer, 
-  Link as LinkIcon, 
-  LayoutTemplate, 
-  CheckCircle2, 
-  Sparkles, 
-  FileText, 
-  X, 
-  Briefcase, 
+  Printer,
+  Link as LinkIcon,
+  LayoutTemplate,
+  CheckCircle2,
+  Sparkles,
+  FileText,
+  X,
+  Briefcase,
   Building,
   Check
 } from 'lucide-react';
@@ -46,7 +46,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
     termsConditions: initialData?.termsConditions || 'Standard terms apply.'
   });
   const [services, setServices] = useState(
-    initialData?.services 
+    initialData?.services
       ? initialData.services.map((s: any) => ({ ...s, id: s._id || s.id || Math.random().toString(), hidePrice: Boolean(s.hidePrice) }))
       : [{ id: '1', name: '', description: '', quantity: 1, price: 0, hidePrice: false }]
   );
@@ -55,7 +55,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
   const [isCustomEvent, setIsCustomEvent] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>(projectId || initialData?.projectId || '');
-  
+
   // Quick Create Project Case Modal State
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
   const [projectModalName, setProjectModalName] = useState('');
@@ -101,7 +101,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          
+
           if (!parsed.sectionsOrder) parsed.sectionsOrder = ['header', 'client', 'services', 'payment', 'terms', 'footer'];
           if (!parsed.pageBgColor) parsed.pageBgColor = "#fdf6f6";
           if (!parsed.headerBgColor) parsed.headerBgColor = "#fef2f2";
@@ -327,9 +327,10 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
   const handleGeneratePDF = async () => {
     const html = generateHTML();
     let iframe: HTMLIFrameElement | null = null;
+    const injectedNodes: HTMLElement[] = [];
     try {
       const html2pdf = (await import('html2pdf.js')).default;
-      
+
       iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
       iframe.style.left = '0';
@@ -376,10 +377,22 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       await new Promise(resolve => setTimeout(resolve, 300));
 
       const targetElement = (doc.querySelector('.invoice-container, .invoice-card, .container') as HTMLElement) || doc.body;
+
+      // Copy all styles and stylesheets into host document head AND targetElement
+      // so when html2pdf clones elements into document.body, all CSS styles apply perfectly!
+      const docStyles = Array.from(doc.querySelectorAll('style, link[rel="stylesheet"]'));
+      docStyles.forEach(s => {
+        const topClone = s.cloneNode(true) as HTMLElement;
+        document.head.appendChild(topClone);
+        injectedNodes.push(topClone);
+        targetElement.insertBefore(s.cloneNode(true), targetElement.firstChild);
+      });
+
       if (targetElement && targetElement !== doc.body) {
         targetElement.style.margin = '0 auto';
         targetElement.style.boxShadow = 'none';
         targetElement.style.border = 'none';
+        targetElement.style.backgroundColor = '#ffffff';
       }
 
       const clientName = (formData.customerName || 'Client').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -406,6 +419,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF');
     } finally {
+      injectedNodes.forEach(n => {
+        if (n.parentNode) n.parentNode.removeChild(n);
+      });
       if (iframe && iframe.parentNode) {
         iframe.parentNode.removeChild(iframe);
       }
@@ -418,7 +434,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full pb-12 font-sans text-[13px] text-gray-800 dark:text-gray-100">
       {/* Form Area */}
       <div className="lg:col-span-8 space-y-6">
-        
+
         {/* Template Style Selector */}
         <div className="glass-card p-5 bg-white border border-[#fee2e2] rounded-2xl space-y-3 shadow-xs">
           <div className="flex items-center justify-between border-b border-gray-100 pb-2">
@@ -442,18 +458,16 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                     setSelectedTemplate(tmpl.id);
                     toast.success(`Switched to ${tmpl.name}`);
                   }}
-                  className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
-                    isSelected 
-                      ? 'border-[#e50914] bg-[#fef2f2]/60 shadow-xs' 
-                      : 'border-gray-200/70 hover:border-gray-300 bg-white hover:bg-gray-50/50'
-                  }`}
+                  className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${isSelected
+                    ? 'border-[#e50914] bg-[#fef2f2]/60 shadow-xs'
+                    : 'border-gray-200/70 hover:border-gray-300 bg-white hover:bg-gray-50/50'
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <div>
                       <span className="font-extrabold text-[13px] text-gray-900 block">{tmpl.name}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md inline-block mt-1 ${
-                        isSelected ? 'bg-[#e50914] text-white' : 'bg-gray-100 text-gray-600'
-                      }`}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md inline-block mt-1 ${isSelected ? 'bg-[#e50914] text-white' : 'bg-gray-100 text-gray-600'
+                        }`}>
                         {tmpl.badge}
                       </span>
                     </div>
@@ -479,9 +493,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Full Name</label>
-              <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
-                placeholder="e.g. Alexandra Vane" 
+              <input
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]"
+                placeholder="e.g. Alexandra Vane"
                 value={formData.customerName}
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
                 type="text"
@@ -489,9 +503,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             </div>
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Phone Number</label>
-              <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
-                placeholder="+91 90000 00000" 
+              <input
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]"
+                placeholder="+91 90000 00000"
                 value={formData.phone}
                 onChange={e => setFormData({ ...formData, phone: e.target.value })}
                 type="tel"
@@ -499,9 +513,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             </div>
             <div className="flex flex-col md:col-span-2">
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Email Address</label>
-              <input 
-                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]" 
-                placeholder="alex@example.com" 
+              <input
+                className="bg-transparent border-b border-gray-300 py-2 focus:outline-none focus:border-[#e50914] text-[15px]"
+                placeholder="alex@example.com"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
                 type="email"
@@ -518,7 +532,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <EventTypeSelect 
+              <EventTypeSelect
                 label="Event Ceremony / Type"
                 value={formData.eventType}
                 onChange={(val) => setFormData({ ...formData, eventType: val })}
@@ -527,8 +541,8 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             </div>
             <div className="flex flex-col">
               <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Event Date</label>
-              <input 
-                className="w-full bg-gray-50/80 border border-gray-200/80 rounded-2xl py-3 px-3.5 focus:outline-none focus:border-[#e50914] text-[13px] font-semibold" 
+              <input
+                className="w-full bg-gray-50/80 border border-gray-200/80 rounded-2xl py-3 px-3.5 focus:outline-none focus:border-[#e50914] text-[13px] font-semibold"
                 type="date"
                 value={formData.bookingDate}
                 onChange={e => setFormData({ ...formData, bookingDate: e.target.value })}
@@ -654,11 +668,10 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                     setServices((prev: any[]) => prev.map(s => ({ ...s, hidePrice: false })));
                     toast.info('All sub-prices will be shown in proposal');
                   }}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    !hideItemPrices && !services.some((s: any) => s.hidePrice)
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs' 
-                      : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
-                  }`}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${!hideItemPrices && !services.some((s: any) => s.hidePrice)
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                    }`}
                   title="Show itemized rates for all services"
                 >
                   <Eye className="w-3.5 h-3.5 text-emerald-600" />
@@ -672,11 +685,10 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                     setServices((prev: any[]) => prev.map(s => ({ ...s, hidePrice: true })));
                     toast.success('All sub-prices hidden in proposal (Package Total only)');
                   }}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    hideItemPrices || (services.length > 0 && services.every((s: any) => s.hidePrice))
-                      ? 'bg-[#e50914] text-white shadow-xs' 
-                      : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
-                  }`}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${hideItemPrices || (services.length > 0 && services.every((s: any) => s.hidePrice))
+                    ? 'bg-[#e50914] text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                    }`}
                   title="Hide individual sub-prices and directly display total in proposal"
                 >
                   <EyeOff className="w-3.5 h-3.5" />
@@ -684,7 +696,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                 </button>
               </div>
 
-              <button 
+              <button
                 onClick={handleAddService}
                 className="flex items-center gap-1 text-[#e50914] hover:bg-[#e50914]/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-bold text-[12px]"
               >
@@ -707,13 +719,12 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
             {services.map((service: any, index: number) => {
               const isHidden = hideItemPrices || Boolean(service.hidePrice);
               return (
-                <div 
-                  key={service.id} 
-                  className={`p-4 rounded-xl border relative space-y-3 transition-all ${
-                    isHidden 
-                      ? 'bg-amber-50/15 border-amber-200/80 shadow-2xs hover:border-amber-300' 
-                      : 'bg-gray-50/80 border-gray-200/60 hover:border-gray-300'
-                  }`}
+                <div
+                  key={service.id}
+                  className={`p-4 rounded-xl border relative space-y-3 transition-all ${isHidden
+                    ? 'bg-amber-50/15 border-amber-200/80 shadow-2xs hover:border-amber-300'
+                    : 'bg-gray-50/80 border-gray-200/60 hover:border-gray-300'
+                    }`}
                 >
                   <div className="grid grid-cols-12 gap-4 items-end">
                     <div className="col-span-12 md:col-span-5 flex flex-col">
@@ -739,8 +750,8 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                     </div>
                     <div className="col-span-4 md:col-span-2 flex flex-col">
                       <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Qty</label>
-                      <input 
-                        className="w-full bg-white dark:bg-[#16181c] border border-gray-200/80 rounded-2xl py-3 px-3.5 focus:outline-none focus:border-[#e50914] text-[13px] font-semibold" 
+                      <input
+                        className="w-full bg-white dark:bg-[#16181c] border border-gray-200/80 rounded-2xl py-3 px-3.5 focus:outline-none focus:border-[#e50914] text-[13px] font-semibold"
                         type="number"
                         min="1"
                         value={service.quantity}
@@ -758,16 +769,15 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                           onClick={() => {
                             const nextHide = !Boolean(service.hidePrice);
                             handleServiceChange(service.id, 'hidePrice', nextHide);
-                            toast(nextHide 
-                              ? `Price hidden in PDF for "${service.name || 'Service Item'}" (Included in package)` 
+                            toast(nextHide
+                              ? `Price hidden in PDF for "${service.name || 'Service Item'}" (Included in package)`
                               : `Price visible in PDF for "${service.name || 'Service Item'}"`
                             );
                           }}
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                            isHidden
-                              ? 'bg-red-50 text-[#e50914] border border-red-200 hover:bg-red-100 shadow-2xs'
-                              : 'bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200 hover:bg-gray-200'
-                          }`}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${isHidden
+                            ? 'bg-red-50 text-[#e50914] border border-red-200 hover:bg-red-100 shadow-2xs'
+                            : 'bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200 hover:bg-gray-200'
+                            }`}
                           title={isHidden ? "Price is hidden in PDF (Click to make visible)" : "Hide price in PDF for this individual service"}
                         >
                           {isHidden ? (
@@ -783,34 +793,33 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                           )}
                         </button>
                       </div>
-                      <input 
-                        className="w-full bg-white dark:bg-[#16181c] border border-gray-200/80 rounded-2xl py-3 px-3.5 focus:outline-none focus:border-[#e50914] text-[13px] font-semibold" 
+                      <input
+                        className="w-full bg-white dark:bg-[#16181c] border border-gray-200/80 rounded-2xl py-3 px-3.5 focus:outline-none focus:border-[#e50914] text-[13px] font-semibold"
                         type="number"
                         value={service.price}
                         onChange={e => handleServiceChange(service.id, 'price', parseFloat(e.target.value) || 0)}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-1 flex items-center justify-end pb-1.5 gap-1">
-                      <button 
+                      <button
                         type="button"
                         onClick={() => {
                           const nextHide = !Boolean(service.hidePrice);
                           handleServiceChange(service.id, 'hidePrice', nextHide);
-                          toast(nextHide 
-                            ? `Price hidden in PDF for "${service.name || 'Service Item'}"` 
+                          toast(nextHide
+                            ? `Price hidden in PDF for "${service.name || 'Service Item'}"`
                             : `Price visible in PDF for "${service.name || 'Service Item'}"`
                           );
                         }}
-                        className={`p-2.5 rounded-xl transition-colors cursor-pointer ${
-                          isHidden
-                            ? 'text-[#e50914] bg-red-50 hover:bg-red-100 border border-red-200'
-                            : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent'
-                        }`}
+                        className={`p-2.5 rounded-xl transition-colors cursor-pointer ${isHidden
+                          ? 'text-[#e50914] bg-red-50 hover:bg-red-100 border border-red-200'
+                          : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent'
+                          }`}
                         title={isHidden ? "Price is hidden in PDF (Click to show)" : "Hide price in PDF for this item"}
                       >
                         {isHidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleRemoveService(service.id)}
                         disabled={services.length === 1}
                         className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors cursor-pointer disabled:opacity-30 disabled:hover:bg-transparent"
@@ -839,9 +848,9 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                         Supports multiple lines & bullet lists (Press Enter for new line)
                       </span>
                     </div>
-                    <textarea 
-                      className="w-full bg-white dark:bg-[#16181c] border border-gray-200/90 dark:border-gray-700/80 rounded-xl p-3 focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-red-500/20 text-[12.5px] text-gray-700 dark:text-gray-200 transition-all resize-y min-h-[72px] font-normal leading-relaxed placeholder:text-gray-400/70 shadow-2xs" 
-                      placeholder="e.g.&#10;• 1 Traditional Video 4K Ultra HD&#10;• 1 Cinematic Highlight Teaser (3-5 mins)&#10;• Full Raw Footage delivered on Cloud Drive&#10;• 2 Candid Photographers + 2 Cinematographers" 
+                    <textarea
+                      className="w-full bg-white dark:bg-[#16181c] border border-gray-200/90 dark:border-gray-700/80 rounded-xl p-3 focus:outline-none focus:border-[#e50914] focus:ring-1 focus:ring-red-500/20 text-[12.5px] text-gray-700 dark:text-gray-200 transition-all resize-y min-h-[72px] font-normal leading-relaxed placeholder:text-gray-400/70 shadow-2xs"
+                      placeholder="e.g.&#10;• 1 Traditional Video 4K Ultra HD&#10;• 1 Cinematic Highlight Teaser (3-5 mins)&#10;• Full Raw Footage delivered on Cloud Drive&#10;• 2 Candid Photographers + 2 Cinematographers"
                       value={service.description || ''}
                       onChange={e => handleServiceChange(service.id, 'description', e.target.value)}
                       rows={3}
@@ -860,7 +869,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
               </div>
               <div className="flex justify-between items-center text-gray-400 text-[12px] uppercase tracking-wider">
                 <span>Retainer Discount</span>
-                <input 
+                <input
                   className="w-24 bg-transparent border-b border-gray-300 text-right focus:outline-none focus:border-[#e50914] text-[13px] font-extrabold"
                   value={formData.discount}
                   onChange={e => setFormData({ ...formData, discount: parseInt(e.target.value) || 0 })}
@@ -881,7 +890,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       <div className="lg:col-span-4">
         <div className="glass-card p-6 bg-white border border-gray-200/50 rounded-2xl space-y-4 shadow-sm sticky top-28">
           <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-2">Proposal Actions</h3>
-          
+
           {/* Pricing Visibility Setting */}
           <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200/80 space-y-2.5">
             <div className="flex items-center justify-between">
@@ -889,27 +898,26 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                 {hideItemPrices || services.some((s: any) => s.hidePrice) ? <EyeOff className="w-3.5 h-3.5 text-[#e50914]" /> : <Eye className="w-3.5 h-3.5 text-emerald-600" />}
                 Pricing in Proposal
               </span>
-              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
-                hideItemPrices 
-                  ? 'bg-red-100 text-[#e50914]' 
-                  : services.some((s: any) => s.hidePrice)
+              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${hideItemPrices
+                ? 'bg-red-100 text-[#e50914]'
+                : services.some((s: any) => s.hidePrice)
                   ? 'bg-amber-100 text-amber-800'
                   : 'bg-emerald-100 text-emerald-700'
-              }`}>
-                {hideItemPrices 
-                  ? 'Direct Total' 
+                }`}>
+                {hideItemPrices
+                  ? 'Direct Total'
                   : services.some((s: any) => s.hidePrice)
-                  ? `${services.filter((s: any) => s.hidePrice).length} Hidden`
-                  : 'Itemized'}
+                    ? `${services.filter((s: any) => s.hidePrice).length} Hidden`
+                    : 'Itemized'}
               </span>
             </div>
-            
+
             <p className="text-[11px] text-gray-500 leading-snug">
-              {hideItemPrices 
-                ? 'All sub-prices hidden. Proposal displays deliverables & direct grand total.' 
+              {hideItemPrices
+                ? 'All sub-prices hidden. Proposal displays deliverables & direct grand total.'
                 : services.some((s: any) => s.hidePrice)
-                ? `${services.filter((s: any) => s.hidePrice).length} of ${services.length} items hidden in proposal (marked as Included).`
-                : 'Individual line item rates & sub-prices are visible in proposal.'}
+                  ? `${services.filter((s: any) => s.hidePrice).length} of ${services.length} items hidden in proposal (marked as Included).`
+                  : 'Individual line item rates & sub-prices are visible in proposal.'}
             </p>
 
             <button
@@ -924,11 +932,10 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
                 }
                 toast(nextState ? 'All sub-prices hidden in PDF (Package Total only)' : 'All sub-prices will be shown in PDF');
               }}
-              className={`w-full py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                hideItemPrices || (services.length > 0 && services.every((s: any) => s.hidePrice))
-                  ? 'bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 shadow-2xs'
-                  : 'bg-[#fee2e2] text-[#e50914] hover:bg-[#fecaca]'
-              }`}
+              className={`w-full py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${hideItemPrices || (services.length > 0 && services.every((s: any) => s.hidePrice))
+                ? 'bg-white border border-gray-300 text-gray-800 hover:bg-gray-50 shadow-2xs'
+                : 'bg-[#fee2e2] text-[#e50914] hover:bg-[#fecaca]'
+                }`}
             >
               {hideItemPrices || (services.length > 0 && services.every((s: any) => s.hidePrice)) ? (
                 <>
@@ -945,15 +952,15 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
           </div>
 
           <div className="space-y-3 pt-1">
-            <button 
-              onClick={handleSave} 
+            <button
+              onClick={handleSave}
               disabled={loading}
               className="w-full flex items-center justify-center bg-[#e50914] hover:bg-red-700 text-white py-3.5 rounded-xl transition-all font-bold text-[14px] shadow-lg shadow-red-500/20 cursor-pointer disabled:opacity-50"
             >
               {loading ? 'Saving...' : quotationId ? 'Save Changes' : 'Generate Quotation'}
             </button>
-            
-            <button 
+
+            <button
               onClick={handlePreview}
               className="w-full flex items-center justify-center gap-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 py-3 rounded-xl transition-all font-bold text-[13px] cursor-pointer shadow-sm"
             >
@@ -961,7 +968,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
               Preview Quotation
             </button>
 
-            <button 
+            <button
               onClick={handleGeneratePDFButton}
               className="w-full flex items-center justify-center gap-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 py-3 rounded-xl transition-all font-bold text-[13px] cursor-pointer shadow-sm"
             >
@@ -969,7 +976,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
               Download PDF Proposal
             </button>
 
-            <button 
+            <button
               onClick={handleCopyPaymentLink}
               className="w-full flex items-center justify-center gap-1 bg-white border border-gray-200 hover:bg-gray-50 text-[#e50914] py-3 rounded-xl transition-all font-bold text-[13px] cursor-pointer shadow-sm"
             >
@@ -983,7 +990,7 @@ export default function QuotationForm({ initialData, quotationId, projectId }: {
       {/* Quick Create Project Case Modal */}
       {isCreateProjectModalOpen && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div 
+          <div
             className="relative w-full max-w-xl bg-white dark:bg-[#181a20] border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-7 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
